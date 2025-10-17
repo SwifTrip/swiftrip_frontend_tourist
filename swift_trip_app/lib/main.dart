@@ -11,7 +11,7 @@ class SwifTripTouristApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'SwifTrip Tourist ',
-      home: customBar()
+      home: customBar(selectedIndex: 3),
     );
   }
 }

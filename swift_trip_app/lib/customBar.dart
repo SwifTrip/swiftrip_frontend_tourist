@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class customBar extends StatelessWidget {
-  int selectedIndex = 0;
+  final int selectedIndex ;
+
+  customBar({required this.selectedIndex});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
