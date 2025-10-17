@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swift_trip_app/customBar.dart';
 
 void main() {
   runApp(SwifTripTouristApp());
@@ -10,7 +11,7 @@ class SwifTripTouristApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'SwifTrip Tourist ',
-      theme: ThemeData(primarySwatch: Colors.teal, fontFamily: 'Roboto'),
+      home: customBar()
     );
   }
 }
