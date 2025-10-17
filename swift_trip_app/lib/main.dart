@@ -9,8 +9,9 @@ class SwifTripTouristApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SwifTrip Tourist',
+      title: 'SwifTrip Tourist App',
       theme: ThemeData(primarySwatch: Colors.teal, fontFamily: 'Roboto'),
+
     );
   }
 }
