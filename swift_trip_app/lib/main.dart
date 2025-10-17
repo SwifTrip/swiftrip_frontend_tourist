@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:swift_trip_app/customBar.dart';
+import 'package:swift_trip_app/screens/customBar.dart';
 
 void main() {
   runApp(SwifTripTouristApp());
