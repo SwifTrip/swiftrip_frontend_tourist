@@ -1,16 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:swift_trip_app/screens/signin.dart';
 
 void main() {
-  runApp(SwifTripTouristApp());
+  runApp(Signin());
 }
 
-class SwifTripTouristApp extends StatelessWidget {
-  const SwifTripTouristApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'SwifTrip Tourist ',
-      theme: ThemeData(primarySwatch: Colors.teal, fontFamily: 'Roboto'),
-    );
-  }
-}
+

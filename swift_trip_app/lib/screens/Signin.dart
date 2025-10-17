@@ -11,6 +11,20 @@ class Signin extends StatefulWidget {
 class SigninState extends State<Signin> {
   @override
   Widget build(context) {
-    return Text("Testing Signin Class");
+    return MaterialApp(
+      title: 'SwifTrip Tourist ',
+      theme: ThemeData(
+        primarySwatch: Colors.teal, 
+        fontFamily: 'Roboto'
+        ),
+      home: Scaffold(
+        body: SafeArea(
+            child: Text(
+                "Testing Signin Class"
+                ),
+            ),
+      )
+    );
+    
   }
 }
