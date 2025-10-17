@@ -36,6 +36,19 @@ class customBar extends StatelessWidget {
                   ),
                 ],
               ),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    buttonBuild("Destination"),
+                    buttonBuild("Agency"),
+                    buttonBuild("Planning"),
+                    buttonBuild("Summary"),
+                    buttonBuild("Payment"),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -43,5 +56,10 @@ class customBar extends StatelessWidget {
     );
   }
 
-  
+  Widget buttonBuild(String title) {
+    return TextButton(
+      onPressed: () {},
+      child: Text(title, style: TextStyle(color: Colors.black, fontSize: 16)),
+    );
+  }
 }
