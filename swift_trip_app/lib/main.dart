@@ -11,7 +11,6 @@ class SwifTripTouristApp extends StatelessWidget {
     return MaterialApp(
       title: 'SwifTrip Tourist App',
       theme: ThemeData(primarySwatch: Colors.teal, fontFamily: 'Roboto'),
-
     );
   }
 }
