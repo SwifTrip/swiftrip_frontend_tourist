@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swift_trip_app/screens/Destination.dart';
 import 'package:swift_trip_app/screens/customBar.dart';
 
 void main() {
@@ -11,7 +12,7 @@ class SwifTripTouristApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'SwifTrip Tourist ',
-      home: customBar(selectedIndex: 3),
+      home: DestinationScreen(),
     );
   }
 }
