@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class customBar extends StatelessWidget {
+  int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,11 +42,11 @@ class customBar extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    buttonBuild("Destination"),
-                    buttonBuild("Agency"),
-                    buttonBuild("Planning"),
-                    buttonBuild("Summary"),
-                    buttonBuild("Payment"),
+                    buttonBuild(0,"Destination"),
+                    buttonBuild(1,"Agency"),
+                    buttonBuild(2,"Planning"),
+                    buttonBuild(3,"Summary"),
+                    buttonBuild(4,"Payment"),
                   ],
                 ),
               ),
@@ -56,10 +57,11 @@ class customBar extends StatelessWidget {
     );
   }
 
-  Widget buttonBuild(String title) {
+  Widget buttonBuild(int index,String title) {
+    bool isSelected = index == selectedIndex;
     return TextButton(
       onPressed: () {},
-      child: Text(title, style: TextStyle(color: Colors.black, fontSize: 16)),
+      child: Text(title, style: TextStyle(color: isSelected ? Colors.blue : Colors.black, fontSize: 16)),
     );
   }
 }
