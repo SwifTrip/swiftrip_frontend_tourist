@@ -7,6 +7,10 @@ class DestinationScreen extends StatefulWidget {
 }
 
 class _DestinationScreenState extends State<DestinationScreen> {
+  final List<String> cities = ["Islamabad", "Lahore", "Karachi", "Peshawar"];
+  String fromCity = "";
+  String toCity = "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,16 +37,18 @@ class _DestinationScreenState extends State<DestinationScreen> {
             ),
             Card(
               margin: EdgeInsets.symmetric(horizontal: 20),
-                child: Padding(
-                  padding: const EdgeInsets.all(15),
-                  child: Column(
-                    children: [
-                      _labelbuild("Departure City"),
-                      _labelbuild("Arrival City"),
-                    ],
-                  ),
+              child: Padding(
+                padding: const EdgeInsets.all(15),
+                child: Column(
+                  children: [
+                    _labelbuild("Departure City"),
+                    _dropdownbuild("Departure City"),
+                    _labelbuild("Arrival City"),
+                    _dropdownbuild("Arrival City"),
+                  ],
                 ),
-              )
+              ),
+            ),
           ],
         ),
       ),
@@ -54,10 +60,40 @@ class _DestinationScreenState extends State<DestinationScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Row(
         children: [
-          Icon(Icons.place, color: title == "Departure City" ? Colors.blue : Colors.green),
+          Icon(
+            Icons.place,
+            color: title == "Departure City" ? Colors.blue : Colors.green,
+          ),
           Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
+    );
+  }
+
+  Widget _dropdownbuild(String city) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+      child: DropdownButtonFormField(
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Color(0xffF9FAFB),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: BorderSide(color: Colors.blueAccent, width: 2),
+          ),
+          hintText: city,
+        ),
+        items: cities.map((value) {
+          return DropdownMenuItem(value: value, child: Text(value));
+        }).toList(),
+        onChanged: (value) {
+            if (city == "Arrival City") {
+              toCity = value.toString();
+            } else {
+              fromCity = value.toString();
+            }
+          })
     );
   }
 }
