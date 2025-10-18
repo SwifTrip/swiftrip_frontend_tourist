@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:swift_trip_app/screens/customBar.dart';
 
-
 class DestinationScreen extends StatefulWidget {
   @override
   _DestinationScreenState createState() => _DestinationScreenState();
@@ -16,7 +15,21 @@ class _DestinationScreenState extends State<DestinationScreen> {
         child: customBar(selectedIndex: 0),
       ),
       body: Center(
-        child: Text("Destination Screen"),
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(top: 20),
+              child: Text("Select Your Journey", style: TextStyle(fontSize: 18)),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 20, bottom: 15),
+              child: Text(
+                "Choose your departure and arrival cities",
+                style: TextStyle(fontSize: 15),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
