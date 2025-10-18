@@ -19,8 +19,44 @@ class SigninState extends State<Signin> {
         ),
       home: Scaffold(
         body: SafeArea(
-            child: Text(
-                "Testing Signin Class"
+            child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 48),
+
+                    // Logo
+                    Image.asset(
+                      'assets/logo.png', // export your Figma logo here
+                      height: 80,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // App name
+                    const Text(
+                      'SwifTrip',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF111827),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+
+                    // Tagline
+                    const Text(
+                      'Plan Smarter. Travel Better.',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF6B7280),
+                      ),
+                    ),
+
+                    const SizedBox(height: 32),
+                  ],
+                ),
                 ),
             ),
       )
