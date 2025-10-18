@@ -14,7 +14,7 @@ class SigninState extends State<Signin> {
     return MaterialApp(
       title: 'SwifTrip Tourist ',
       theme: ThemeData(
-        primarySwatch: Colors.teal, 
+        primarySwatch: Colors.teal,
         fontFamily: 'Roboto'
         ),
       home: Scaffold(
