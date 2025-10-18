@@ -51,7 +51,7 @@ class customBar extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Text("  Step ${selectedIndex} of 5"),
+                  Text("Step $selectedIndex of 5"),
                 ],
               ),
             ),

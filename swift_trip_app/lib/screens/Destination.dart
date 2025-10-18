@@ -49,6 +49,24 @@ class _DestinationScreenState extends State<DestinationScreen> {
                 ),
               ),
             ),
+            Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: ElevatedButton(
+                      onPressed: () {
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.blueAccent,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 120,
+                          vertical: 15,
+                        ),
+                        child: Text("Continue", style: TextStyle()),
+                      ),
+                    ),
+                  ),
           ],
         ),
       ),
