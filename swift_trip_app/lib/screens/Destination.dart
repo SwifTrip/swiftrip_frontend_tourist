@@ -15,8 +15,8 @@ class _DestinationScreenState extends State<DestinationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(100),
-        child: customBar(selectedIndex: 0),
+        preferredSize: Size.fromHeight(130),
+        child: customBar(selectedIndex: 1),
       ),
       body: Center(
         child: Column(

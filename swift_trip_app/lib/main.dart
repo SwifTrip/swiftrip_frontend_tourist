@@ -13,6 +13,9 @@ class SwifTripTouristApp extends StatelessWidget {
     return MaterialApp(
       title: 'SwifTrip Tourist ',
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+          scaffoldBackgroundColor: Color(0xFFDFF2FE),
+          ),
       home: DestinationScreen(),
     );
   }
