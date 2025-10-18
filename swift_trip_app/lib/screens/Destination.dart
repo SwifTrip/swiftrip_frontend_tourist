@@ -19,7 +19,10 @@ class _DestinationScreenState extends State<DestinationScreen> {
           children: [
             Padding(
               padding: EdgeInsets.only(top: 20),
-              child: Text("Select Your Journey", style: TextStyle(fontSize: 18)),
+              child: Text(
+                "Select Your Journey",
+                style: TextStyle(fontSize: 18),
+              ),
             ),
             Padding(
               padding: EdgeInsets.only(top: 20, bottom: 15),
@@ -28,8 +31,32 @@ class _DestinationScreenState extends State<DestinationScreen> {
                 style: TextStyle(fontSize: 15),
               ),
             ),
+            Card(
+              margin: EdgeInsets.symmetric(horizontal: 20),
+                child: Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Column(
+                    children: [
+                      _labelbuild("Departure City"),
+                      _labelbuild("Arrival City"),
+                    ],
+                  ),
+                ),
+              )
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _labelbuild(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Row(
+        children: [
+          Icon(Icons.place, color: title == "Departure City" ? Colors.blue : Colors.green),
+          Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+        ],
       ),
     );
   }
