@@ -12,6 +12,7 @@ class SwifTripTouristApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'SwifTrip Tourist ',
+      debugShowCheckedModeBanner: false,
       home: DestinationScreen(),
     );
   }
