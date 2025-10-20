@@ -57,8 +57,8 @@ class SigninState extends State<Signin> {
                     const SizedBox(height: 32),
 
                     Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-                      padding: const EdgeInsets.all(24),
+                      margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 32),
+                      padding: const EdgeInsets.all(30),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
@@ -150,6 +150,20 @@ class SigninState extends State<Signin> {
                         ],
                       ),
                     ),
+
+                    // Divider with text
+                    Row(
+                      children: const [
+                        Expanded(child: Divider()),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8),
+                          child: Text('Or continue with'),
+                        ),
+                        Expanded(child: Divider()),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
 
                                       
                   ],
