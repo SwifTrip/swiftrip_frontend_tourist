@@ -117,6 +117,20 @@ class SigninState extends State<Signin> {
                       ),
                     ),
 
+                    const SizedBox(height: 12),
+
+                    // Forgot password
+                          Align(
+                            alignment: Alignment.center,
+                            child: Text(
+                              'Forgot Password?',
+                              style: TextStyle(
+                                fontSize: 14, 
+                                color: Color(0xFF3B82F6),
+                                ),
+                            ),
+                          ),
+
                     
                   ],
                 ),
