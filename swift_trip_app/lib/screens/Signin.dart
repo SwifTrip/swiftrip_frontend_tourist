@@ -28,7 +28,7 @@ class SigninState extends State<Signin> {
 
                     // Logo
                     Image.asset(
-                      'assets/logo.png', // export your Figma logo here
+                      'assets/logo.png', 
                       height: 80,
                     ),
                     const SizedBox(height: 16),
