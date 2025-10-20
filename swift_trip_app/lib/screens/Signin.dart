@@ -165,6 +165,41 @@ class SigninState extends State<Signin> {
 
                     const SizedBox(height: 16),
 
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            icon: Icon(Icons.g_mobiledata, color: Colors.red), 
+                            label: const Text('Google'),
+                            onPressed: () {},
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              side: const BorderSide(color: Color(0xFFD1D5DB)), 
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 20), // spacing between buttons
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            icon: Icon(Icons.facebook, color: Colors.blue), 
+                            label: const Text('Facebook'),
+                            onPressed: () {},
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              side: const BorderSide(color: Color(0xFFD1D5DB)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                    
+
                                       
                   ],
 
