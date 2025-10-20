@@ -74,6 +74,26 @@ class SigninState extends State<Signin> {
                     ),
                     const SizedBox(height: 16),
 
+                    // Password field
+                          TextField(
+                            obscureText: true,
+                            decoration: InputDecoration(
+                              hintText: 'Enter your password',
+                              filled: true,
+                              fillColor: Color(0xFFF3F4F6),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
+                              ),
+                              border: const OutlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(12)),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+
                     
                   ],
                 ),
