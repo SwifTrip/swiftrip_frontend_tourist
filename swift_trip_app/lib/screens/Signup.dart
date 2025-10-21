@@ -21,7 +21,15 @@ class SignupScreen extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: Container(), 
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          children: [
+            const SizedBox(height: 24),
+
+          ],
+        ),
+      )
     );
   }
 }
