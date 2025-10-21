@@ -68,6 +68,34 @@ class SignupScreen extends StatelessWidget {
                     obscureText: true,
                   ),
                   const SizedBox(height: 16),
+
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: Color(0xFFE5E5E5)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        icon: Icon(Icons.language),
+                      ),
+                      hint: const Text(
+                        'Select your language',
+                        style: TextStyle(color: Color(0xFFA1A1A1)),
+                      ),
+                      items: const [
+                        DropdownMenuItem(value: 'en', child: Text('English')),
+                        DropdownMenuItem(value: 'ur', child: Text('Urdu')),
+                        DropdownMenuItem(value: 'ar', child: Text('Arabic')),
+                      ],
+                      onChanged: (value) {},
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
                 ],
               ),
             )
