@@ -41,7 +41,22 @@ class SignupScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  
+                  const CustomInputField(
+                    icon: Icons.person_outline,
+                    hintText: 'Enter your full name',
+                  ),
+                  const SizedBox(height: 16),
+                  const CustomInputField(
+                    icon: Icons.email_outlined,
+                    hintText: 'Enter your email',
+                  ),
+                  const SizedBox(height: 16),
+                  const CustomInputField(
+                    icon: Icons.phone_outlined,
+                    hintText: 'Enter your phone number',
+                  ),
+                  const SizedBox(height: 16),
+
                 ],
               ),
             )
