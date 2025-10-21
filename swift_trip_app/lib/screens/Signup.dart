@@ -125,6 +125,24 @@ class SignupScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Text(
+                  'Already have an account? ',
+                  style: TextStyle(color: Color(0xFF111827)),
+                ),
+                Text(
+                  'Login',
+                  style: TextStyle(
+                    color: Color(0xFF2563EB),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+
+
           ],
         ),
       )
