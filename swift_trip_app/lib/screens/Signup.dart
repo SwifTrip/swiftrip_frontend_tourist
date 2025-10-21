@@ -56,7 +56,18 @@ class SignupScreen extends StatelessWidget {
                     hintText: 'Enter your phone number',
                   ),
                   const SizedBox(height: 16),
-
+                  const CustomInputField(
+                    icon: Icons.lock_outline,
+                    hintText: 'Create a password',
+                    obscureText: true,
+                  ),
+                  const SizedBox(height: 16),
+                  const CustomInputField(
+                    icon: Icons.lock_outline,
+                    hintText: 'Confirm your password',
+                    obscureText: true,
+                  ),
+                  const SizedBox(height: 16),
                 ],
               ),
             )
