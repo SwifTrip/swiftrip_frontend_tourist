@@ -26,6 +26,25 @@ class SignupScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  
+                ],
+              ),
+            )
 
           ],
         ),
@@ -33,3 +52,44 @@ class SignupScreen extends StatelessWidget {
     );
   }
 }
+
+
+
+
+class CustomInputField extends StatelessWidget {
+  final IconData icon;
+  final String hintText;
+  final bool obscureText;
+
+  const CustomInputField({
+    super.key,
+    required this.icon,
+    required this.hintText,
+    this.obscureText = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        prefixIcon: Icon(icon, color: Color(0xFFA1A1A1)),
+        hintText: hintText,
+        hintStyle: const TextStyle(color: Color(0xFFA1A1A1)),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFE5E5E5)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF2563EB)),
+        ),
+      ),
+    );
+  }
+}
+
+
