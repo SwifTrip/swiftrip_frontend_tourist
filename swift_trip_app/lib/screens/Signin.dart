@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'Signup.dart';
 
 class Signin extends StatefulWidget {
   const Signin({super.key});
@@ -293,18 +294,27 @@ class SigninState extends State<Signin> {
                 const SizedBox(height: 24),
 
                 // Footer
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Text("Don't have an account? "),
-                    Text(
-                      'Sign up',
-                      style: TextStyle(
-                        color: Color(0xFF3B82F6),
-                        fontWeight: FontWeight.w600,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const SignupScreen(),
                       ),
-                    ),
-                  ],
+                    );
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Text("Don't have an account? "),
+                      Text(
+                        'Sign up',
+                        style: TextStyle(
+                          color: Color(0xFF3B82F6),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
