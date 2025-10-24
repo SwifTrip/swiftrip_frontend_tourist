@@ -73,97 +73,266 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ],
                 ),
-                child: Column(
-                  children: [
-                    CustomInputField(
-                      icon: Icons.person_outline,
-                      hintText: 'Enter your first name',
-                      controller: _firstNameController,
-                    ),
-                    const SizedBox(height: 16),
-                    CustomInputField(
-                      icon: Icons.person_outline,
-                      hintText: 'Enter your last name',
-                      controller: _lastNameController,
-                    ),
-                    const SizedBox(height: 16),
-                    CustomInputField(
-                      icon: Icons.email_outlined,
-                      hintText: 'Enter your email',
-                      controller: _emailController,
-                    ),
-                    const SizedBox(height: 16),
-                    const CustomInputField(
-                      icon: Icons.phone_outlined,
-                      hintText: 'Enter your phone number',
-                    ),
-                    const SizedBox(height: 16),
-                    CustomInputField(
-                      icon: Icons.lock_outline,
-                      hintText: 'Create a password',
-                      obscureText: true,
-                      controller: _passwordController,
-                    ),
-                    const SizedBox(height: 16),
-                    CustomInputField(
-                      icon: Icons.lock_outline,
-                      hintText: 'Confirm your password',
-                      obscureText: true,
-                      controller: _confirmPasswordController,
-                    ),
-                    const SizedBox(height: 16),
-
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: Color(0xFFE5E5E5)),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          icon: Icon(Icons.language),
-                        ),
-                        hint: const Text(
-                          'Select your language',
-                          style: TextStyle(color: Color(0xFFA1A1A1)),
-                        ),
-                        items: const [
-                          DropdownMenuItem(value: 'en', child: Text('English')),
-                          DropdownMenuItem(value: 'ur', child: Text('Urdu')),
-                          DropdownMenuItem(value: 'ar', child: Text('Arabic')),
-                        ],
-                        onChanged: (value) {},
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2563EB),
-                          shape: RoundedRectangleBorder(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _firstNameController,
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(
+                            Icons.person_outline,
+                            color: Color(0xFFA1A1A1),
+                          ),
+                          hintText: 'Enter your first name',
+                          hintStyle: const TextStyle(color: Color(0xFFA1A1A1)),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                          enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFE5E5E5),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF2563EB),
+                            ),
                           ),
                         ),
-                        onPressed: () {},
-                        child: const Text(
-                          'Create Account',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'First name is required';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _lastNameController,
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(
+                            Icons.person_outline,
+                            color: Color(0xFFA1A1A1),
+                          ),
+                          hintText: 'Enter your last name',
+                          hintStyle: const TextStyle(color: Color(0xFFA1A1A1)),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFE5E5E5),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF2563EB),
+                            ),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Last name is required';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(
+                            Icons.email_outlined,
+                            color: Color(0xFFA1A1A1),
+                          ),
+                          hintText: 'Enter your email',
+                          hintStyle: const TextStyle(color: Color(0xFFA1A1A1)),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFE5E5E5),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF2563EB),
+                            ),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Email is required';
+                          }
+                          final email = value.trim();
+                          if (!email.contains('@') || !email.contains('.')) {
+                            return 'Enter a valid email';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      const CustomInputField(
+                        icon: Icons.phone_outlined,
+                        hintText: 'Enter your phone number',
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(
+                            Icons.lock_outline,
+                            color: Color(0xFFA1A1A1),
+                          ),
+                          hintText: 'Create a password',
+                          hintStyle: const TextStyle(color: Color(0xFFA1A1A1)),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFE5E5E5),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF2563EB),
+                            ),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Password is required';
+                          }
+                          if (value.length < 6) {
+                            return 'Password must be at least 6 characters';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _confirmPasswordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          prefixIcon: Icon(
+                            Icons.lock_outline,
+                            color: Color(0xFFA1A1A1),
+                          ),
+                          hintText: 'Confirm your password',
+                          hintStyle: const TextStyle(color: Color(0xFFA1A1A1)),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFFE5E5E5),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF2563EB),
+                            ),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please confirm your password';
+                          }
+                          if (value != _passwordController.text) {
+                            return 'Passwords do not match';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: Color(0xFFE5E5E5)),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: DropdownButtonFormField<String>(
+                          decoration: const InputDecoration(
+                            border: InputBorder.none,
+                            icon: Icon(Icons.language),
+                          ),
+                          hint: const Text(
+                            'Select your language',
+                            style: TextStyle(color: Color(0xFFA1A1A1)),
+                          ),
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'en',
+                              child: Text('English'),
+                            ),
+                            DropdownMenuItem(value: 'ur', child: Text('Urdu')),
+                            DropdownMenuItem(
+                              value: 'ar',
+                              child: Text('Arabic'),
+                            ),
+                          ],
+                          onChanged: (value) {},
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF2563EB),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed: () {},
+                          child: const Text(
+                            'Create Account',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
+                    ],
+                  ), // end Column inside Form
+                ), // end Form
+              ), // end Container
 
               const SizedBox(height: 24),
 
