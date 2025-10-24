@@ -10,7 +10,6 @@ class Signin extends StatefulWidget {
 }
 
 class SigninState extends State<Signin> {
-  // Form key and controllers (step 1: add state only)
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
@@ -38,7 +37,6 @@ class SigninState extends State<Signin> {
         _isLoading = true;
       });
 
-      // Simulate async operation (in next step this will be the API call)
       Future.delayed(const Duration(seconds: 2), () {
         setState(() {
           _isLoading = false;
