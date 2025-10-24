@@ -86,11 +86,13 @@ class SigninState extends State<Signin> {
                       ),
                     ],
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Email field
-                      TextField(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Email field
+                        TextFormField(
                         controller: _emailController,
                         decoration: InputDecoration(
                           hintText: 'Enter your email',
@@ -105,11 +107,22 @@ class SigninState extends State<Signin> {
                             borderSide: BorderSide.none,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Email is required';
+                            }
+                            // very basic email check to keep it minimal
+                            final email = value.trim();
+                            if (!email.contains('@') || !email.contains('.')) {
+                              return 'Enter a valid email';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
 
-                      // Password field
-                      TextField(
+                        // Password field
+                        TextFormField(
                         controller: _passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
@@ -125,47 +138,57 @@ class SigninState extends State<Signin> {
                             borderSide: BorderSide.none,
                           ),
                         ),
-                      ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Password is required';
+                            }
+                            if (value.length < 6) {
+                              return 'Password must be at least 6 characters';
+                            }
+                            return null;
+                          },
+                        ),
 
-                      const SizedBox(height: 24),
+                        const SizedBox(height: 24),
 
-                      // Login button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF3B82F6),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                        // Login button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF3B82F6),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            onPressed: () {},
+                            child: const Text(
+                              'Login',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
-                          onPressed: () {},
-                          child: const Text(
-                            'Login',
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // Forgot password
+                        Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            'Forgot Password?',
                             style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                              fontSize: 14,
+                              color: Color(0xFF3B82F6),
                             ),
                           ),
                         ),
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      // Forgot password
-                      Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Forgot Password?',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF3B82F6),
-                          ),
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
 
