@@ -37,6 +37,40 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
+  void _handleCreateAccount() {
+    // Validate the form
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      // Simulate async work (placeholder for API integration)
+      Future.delayed(const Duration(seconds: 2), () {
+        setState(() {
+          _isLoading = false;
+        });
+
+        final first = _firstNameController.text.trim();
+        final last = _lastNameController.text.trim();
+        final email = _emailController.text.trim();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Signup validated for: $first $last • $email'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fix the errors above'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -319,7 +353,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          onPressed: _isLoading ? null : () {},
+                          onPressed: _isLoading ? null : _handleCreateAccount,
                           child: _isLoading
                               ? const SizedBox(
                                   height: 20,
