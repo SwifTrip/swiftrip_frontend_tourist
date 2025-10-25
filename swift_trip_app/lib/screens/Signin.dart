@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'Signup.dart';
+import '../services/auth_service.dart';
 
 class Signin extends StatefulWidget {
   const Signin({super.key});
@@ -15,6 +16,9 @@ class SigninState extends State<Signin> {
   late final TextEditingController _passwordController;
   bool _isLoading = false;
 
+  // Service
+  final AuthService _authService = AuthService();
+
   @override
   void initState() {
     super.initState();
@@ -29,7 +33,7 @@ class SigninState extends State<Signin> {
     super.dispose();
   }
 
-  void _handleLogin() {
+  void _handleLogin() async {
     // Validate the form
     if (_formKey.currentState!.validate()) {
       // Show loading state briefly
@@ -37,20 +41,45 @@ class SigninState extends State<Signin> {
         _isLoading = true;
       });
 
-      Future.delayed(const Duration(seconds: 2), () {
+      try {
+        final result = await _authService.login(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        );
+
+        if (!mounted) return;
+
         setState(() {
           _isLoading = false;
         });
 
-        // Show success message with input values
-        final email = _emailController.text.trim();
+        if (result['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result['message'] ?? 'Login successful'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result['message'] ?? 'Login failed'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        if (!mounted) return;
+        setState(() {
+          _isLoading = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Login validated for: $email'),
-            backgroundColor: Colors.green,
+            content: Text('An error occurred: ${e.toString()}'),
+            backgroundColor: Colors.red,
           ),
         );
-      });
+      }
     } else {
       // Show error if validation fails
       ScaffoldMessenger.of(context).showSnackBar(
