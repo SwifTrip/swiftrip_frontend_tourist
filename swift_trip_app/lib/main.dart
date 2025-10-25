@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:swift_trip_app/screens/Destination.dart';
-import 'package:swift_trip_app/screens/customBar.dart';
 import 'package:swift_trip_app/screens/Signin.dart';
 
 void main() {
-  runApp(Signin());
+  runApp(const SwifTripTouristApp());
 }
 
 class SwifTripTouristApp extends StatelessWidget {
@@ -12,12 +10,10 @@ class SwifTripTouristApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SwifTrip Tourist ',
+      title: 'SwifTrip Tourist',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-          scaffoldBackgroundColor: Color(0xFFDFF2FE),
-          ),
-      home: DestinationScreen(),
+      theme: ThemeData(scaffoldBackgroundColor: Color(0xFFDFF2FE)),
+      home: Signin(), // Start with Signin screen
     );
   }
 }
