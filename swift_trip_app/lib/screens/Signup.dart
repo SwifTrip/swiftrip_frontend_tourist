@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'Signin.dart';
+import '../services/auth_service.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -17,6 +18,9 @@ class _SignupScreenState extends State<SignupScreen> {
   late final TextEditingController _passwordController;
   late final TextEditingController _confirmPasswordController;
   bool _isLoading = false;
+  
+  // Service
+  final AuthService _authService = AuthService();
 
   @override
   void initState() {
@@ -38,30 +42,59 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  void _handleCreateAccount() {
+  void _handleCreateAccount() async {
     // Validate the form
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
 
-      // Simulate async work (placeholder for API integration)
-      Future.delayed(const Duration(seconds: 2), () {
+      try {
+        final result = await _authService.register(
+          firstName: _firstNameController.text.trim(),
+          lastName: _lastNameController.text.trim(),
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+          role: 'TOURIST',
+        );
+
+        if (!mounted) return;
+
         setState(() {
           _isLoading = false;
         });
 
-        final first = _firstNameController.text.trim();
-        final last = _lastNameController.text.trim();
-        final email = _emailController.text.trim();
-
+        if (result['success'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result['message'] ?? 'Account created'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          // Navigate to Signin after success
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => const Signin()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result['message'] ?? 'Registration failed'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        if (!mounted) return;
+        setState(() {
+          _isLoading = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Signup validated for: $first $last • $email'),
-            backgroundColor: Colors.green,
+            content: Text('An error occurred: ${e.toString()}'),
+            backgroundColor: Colors.red,
           ),
         );
-      });
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
