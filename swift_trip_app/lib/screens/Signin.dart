@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'Signup.dart';
+import 'Destination.dart';
 import '../services/auth_service.dart';
 
 class Signin extends StatefulWidget {
@@ -59,6 +60,10 @@ class SigninState extends State<Signin> {
               content: Text(result['message'] ?? 'Login successful'),
               backgroundColor: Colors.green,
             ),
+          );
+          // Navigate to Destination screen on successful login
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => DestinationScreen()),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
