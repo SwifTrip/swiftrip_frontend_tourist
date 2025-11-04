@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swift_trip_app/screens/Signup.dart';
 
 class Signin extends StatefulWidget {
   const Signin({super.key});
@@ -27,10 +28,10 @@ class SigninState extends State<Signin> {
                     const SizedBox(height: 48),
 
                     // Logo
-                    Image.asset(
-                      'assets/logo.png', 
-                      height: 80,
-                    ),
+                    // Image.asset(
+                    //   'assets/logo.png', 
+                    //   height: 80,
+                    // ),
                     const SizedBox(height: 16),
 
                     // App name
@@ -204,14 +205,20 @@ class SigninState extends State<Signin> {
                     // Footer
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Text("Don't have an account? "),
-                        Text(
-                          'Sign up',
-                          style: TextStyle(
-                            color: Color(0xFF3B82F6),
-                            fontWeight: FontWeight.w600,
+                        InkWell(
+                          child: Text(
+                            'Sign up',
+                            style: TextStyle(
+                              color: Color(0xFF3B82F6),
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
+                          onTap: (){ Navigator.pushReplacement(context, 
+                            MaterialPageRoute(builder: (context) => SignupScreen()),
+                          );
+                          },
                         ),
                       ],
                     ),
