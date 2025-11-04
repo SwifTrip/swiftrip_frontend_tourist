@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class customBar extends StatelessWidget {
   final int selectedIndex ;
 
-  customBar({required this.selectedIndex});
+  const customBar({super.key, required this.selectedIndex});
   @override
   Widget build(BuildContext context) {
     return  Container(
