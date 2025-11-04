@@ -3,7 +3,7 @@ import 'package:swift_trip_app/screens/Destination.dart';
 import 'package:swift_trip_app/screens/Signin.dart';
 
 void main() {
-  runApp(Signin());
+  runApp(SwifTripTouristApp());
 }
 
 class SwifTripTouristApp extends StatelessWidget {

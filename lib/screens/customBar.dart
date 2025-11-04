@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swift_trip_app/screens/Signin.dart';
 
 class customBar extends StatelessWidget {
   final int selectedIndex ;
@@ -18,7 +19,9 @@ class customBar extends StatelessWidget {
                   padding: const EdgeInsets.only(left: 25),
                   child: IconButton(
                     onPressed: () {
-                      Navigator.pop(context);
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                        return Signin();
+                      }));
                     },
                     icon: Icon(Icons.arrow_back),
                   ),
