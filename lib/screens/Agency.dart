@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:swift_trip_app/screens/customBar.dart';
 
-class agency extends StatefulWidget {
+class AgencyScreen extends StatefulWidget {
   @override
-  _agencyState createState() => _agencyState();
+  _AgencyScreenState createState() => _AgencyScreenState();
 }
-class _agencyState extends State<agency> {
+class _AgencyScreenState extends State<AgencyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Agency Screen'),
-      ),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(130),
+        child: customBar(selectedIndex: 2)),
       body: Center(
         child: Text('Welcome to the Agency Screen!'),
       ),

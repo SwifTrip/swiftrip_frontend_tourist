@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:swift_trip_app/screens/Agency.dart';
-import 'package:swift_trip_app/screens/Destination.dart';
-import 'package:swift_trip_app/screens/Signin.dart';
 
 void main() {
   runApp(SwifTripTouristApp());
@@ -17,7 +15,7 @@ class SwifTripTouristApp extends StatelessWidget {
       theme: ThemeData(
           scaffoldBackgroundColor: Color(0xFFDFF2FE),
           ),
-      home: agency(),
+      home: AgencyScreen(),
     );
   }
 }
