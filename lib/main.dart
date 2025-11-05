@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swift_trip_app/screens/Agency.dart';
 import 'package:swift_trip_app/screens/Destination.dart';
 import 'package:swift_trip_app/screens/Signin.dart';
 
@@ -16,7 +17,7 @@ class SwifTripTouristApp extends StatelessWidget {
       theme: ThemeData(
           scaffoldBackgroundColor: Color(0xFFDFF2FE),
           ),
-      home: DestinationScreen(),
+      home: agency(),
     );
   }
 }
