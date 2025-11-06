@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:swift_trip_app/screens/Agency.dart';
 import 'package:swift_trip_app/screens/Destination.dart';
@@ -81,7 +79,7 @@ class customBar extends StatelessWidget {
     );
   }
 
-  Widget buttonBuild(int index,String title,context) {
+  Widget buttonBuild(int index,String title,BuildContext context) {
     bool isSelected = index == selectedIndex;
     return TextButton(
       onPressed: () {
