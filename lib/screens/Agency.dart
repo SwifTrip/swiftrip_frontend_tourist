@@ -12,8 +12,25 @@ class _AgencyScreenState extends State<AgencyScreen> {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(130),
         child: customBar(selectedIndex: 2)),
-      body: Center(
-        child: Text('Welcome to the Agency Screen!'),
+      body: Container(
+        width: double.infinity,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Text(
+                    "Choose Your Travel Partner",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 20, bottom: 15),
+                    child: Text(
+                      "Select from our trusted travel agencies",
+                      style: TextStyle(fontSize: 15),
+                    ),
+                  ),
+          ],),
+        )
       ),
     );
   }
