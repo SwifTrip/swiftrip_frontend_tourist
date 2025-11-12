@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swift_trip_app/screens/Agency.dart';
 import 'package:swift_trip_app/screens/customBar.dart';
 
 class DestinationScreen extends StatefulWidget {
@@ -56,7 +57,11 @@ class _DestinationScreenState extends State<DestinationScreen> {
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushReplacement(context, MaterialPageRoute(
+                      builder: (context) => AgencyScreen(),
+                    ));
+                  },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.blueAccent,
