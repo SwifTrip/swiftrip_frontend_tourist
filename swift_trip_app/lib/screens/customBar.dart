@@ -6,7 +6,7 @@ class customBar extends StatelessWidget {
   customBar({required this.selectedIndex});
   @override
   Widget build(BuildContext context) {
-    return  Container(
+    return  Container( 
         height: 130,
         color: Colors.white,
         child: Column(
