@@ -412,7 +412,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-          FontWeight: FontWeight.w600,
+          // FontWeight: FontWeight.w600,
               children: [
                 const Text(
                   'Already have an account? ',
