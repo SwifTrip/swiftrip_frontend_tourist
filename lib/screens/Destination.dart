@@ -10,7 +10,24 @@ class DestinationScreen extends StatefulWidget {
 }
 
 class _DestinationScreenState extends State<DestinationScreen> {
-  final List<String> cities = ["Islamabad", "Lahore", "Karachi", "Peshawar"];
+  final List<String> cities = [
+    // Punjab
+    "Lahore", "Faisalabad", "Rawalpindi",  "Gujranwala", "Multan", "Sialkot", "Bahawalpur", "Sargodha",
+    "Sahiwal", "Jhang", "Dera Ghazi Khan", "Sheikhupura", "Rahim Yar Khan",
+    // Sindh
+    "Karachi", "Hyderabad", "Sukkur", "Larkana", "Nawabshah", "Mirpurkhas", "Khairpur",
+    // Khyber Pakhtunkhwa (KP)
+    "Peshawar", "Mardan", "Abbottabad", "Swat", "Kohat", "Dera Ismail Khan", "Charsadda", "Chitral",
+    // Balochistan
+    "Quetta", "Gwadar", "Turbat", "Zhob", "Khuzdar", "Sibi", 
+    // Islamabad Capital Territory
+    "Islamabad",
+    // Gilgit-Baltistan
+    "Gilgit","Skardu","Hunza",
+    // Azad Jammu & Kashmir
+    "Muzaffarabad","Mirpur","Kotli",
+  ];
+
   late String fromCity = cities[0];
   late String toCity = cities[1];
 
@@ -49,7 +66,7 @@ class _DestinationScreenState extends State<DestinationScreen> {
                       _dropdownbuild("Departure City"),
                       _labelbuild("Arrival City"),
                       _dropdownbuild("Arrival City"),
-                      _routePreviewBuild()
+                      _routePreviewBuild(),
                     ],
                   ),
                 ),
@@ -58,9 +75,10 @@ class _DestinationScreenState extends State<DestinationScreen> {
                 padding: const EdgeInsets.all(10),
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushReplacement(context, MaterialPageRoute(
-                      builder: (context) => AgencyScreen(),
-                    ));
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => AgencyScreen()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
@@ -118,10 +136,10 @@ class _DestinationScreenState extends State<DestinationScreen> {
         onChanged: (value) {
           setState(() {
             if (city == "Arrival City") {
-            toCity = value.toString();
-          } else {
-            fromCity = value.toString();
-          }
+              toCity = value.toString();
+            } else {
+              fromCity = value.toString();
+            }
           });
         },
       ),
@@ -150,7 +168,10 @@ class _DestinationScreenState extends State<DestinationScreen> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(left: 5),
-                          child: Icon(Icons.directions_bus, color: Colors.blueGrey),
+                          child: Icon(
+                            Icons.directions_bus,
+                            color: Colors.blueGrey,
+                          ),
                         ),
                         Text(
                           "Route Preview",
