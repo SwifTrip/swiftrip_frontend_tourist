@@ -6,6 +6,7 @@ class PlanningScreen extends StatefulWidget {
   _PlanningScreenState createState() => _PlanningScreenState();
 }
 class _PlanningScreenState extends State<PlanningScreen> {
+  bool selected = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,7 +15,60 @@ class _PlanningScreenState extends State<PlanningScreen> {
         child: customBar(selectedIndex: 3),
       ),
       body: Center(
-        child: Text("This is the Planning Screen"),
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(top: 20),
+              child: Text(
+                "Plan Your Journey",
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+            builAccomodationCard(),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  Widget builAccomodationCard() {
+    
+    return Container(
+      height: 100,
+      margin: EdgeInsets.all(10),
+      child: Card(
+        
+          color: selected ? const Color(0xffEFF6FF) : Colors.white,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(
+              color: selected ? Colors.blueAccent : Colors.grey.shade300,
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(10),
+          ),
+        child: InkWell(
+          
+        onTap: () {
+          setState(() {
+            selected = !selected;
+          });
+        },
+          child: Padding(
+            padding: const EdgeInsets.all(15),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Hotel Stay Resort \n ⭐4.5(150 reviews)"),
+                    Text("Rs 8000/Night"),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
