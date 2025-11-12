@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'Signup.dart';
 import 'Destination.dart';
 import '../services/auth_service.dart';
+import '../utils/validators.dart';
 
 class Signin extends StatefulWidget {
   const Signin({super.key});
@@ -63,7 +64,7 @@ class SigninState extends State<Signin> {
           );
           // Navigate to Destination screen on successful login
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => DestinationScreen()),
+            MaterialPageRoute(builder: (context) => const DestinationScreen()),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -169,17 +170,7 @@ class SigninState extends State<Signin> {
                             borderSide: BorderSide.none,
                           ),
                         ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Email is required';
-                          }
-                          // very basic email check to keep it minimal
-                          final email = value.trim();
-                          if (!email.contains('@') || !email.contains('.')) {
-                            return 'Enter a valid email';
-                          }
-                          return null;
-                        },
+                        validator: Validators.validateEmail,
                       ),
                       const SizedBox(height: 16),
 
@@ -200,15 +191,7 @@ class SigninState extends State<Signin> {
                             borderSide: BorderSide.none,
                           ),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Password is required';
-                          }
-                          if (value.length < 6) {
-                            return 'Password must be at least 6 characters';
-                          }
-                          return null;
-                        },
+                        validator: Validators.validateSigninPassword,
                       ),
 
                       const SizedBox(height: 24),

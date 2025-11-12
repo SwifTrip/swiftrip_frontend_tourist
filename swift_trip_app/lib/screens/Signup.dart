@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'Signin.dart';
 import '../services/auth_service.dart';
+import '../utils/validators.dart';
+import '../widgets/custom_text_form_field.dart';
+import '../constants/app_colors.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -108,15 +111,15 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F5FF),
+      backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF0F5FF),
+        backgroundColor: AppColors.backgroundLight,
         elevation: 0,
-        leading: const Icon(Icons.arrow_back, color: Color(0xFF111827)),
+        leading: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
         title: const Text(
           'Create Account',
           style: TextStyle(
-            color: Color(0xFF111827),
+            color: AppColors.textPrimary,
             fontSize: 20,
             fontWeight: FontWeight.w600,
           ),
@@ -145,34 +148,10 @@ class _SignupScreenState extends State<SignupScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    TextFormField(
+                    CustomTextFormField(
                       controller: _firstNameController,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(
-                          Icons.person_outline,
-                          color: Color(0xFFA1A1A1),
-                        ),
-                        hintText: 'Enter your first name',
-                        hintStyle: const TextStyle(color: Color(0xFFA1A1A1)),
-                        filled: true,
-                        fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFE5E5E5),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF2563EB),
-                          ),
-                        ),
-                      ),
+                      icon: Icons.person_outline,
+                      hintText: 'Enter your first name',
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
                           return 'First name is required';
@@ -181,34 +160,10 @@ class _SignupScreenState extends State<SignupScreen> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                    CustomTextFormField(
                       controller: _lastNameController,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(
-                          Icons.person_outline,
-                          color: Color(0xFFA1A1A1),
-                        ),
-                        hintText: 'Enter your last name',
-                        hintStyle: const TextStyle(color: Color(0xFFA1A1A1)),
-                        filled: true,
-                        fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFE5E5E5),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF2563EB),
-                          ),
-                        ),
-                      ),
+                      icon: Icons.person_outline,
+                      hintText: 'Enter your last name',
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
                           return 'Last name is required';
@@ -217,44 +172,12 @@ class _SignupScreenState extends State<SignupScreen> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                    CustomTextFormField(
                       controller: _emailController,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(
-                          Icons.email_outlined,
-                          color: Color(0xFFA1A1A1),
-                        ),
-                        hintText: 'Enter your email',
-                        hintStyle: const TextStyle(color: Color(0xFFA1A1A1)),
-                        filled: true,
-                        fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFE5E5E5),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF2563EB),
-                          ),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Email is required';
-                        }
-                        final email = value.trim();
-                        if (!email.contains('@') || !email.contains('.')) {
-                          return 'Enter a valid email';
-                        }
-                        return null;
-                      },
+                      icon: Icons.email_outlined,
+                      hintText: 'Enter your email',
+                      keyboardType: TextInputType.emailAddress,
+                      validator: Validators.validateEmail,
                     ),
                     const SizedBox(height: 16),
                     const CustomInputField(
@@ -262,75 +185,19 @@ class _SignupScreenState extends State<SignupScreen> {
                       hintText: 'Enter your phone number',
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                    CustomTextFormField(
                       controller: _passwordController,
+                      icon: Icons.lock_outline,
+                      hintText: 'Create a password',
                       obscureText: true,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(
-                          Icons.lock_outline,
-                          color: Color(0xFFA1A1A1),
-                        ),
-                        hintText: 'Create a password',
-                        hintStyle: const TextStyle(color: Color(0xFFA1A1A1)),
-                        filled: true,
-                        fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFE5E5E5),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF2563EB),
-                          ),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Password is required';
-                        }
-                        if (value.length < 6) {
-                          return 'Password must be at least 6 characters';
-                        }
-                        return null;
-                      },
+                      validator: Validators.validateSignupPassword,
                     ),
                     const SizedBox(height: 16),
-                    TextFormField(
+                    CustomTextFormField(
                       controller: _confirmPasswordController,
+                      icon: Icons.lock_outline,
+                      hintText: 'Confirm your password',
                       obscureText: true,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(
-                          Icons.lock_outline,
-                          color: Color(0xFFA1A1A1),
-                        ),
-                        hintText: 'Confirm your password',
-                        hintStyle: const TextStyle(color: Color(0xFFA1A1A1)),
-                        filled: true,
-                        fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFFE5E5E5),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF2563EB),
-                          ),
-                        ),
-                      ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please confirm your password';
@@ -347,7 +214,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        border: Border.all(color: Color(0xFFE5E5E5)),
+                        border: Border.all(color: AppColors.borderEnabled),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: DropdownButtonFormField<String>(
@@ -357,7 +224,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         hint: const Text(
                           'Select your language',
-                          style: TextStyle(color: Color(0xFFA1A1A1)),
+                          style: TextStyle(color: AppColors.textSecondary),
                         ),
                         items: const [
                           DropdownMenuItem(value: 'en', child: Text('English')),
@@ -375,7 +242,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       height: 48,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2563EB),
+                          backgroundColor: AppColors.primary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -414,7 +281,7 @@ class _SignupScreenState extends State<SignupScreen> {
               children: [
                 const Text(
                   'Already have an account? ',
-                  style: TextStyle(color: Color(0xFF111827)),
+                  style: TextStyle(color: AppColors.textPrimary),
                 ),
                 GestureDetector(
                   onTap: () {
@@ -425,7 +292,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: const Text(
                     'Login',
                     style: TextStyle(
-                      color: Color(0xFF2563EB),
+                      color: AppColors.primary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
