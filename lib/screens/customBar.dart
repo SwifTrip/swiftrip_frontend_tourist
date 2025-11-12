@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:swift_trip_app/screens/Agency.dart';
 import 'package:swift_trip_app/screens/Destination.dart';
+import 'package:swift_trip_app/screens/Plannig.dart';
 import 'package:swift_trip_app/screens/Signin.dart';
 
 class customBar extends StatelessWidget {
@@ -83,15 +84,19 @@ class customBar extends StatelessWidget {
     bool isSelected = index == selectedIndex;
     return TextButton(
       onPressed: () {
-        if(selectedIndex==1){
-          Navigator.pushReplacement(context, MaterialPageRoute(
-            builder: (context) => DestinationScreen(),
-          ));
+        if(index==1){
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>
+            DestinationScreen()));
         }
-        else if(selectedIndex==2){
-          Navigator.pushReplacement(context, MaterialPageRoute(
-            builder: (context) => AgencyScreen(),
-          ));
+        else if(index==2){
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+            return  AgencyScreen();
+          }));
+        }
+        else if(index==3){
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+            return  PlanningScreen();
+          }));
         }
       },
       child: Text(title, style: TextStyle(color: isSelected ? Colors.blue : Colors.black, fontSize: 16)),
