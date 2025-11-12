@@ -6,7 +6,7 @@ class PlanningScreen extends StatefulWidget {
   _PlanningScreenState createState() => _PlanningScreenState();
 }
 class _PlanningScreenState extends State<PlanningScreen> {
-  bool selected = false;
+  int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +24,9 @@ class _PlanningScreenState extends State<PlanningScreen> {
                 style: TextStyle(fontSize: 18),
               ),
             ),
-            builAccomodationCard(),
+            builAccomodationCard(1),
+            builAccomodationCard(2),
+            builAccomodationCard(3),
           ],
         ),
       ),
@@ -32,13 +34,12 @@ class _PlanningScreenState extends State<PlanningScreen> {
   }
 
 
-  Widget builAccomodationCard() {
-    
+  Widget builAccomodationCard(int index) {
+    bool selected = selectedIndex == index;
     return Container(
       height: 100,
-      margin: EdgeInsets.all(10),
+      margin: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
       child: Card(
-        
           color: selected ? const Color(0xffEFF6FF) : Colors.white,
           shape: RoundedRectangleBorder(
             side: BorderSide(
@@ -48,10 +49,9 @@ class _PlanningScreenState extends State<PlanningScreen> {
             borderRadius: BorderRadius.circular(10),
           ),
         child: InkWell(
-          
         onTap: () {
           setState(() {
-            selected = !selected;
+            selectedIndex = index;
           });
         },
           child: Padding(
