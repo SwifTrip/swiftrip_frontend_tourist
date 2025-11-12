@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:swift_trip_app/screens/customBar.dart';
 
 class DestinationScreen extends StatefulWidget {
+  const DestinationScreen({super.key});
+
   @override
   _DestinationScreenState createState() => _DestinationScreenState();
 }
