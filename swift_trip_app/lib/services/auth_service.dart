@@ -108,7 +108,10 @@ class AuthService {
   Future<Map<String, dynamic>> logout() async {
     try {
       final response = await http
-          .get(Uri.parse(ApiConfig.logout))
+          .post(
+            Uri.parse(ApiConfig.logout),
+            headers: {'Content-Type': 'application/json'},
+          )
           .timeout(ApiConfig.timeout);
 
       final responseData = jsonDecode(response.body);
