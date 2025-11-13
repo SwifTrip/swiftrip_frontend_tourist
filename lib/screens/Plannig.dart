@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:swift_trip_app/screens/Agency.dart';
 import 'package:swift_trip_app/screens/customBar.dart';
+import 'package:swift_trip_app/screens/summary_screen.dart';
+import 'package:swift_trip_app/widgets/custom_app_bar.dart';
+import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
+
 
 class PlanningScreen extends StatefulWidget {
   @override
@@ -11,10 +16,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(130),
-        child: customBar(selectedIndex: 3),
-      ),
+      appBar: CustomAppBar(currentStep: 2),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -114,6 +116,69 @@ class _PlanningScreenState extends State<PlanningScreen> {
                     builAccomodationCard(2),
                     builAccomodationCard(3),
                     buildDay(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AgencyScreen(),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 25,
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.arrow_back, color: Colors.black),
+                            Text("Back", style: TextStyle(color: Colors.black)),
+                          ],
+                        ),
+                      ),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => SummaryScreen()),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 25,
+                        ),
+                        child: Row(
+                          children: [
+                            Text(
+                              "Continue",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            Icon(Icons.arrow_forward, color: Colors.white),
+                          ],
+                        ),
+                      ),
+                    ),
+                  
+                      ],
+                    )
                   ],
                 ),
               ],
@@ -121,6 +186,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
           ],
         ),
       ),
+      bottomNavigationBar: CustomBottomBar(currentIndex: 1),
     );
   }
 

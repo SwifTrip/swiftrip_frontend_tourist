@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:swift_trip_app/screens/Destination.dart';
+import 'package:swift_trip_app/screens/Plannig.dart';
 import 'package:swift_trip_app/screens/customBar.dart';
 import 'package:swift_trip_app/widgets/custom_app_bar.dart';
 import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
@@ -13,10 +14,7 @@ class _AgencyScreenState extends State<AgencyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(130),
-        child: customBar(selectedIndex: 2),
-      ),
+      appBar: CustomAppBar(currentStep: 1),
       body: SingleChildScrollView(
         child: Container(
           width: double.infinity,
@@ -75,7 +73,12 @@ class _AgencyScreenState extends State<AgencyScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => PlanningScreen()),
+                        );
+                      },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                           vertical: 10,
