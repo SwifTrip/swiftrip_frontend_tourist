@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:swift_trip_app/screens/planning_screen.dart';
-import 'package:swift_trip_app/widgets/custom_app_bar.dart';
-import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
-
+import 'package:swift_trip_app/screens/Agency.dart';
+import 'package:swift_trip_app/screens/customBar.dart';
 
 class DestinationScreen extends StatefulWidget {
   const DestinationScreen({super.key});
@@ -12,7 +10,24 @@ class DestinationScreen extends StatefulWidget {
 }
 
 class _DestinationScreenState extends State<DestinationScreen> {
-  final List<String> cities = ["Islamabad", "Lahore", "Karachi", "Peshawar"];
+  final List<String> cities = [
+    // Punjab
+    "Lahore", "Faisalabad", "Rawalpindi",  "Gujranwala", "Multan", "Sialkot", "Bahawalpur", "Sargodha",
+    "Sahiwal", "Jhang", "Dera Ghazi Khan", "Sheikhupura", "Rahim Yar Khan",
+    // Sindh
+    "Karachi", "Hyderabad", "Sukkur", "Larkana", "Nawabshah", "Mirpurkhas", "Khairpur",
+    // Khyber Pakhtunkhwa (KP)
+    "Peshawar", "Mardan", "Abbottabad", "Swat", "Kohat", "Dera Ismail Khan", "Charsadda", "Chitral",
+    // Balochistan
+    "Quetta", "Gwadar", "Turbat", "Zhob", "Khuzdar", "Sibi", 
+    // Islamabad Capital Territory
+    "Islamabad",
+    // Gilgit-Baltistan
+    "Gilgit","Skardu","Hunza",
+    // Azad Jammu & Kashmir
+    "Muzaffarabad","Mirpur","Kotli",
+  ];
+
   late String fromCity = cities[0];
   late String toCity = cities[1];
 
@@ -57,10 +72,11 @@ class _DestinationScreenState extends State<DestinationScreen> {
                 padding: const EdgeInsets.all(10),
                 child: ElevatedButton(
                   onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => PlanningScreen()),
-                      );
-                    },
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => AgencyScreen()),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.blueAccent,

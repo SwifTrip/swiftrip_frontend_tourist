@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:swift_trip_app/screens/Agency.dart';
+import 'package:swift_trip_app/screens/Destination.dart';
+import 'package:swift_trip_app/screens/Plannig.dart';
 import 'package:swift_trip_app/screens/Signin.dart';
 
 class customBar extends StatelessWidget {
@@ -63,11 +66,11 @@ class customBar extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  buttonBuild(1,"Destination"),
-                  buttonBuild(2,"Agency"),
-                  buttonBuild(3,"Planning"),
-                  buttonBuild(4,"Summary"),
-                  buttonBuild(5,"Payment"),
+                  buttonBuild(1,"Destination",context),
+                  buttonBuild(2,"Agency",context),
+                  buttonBuild(3,"Planning",context),
+                  buttonBuild(4,"Summary",context),
+                  buttonBuild(5,"Payment",context),
                 ],
               ),
             ),
@@ -77,10 +80,25 @@ class customBar extends StatelessWidget {
     );
   }
 
-  Widget buttonBuild(int index,String title) {
+  Widget buttonBuild(int index,String title,BuildContext context) {
     bool isSelected = index == selectedIndex;
     return TextButton(
-      onPressed: () {},
+      onPressed: () {
+        if(index==1){
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>
+            DestinationScreen()));
+        }
+        else if(index==2){
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+            return  AgencyScreen();
+          }));
+        }
+        else if(index==3){
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+            return  PlanningScreen();
+          }));
+        }
+      },
       child: Text(title, style: TextStyle(color: isSelected ? Colors.blue : Colors.black, fontSize: 16)),
     );
   }
