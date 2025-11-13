@@ -35,11 +35,102 @@ class SummaryScreen extends StatelessWidget {
             const SizedBox(height: 20),
             _buildItinerary(),
             const SizedBox(height: 20),
-            _buildCostBreakdown(),
+            //_buildCostBreakdown(),
           ],
         ),
       ),
       bottomNavigationBar: ,
     );
   }
+}
+
+Widget _buildItinerary() {
+  return Container(
+    padding: const EdgeInsets.all(16.0),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12.0),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.1),
+          spreadRadius: 1,
+          blurRadius: 10,
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Itinerary',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppTheme.textColor,
+          ),
+        ),
+        const SizedBox(height: 20),
+        _buildDayPlan(
+          day: 'Arrival Day',
+          isExpanded: true,
+          children: [
+            _buildTimelineItem(
+              title: 'Accommodation',
+              content: _buildAccommodationCard(
+                imageUrl:
+                    'https://lh3.googleusercontent.com/aida-public/AB6AXuC6KXqejCy4AWepX8j-c0i9kjx0ML3yfH8x6OMFSMxxTB8HUYrTRpd_ubxgsg2HXfhrgUqQFg5V1gCp0przG_6LFKm_7yYxp8kbx_S-2cSM9L7KhVzUdBwa_BeZIF1OBvoROB9zGH9sWzQJqh9OFlWmVjK_DlQtU7Yn2ydYDfsGq4HMQBjJO2f9RjjiKLn7Mrn8_qNDdC5cBsjoo5MHRhAsZPCGAF-Z0htTl3SOLsuA-e72YlGBRrM-RIp-2iuW73Z3Ziuy57X0kCc',
+                name: 'Mountain View Resort',
+                rating: 4.5,
+                reviews: 1234,
+              ),
+            ),
+            _buildTimelineItem(
+              title: 'Activities',
+              content: _buildActivityCard(
+                activity: 'Welcome Dinner',
+                details: '7:00 PM - Local Cuisine',
+              ),
+              isLast: true,
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        _buildDayPlan(
+          day: 'Day 1',
+          isExpanded: true,
+          children: [
+            _buildTimelineItem(
+              title: 'Accommodation',
+              content: _buildAccommodationCard(
+                imageUrl:
+                    'https://lh3.googleusercontent.com/aida-public/AB6AXuCrJ86mX5CvZUYemYf3Cigj6bXEP5StG_GctXbijL8iVv5a_8YNrsrHS-Vg6G6c0iIwKmYSwUMCTdsucppwCvOt2M75EkCCZRsp6OlXeJsR6KuEn-wAbUo6j1uBVHLYR-67KZk6atWSzDwA-CqUZK2Y7Lt9R9TaPMVpHf4mBqB-vCnj-1Sa79E836lnRskuOYcjMUMbp22eaQ0yzpHXGHZX5vXe1jp0gDvWjl7LnLMfnnpaEKb9gkdnKOADEkmnvxMR0L0POLVEWaU',
+                name: 'Comfort Inn',
+                rating: 4.2,
+                reviews: 876,
+              ),
+            ),
+            _buildTimelineItem(
+              title: 'Activities',
+              content: Column(
+                children: [
+                  _buildActivityCard(
+                    activity: 'City Walking Tour',
+                    details: '9:00 AM - 3 hours',
+                  ),
+                  const SizedBox(height: 10),
+                  _buildActivityCard(
+                    activity: 'Museum Visit',
+                    details: '2:00 PM - 2 hours',
+                  ),
+                ],
+              ),
+              isLast: true,
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        _buildDayPlan(day: 'Day 2', isExpanded: false, children: []),
+      ],
+    ),
+  );
 }
