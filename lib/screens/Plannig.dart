@@ -206,7 +206,8 @@ class _PlanningScreenState extends State<PlanningScreen> {
               buildActivity("Shangrila Lake Visit", "3 hours", "Rs. 5,000"),
               buildActivity("Mountain Hiking", "5 hours", "Rs. 6,000"),
               const SizedBox(height: 10),
-
+              Text("Add Activities",style: TextStyle(fontWeight: FontWeight.bold),),
+              const SizedBox(height: 15),
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(

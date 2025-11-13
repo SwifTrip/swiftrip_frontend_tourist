@@ -15,75 +15,27 @@ class _AgencyScreenState extends State<AgencyScreen> {
         preferredSize: Size.fromHeight(130),
         child: customBar(selectedIndex: 2),
       ),
-      body: Container(
-        width: double.infinity,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Text(
-                "Choose Your Travel Partner",
-                style: TextStyle(fontSize: 18),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 20, bottom: 15),
-                child: Text(
-                  "Select from our trusted travel agencies",
-                  style: TextStyle(fontSize: 15),
+      body: SingleChildScrollView(
+        child: Container(
+          width: double.infinity,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Text(
+                  "Choose Your Travel Partner",
+                  style: TextStyle(fontSize: 18),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(15),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Icon(
-                              Icons.add_a_photo,
-                              size: 50,
-                              color: Colors.brown,
-                            ),
-                            Text("Mountain \nAdventures"),
-                            Text("Rs\n5000"),
-                          ],
-                        ),
-                        Text("⭐ 4.8 (200 reviews)"),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            width: 300,
-                            child: GridView(
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    childAspectRatio: 5,
-                                  ),
-                              shrinkWrap: true,
-                              children: [
-                                Card(
-                                  child: Center(child: Text("Mountain Tours")),
-                                ),
-                                Card(
-                                  child: Center(
-                                    child: Text("Adventure Travels"),
-                                  ),
-                                ),
-                                Card(child: Center(child: Text("Photography"))),
-                              ],
-                            ),
-                          ),
-                        ),
-                        
-                      ],
-                    ),
+                Padding(
+                  padding: EdgeInsets.only(top: 20, bottom: 15),
+                  child: Text(
+                    "Select from our trusted travel agencies",
+                    style: TextStyle(fontSize: 15),
                   ),
                 ),
-              ),
-              Row(
+                buildAgencyCard("Mountain Adventures", 8500),
+                buildAgencyCard("City Explorers", 9500),
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton(
@@ -140,7 +92,49 @@ class _AgencyScreenState extends State<AgencyScreen> {
                     ),
                   ],
                 ),
-              
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildAgencyCard(String agencyName, int price) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Icon(Icons.add_a_photo, size: 50, color: Colors.brown),
+                  Text(agencyName),
+                  Text("Rs\n$price"),
+                ],
+              ),
+              Text("⭐ 4.8 (200 reviews)"),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                  width: 300,
+                  child: GridView(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 5,
+                    ),
+                    shrinkWrap: true,
+                    children: [
+                      Card(child: Center(child: Text("Mountain Tours"))),
+                      Card(child: Center(child: Text("Adventure Travels"))),
+                      Card(child: Center(child: Text("Photography"))),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
