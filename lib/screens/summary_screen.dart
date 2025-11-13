@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:swift_trip_app/widgets/custom_app_bar.dart';
+import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
 
 class SummaryScreen extends StatelessWidget {
   const SummaryScreen({super.key});
@@ -6,7 +8,7 @@ class SummaryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ,
+      appBar: CustomBottomBar(currentIndex: 1),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -18,7 +20,7 @@ class SummaryScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: ,
+                  color: AppTheme.textColor,
                 ),
               ),
             ),
@@ -28,18 +30,19 @@ class SummaryScreen extends StatelessWidget {
                 'Review your customized tour package',
                 style: TextStyle(
                   fontSize: 16,
-                  color: ,
+                  color: AppTheme.secondaryTextColor,
                 ),
               ),
             ),
             const SizedBox(height: 20),
             _buildItinerary(),
             const SizedBox(height: 20),
-            //_buildCostBreakdown(),
+            _buildCostBreakdown(),
           ],
         ),
       ),
-      bottomNavigationBar: ,
+      bottomNavigationBar: CustomAppBar(currentStep: 2)
+,
     );
   }
 }
