@@ -165,3 +165,42 @@ Widget _buildDayPlan({
   );
 }
 
+Widget _buildTimelineItem({
+  required String title,
+  required Widget content,
+  bool isLast = false,
+}) {
+  return IntrinsicHeight(
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Column(
+          children: [
+            const Icon(Icons.circle, color: AppTheme.primaryColor, size: 16),
+            if (!isLast)
+              Expanded(
+                child: Container(width: 2, color: AppTheme.primaryColor),
+              ),
+          ],
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 5),
+              content,
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
