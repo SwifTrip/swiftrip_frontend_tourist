@@ -48,7 +48,7 @@ class _DestinationScreenState extends State<DestinationScreen> {
                       _dropdownbuild("Departure City"),
                       _labelbuild("Arrival City"),
                       _dropdownbuild("Arrival City"),
-                      _routePreviewBuild()
+                      _routePreviewBuild(),
                     ],
                   ),
                 ),
@@ -113,10 +113,10 @@ class _DestinationScreenState extends State<DestinationScreen> {
         onChanged: (value) {
           setState(() {
             if (city == "Arrival City") {
-            toCity = value.toString();
-          } else {
-            fromCity = value.toString();
-          }
+              toCity = value.toString();
+            } else {
+              fromCity = value.toString();
+            }
           });
         },
       ),
@@ -145,7 +145,10 @@ class _DestinationScreenState extends State<DestinationScreen> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(left: 5),
-                          child: Icon(Icons.directions_bus, color: Colors.blueGrey),
+                          child: Icon(
+                            Icons.directions_bus,
+                            color: Colors.blueGrey,
+                          ),
                         ),
                         Text(
                           "Route Preview",
