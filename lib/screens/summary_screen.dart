@@ -269,3 +269,33 @@ Widget _buildAccommodationCard({
     ),
   );
 }
+
+Widget _buildActivityCard({required String activity, required String details}) {
+  return Container(
+    padding: const EdgeInsets.all(12.0),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(10.0),
+      border: Border.all(color: Colors.grey[200]!),
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              activity,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              details,
+              style: const TextStyle(color: AppTheme.secondaryTextColor),
+            ),
+          ],
+        ),
+        const Icon(Icons.edit, color: AppTheme.primaryColor),
+      ],
+    ),
+  );
+}
