@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:swift_trip_app/widgets/custom_app_bar.dart';
 import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
+import 'package:swift_trip_app/screens/app-theme.dart';
 
 class SummaryScreen extends StatelessWidget {
   const SummaryScreen({super.key});
@@ -8,7 +9,7 @@ class SummaryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomBottomBar(currentIndex: 1),
+      appBar: CustomAppBar(currentStep: 2),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -41,8 +42,7 @@ class SummaryScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: CustomAppBar(currentStep: 2)
-,
+      bottomNavigationBar: CustomBottomBar(currentIndex: 1),
     );
   }
 }
