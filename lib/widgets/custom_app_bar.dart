@@ -19,7 +19,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               SizedBox(
                 height: 40,
                 child: CustomPaint(
-                  painter: ,
+                  painter: _ProgressPainter(currentStep: currentStep),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: List.generate(
@@ -69,4 +69,48 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight + 80.0);
+}
+
+
+class _ProgressPainter extends CustomPainter {
+  final int currentStep;
+
+  _ProgressPainter({required this.currentStep});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke;
+
+    final double stepWidth = size.width / 4;
+    final double y = size.height / 2;
+
+    for (int i = 0; i < 5; i++) {
+      final double x = i * stepWidth;
+      final color = i <= currentStep ? Colors.blue : Colors.grey;
+      paint.color = color;
+
+      canvas.drawCircle(
+        Offset(x, y),
+        8,
+        paint
+          ..style = i <= currentStep
+              ? PaintingStyle.fill
+              : PaintingStyle.stroke,
+      );
+
+      if (i < 4) {
+        final double nextX = (i + 1) * stepWidth;
+        final lineColor = i < currentStep ? Colors.blue : Colors.grey;
+        paint.color = lineColor;
+        canvas.drawLine(Offset(x + 10, y), Offset(nextX - 10, y), paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
 }
