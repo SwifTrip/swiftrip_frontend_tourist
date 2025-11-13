@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:swift_trip_app/screens/customBar.dart';
+import 'package:swift_trip_app/screens/planning_screen.dart';
+import 'package:swift_trip_app/widgets/custom_app_bar.dart';
+import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
+
 
 class DestinationScreen extends StatefulWidget {
   const DestinationScreen({super.key});
@@ -16,10 +19,7 @@ class _DestinationScreenState extends State<DestinationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(130),
-        child: customBar(selectedIndex: 1),
-      ),
+      appBar: CustomAppBar(currentStep: 0),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
@@ -56,7 +56,11 @@ class _DestinationScreenState extends State<DestinationScreen> {
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => PlanningScreen()),
+                      );
+                    },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.blueAccent,
@@ -74,6 +78,7 @@ class _DestinationScreenState extends State<DestinationScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: CustomBottomBar(currentIndex: 1),
     );
   }
 
