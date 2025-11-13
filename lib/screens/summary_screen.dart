@@ -299,3 +299,70 @@ Widget _buildActivityCard({required String activity, required String details}) {
     ),
   );
 }
+
+Widget _buildCostBreakdown() {
+  return Container(
+    padding: const EdgeInsets.all(16.0),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12.0),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.1),
+          spreadRadius: 1,
+          blurRadius: 10,
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Cost Breakdown',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppTheme.textColor,
+          ),
+        ),
+        const SizedBox(height: 10),
+        _buildCostRow('Base Package (Heritage Tours)', '\$2,800.00'),
+        _buildCostRow('Arrival Day - Mountain View Resort', '\$150.00'),
+        _buildCostRow('Day 1 - Comfort Inn', '\$80.00'),
+        _buildCostRow('Day 2 - Luxury Palace', '\$250.00'),
+        const Divider(height: 20),
+        _buildCostRow('Subtotal', '\$3,280.00'),
+        _buildCostRow('Taxes (10%)', '\$328.00'),
+        const Divider(height: 20),
+        _buildCostRow('Total', '\$3,608.00', isTotal: true),
+      ],
+    ),
+  );
+}
+
+Widget _buildCostRow(String title, String amount, {bool isTotal = false}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 4.0),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+            color: isTotal ? Colors.green : AppTheme.textColor,
+          ),
+        ),
+        Text(
+          amount,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+            color: isTotal ? Colors.green : AppTheme.textColor,
+          ),
+        ),
+      ],
+    ),
+  );
+}
