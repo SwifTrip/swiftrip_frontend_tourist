@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:swift_trip_app/widgets/custom_app_bar.dart';
 import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
 import 'package:swift_trip_app/screens/app-theme.dart';
+import 'package:swift_trip_app/screens/payment_screen.dart';
 
 class SummaryScreen extends StatelessWidget {
   const SummaryScreen({super.key});
@@ -9,7 +10,7 @@ class SummaryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(currentStep: 2),
+      appBar: CustomAppBar(currentStep: 3),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -39,6 +40,30 @@ class SummaryScreen extends StatelessWidget {
             _buildItinerary(),
             const SizedBox(height: 20),
             _buildCostBreakdown(),
+
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: ElevatedButton(
+                  onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (context) => PaymentScreen()),
+                      );
+                    },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.blueAccent,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 120,
+                      vertical: 15,
+                    ),
+                    child: const Text("Continue"),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
