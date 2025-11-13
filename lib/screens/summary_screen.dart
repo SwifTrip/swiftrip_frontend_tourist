@@ -134,3 +134,34 @@ Widget _buildItinerary() {
     ),
   );
 }
+
+Widget _buildDayPlan({
+  required String day,
+  required bool isExpanded,
+  required List<Widget> children,
+}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            day,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textColor,
+            ),
+          ),
+          Icon(
+            isExpanded ? Icons.expand_less : Icons.expand_more,
+            color: AppTheme.secondaryTextColor,
+          ),
+        ],
+      ),
+      if (isExpanded) ...[const SizedBox(height: 10), ...children],
+    ],
+  );
+}
+
