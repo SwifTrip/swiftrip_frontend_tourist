@@ -60,23 +60,14 @@ class CompanyInfo {
   final int id;
   final String name;
 
-  CompanyInfo({
-    required this.id,
-    required this.name,
-  });
+  CompanyInfo({required this.id, required this.name});
 
   factory CompanyInfo.fromJson(Map<String, dynamic> json) {
-    return CompanyInfo(
-      id: json['id'],
-      name: json['name'],
-    );
+    return CompanyInfo(id: json['id'], name: json['name']);
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-    };
+    return {'id': id, 'name': name};
   }
 }
 

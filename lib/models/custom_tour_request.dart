@@ -31,10 +31,7 @@ class ItineraryDay {
   final int dayNumber;
   final List<int> selectedOptionalItems;
 
-  ItineraryDay({
-    required this.dayNumber,
-    required this.selectedOptionalItems,
-  });
+  ItineraryDay({required this.dayNumber, required this.selectedOptionalItems});
 
   Map<String, dynamic> toJson() {
     return {
