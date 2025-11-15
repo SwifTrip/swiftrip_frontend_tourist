@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:swift_trip_app/screens/Agency.dart';
 import 'package:swift_trip_app/screens/Destination.dart';
 import 'package:swift_trip_app/screens/Plannig.dart';
 import 'package:swift_trip_app/screens/Signin.dart';
@@ -89,9 +88,9 @@ class customBar extends StatelessWidget {
             DestinationScreen()));
         }
         else if(index==2){
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-            return  AgencyScreen();
-          }));
+          // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+          //   return  AgencyScreen();
+          // }));
         }
         else if(index==3){
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {

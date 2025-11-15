@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:swift_trip_app/models/Agency.dart';
 import 'package:swift_trip_app/screens/Destination.dart';
 import 'package:swift_trip_app/screens/Plannig.dart';
 import 'package:swift_trip_app/widgets/custom_app_bar.dart';
 import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
 
 class AgencyScreen extends StatefulWidget {
+  final List<Agency> agencies;
+  const AgencyScreen({super.key, required this.agencies});
   @override
   _AgencyScreenState createState() => _AgencyScreenState();
 }
@@ -32,8 +35,17 @@ class _AgencyScreenState extends State<AgencyScreen> {
                     style: TextStyle(fontSize: 15),
                   ),
                 ),
-                buildAgencyCard("Mountain Adventures", 8500),
-                buildAgencyCard("City Explorers", 9500),
+                ListView.builder(
+                  itemCount: widget.agencies.length,
+                  itemBuilder: (context, index) {
+                    final agency = widget.agencies[index];
+                    return buildAgencyCard(
+                      agency.companyName,
+                    );
+                  },
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -75,7 +87,9 @@ class _AgencyScreenState extends State<AgencyScreen> {
                       onPressed: () {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => PlanningScreen()),
+                          MaterialPageRoute(
+                            builder: (context) => PlanningScreen(),
+                          ),
                         );
                       },
                       child: Padding(
@@ -105,7 +119,7 @@ class _AgencyScreenState extends State<AgencyScreen> {
     );
   }
 
-  Widget buildAgencyCard(String agencyName, int price) {
+  Widget buildAgencyCard(String agencyName) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Card(
@@ -114,11 +128,12 @@ class _AgencyScreenState extends State<AgencyScreen> {
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Icon(Icons.add_a_photo, size: 50, color: Colors.brown),
-                  Text(agencyName),
-                  Text("Rs\n$price"),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15),
+                    child: Text(agencyName),
+                  ),
                 ],
               ),
               Text("⭐ 4.8 (200 reviews)"),

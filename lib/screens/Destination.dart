@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:swift_trip_app/screens/Agency.dart';
+import 'package:swift_trip_app/services/search_service.dart';
 import 'package:swift_trip_app/widgets/custom_app_bar.dart';
 import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
 
@@ -13,20 +14,42 @@ class DestinationScreen extends StatefulWidget {
 class _DestinationScreenState extends State<DestinationScreen> {
   final List<String> cities = [
     // Punjab
-    "Lahore", "Faisalabad", "Rawalpindi",  "Gujranwala", "Multan", "Sialkot", "Bahawalpur", "Sargodha",
+    "Lahore",
+    "Geneva",
+    "Zermatt",
+    "Faisalabad",
+    "Rawalpindi",
+    "Gujranwala",
+    "Multan",
+    "Sialkot",
+    "Bahawalpur",
+    "Sargodha",
     "Sahiwal", "Jhang", "Dera Ghazi Khan", "Sheikhupura", "Rahim Yar Khan",
     // Sindh
-    "Karachi", "Hyderabad", "Sukkur", "Larkana", "Nawabshah", "Mirpurkhas", "Khairpur",
+    "Karachi",
+    "Hyderabad",
+    "Sukkur",
+    "Larkana",
+    "Nawabshah",
+    "Mirpurkhas",
+    "Khairpur",
     // Khyber Pakhtunkhwa (KP)
-    "Peshawar", "Mardan", "Abbottabad", "Swat", "Kohat", "Dera Ismail Khan", "Charsadda", "Chitral",
+    "Peshawar",
+    "Mardan",
+    "Abbottabad",
+    "Swat",
+    "Kohat",
+    "Dera Ismail Khan",
+    "Charsadda",
+    "Chitral",
     // Balochistan
-    "Quetta", "Gwadar", "Turbat", "Zhob", "Khuzdar", "Sibi", 
+    "Quetta", "Gwadar", "Turbat", "Zhob", "Khuzdar", "Sibi",
     // Islamabad Capital Territory
     "Islamabad",
     // Gilgit-Baltistan
-    "Gilgit","Skardu","Hunza",
+    "Gilgit", "Skardu", "Hunza",
     // Azad Jammu & Kashmir
-    "Muzaffarabad","Mirpur","Kotli",
+    "Muzaffarabad", "Mirpur", "Kotli",
   ];
 
   late String fromCity = cities[0];
@@ -35,12 +58,14 @@ class _DestinationScreenState extends State<DestinationScreen> {
   late TextEditingController minBudget;
   late TextEditingController maxBudget;
 
+  @override
   void initState() {
     super.initState();
     minBudget = TextEditingController();
     maxBudget = TextEditingController();
   }
 
+  @override
   void dispose() {
     minBudget.dispose();
     maxBudget.dispose();
@@ -90,11 +115,32 @@ class _DestinationScreenState extends State<DestinationScreen> {
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => AgencyScreen()),
-                    );
+                  onPressed: () async {
+                    try {
+                      int min = int.tryParse(minBudget.text) ?? 0;
+                      int max = int.tryParse(maxBudget.text) ?? 999999;
+
+                      final service = TourService();
+                      final results = await service.searchAgencies(
+                        fromCity: fromCity,
+                        toCity: toCity,
+                        minBudget: min,
+                        maxBudget: max,
+                      );
+
+                      // Navigate to screen showing results
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                            AgencyScreen(agencies: results)
+                        ),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Search failed: $e")),
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
@@ -145,7 +191,6 @@ class _DestinationScreenState extends State<DestinationScreen> {
             borderSide: BorderSide(color: Colors.blueAccent, width: 2),
           ),
           hintText: city,
-          
         ),
         initialValue: city == "Arrival City" ? toCity : fromCity,
         items: cities.map((value) {
@@ -164,7 +209,7 @@ class _DestinationScreenState extends State<DestinationScreen> {
     );
   }
 
-  Widget _budgetBuild(String title, TextEditingController controller) {
+  Widget _budgetBuild(String title, TextEditingController controllerName) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: TextFormField(
@@ -178,64 +223,8 @@ class _DestinationScreenState extends State<DestinationScreen> {
           ),
           hintText: title,
         ),
-        controller: minBudget,
+        controller: controllerName,
         keyboardType: TextInputType.number,
-      ),
-    );
-  }
-
-  Widget _routePreviewBuild() {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: SizedBox(
-        width: 500,
-        height: 105,
-        child: Card(
-          color: Color(0xffEFF6FF),
-          elevation: 1,
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 15,
-                      vertical: 10,
-                    ),
-                    child: Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 5),
-                          child: Icon(
-                            Icons.directions_bus,
-                            color: Colors.blueGrey,
-                          ),
-                        ),
-                        Text(
-                          "Route Preview",
-                          style: TextStyle(color: Color(0xff1C398E)),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 15,
-                  vertical: 0,
-                ),
-                child: Row(
-                  children: [
-                    Text(fromCity, style: TextStyle(color: Color(0xff1447E6))),
-                    Icon(Icons.arrow_forward, color: Color(0xff1447E6)),
-                    Text(toCity, style: TextStyle(color: Color(0xff1447E6))),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

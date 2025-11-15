@@ -1,4 +1,4 @@
-import 'package:swift_trip_app/models/searchAgency.dart';
+import 'package:swift_trip_app/models/package_search.dart';
 
 class Agency {
   final int companyId;
