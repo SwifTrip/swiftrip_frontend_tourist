@@ -9,7 +9,10 @@ class ApiConfig {
   static const String login = '$baseUrl/login';
   static const String logout = '$baseUrl/logout';
 
-  // Custom Tour Endpoints
+  // Agency search in custom tour Endpoint
+  static const String tourSearch = '$baseUrl/custom-tour/search';
+
+// Custom Tour Endpoints
   static const String createCustomTour = '$baseUrl/custom-tour/create';
 
   // Request timeout duration

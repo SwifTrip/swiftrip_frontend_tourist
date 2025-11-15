@@ -32,6 +32,21 @@ class _DestinationScreenState extends State<DestinationScreen> {
   late String fromCity = cities[0];
   late String toCity = cities[1];
 
+  late TextEditingController minBudget;
+  late TextEditingController maxBudget;
+
+  void initState() {
+    super.initState();
+    minBudget = TextEditingController();
+    maxBudget = TextEditingController();
+  }
+
+  void dispose() {
+    minBudget.dispose();
+    maxBudget.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,7 +79,10 @@ class _DestinationScreenState extends State<DestinationScreen> {
                       _dropdownbuild("Departure City"),
                       _labelbuild("Arrival City"),
                       _dropdownbuild("Arrival City"),
-                      _routePreviewBuild(),
+                      _labelbuild("Minimum Budget"),
+                      _budgetBuild("Minimum Budget", minBudget),
+                      _labelbuild("Maximum Budget"),
+                      _budgetBuild("Maximum Budget", maxBudget),
                     ],
                   ),
                 ),
@@ -104,10 +122,10 @@ class _DestinationScreenState extends State<DestinationScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Row(
         children: [
-          Icon(
-            Icons.place,
-            color: title == "Departure City" ? Colors.blue : Colors.green,
-          ),
+          // Icon(
+          //   Icons.place,
+          //   color: title == "Departure City" ? Colors.blue : Colors.green,
+          // ),
           Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
@@ -127,6 +145,7 @@ class _DestinationScreenState extends State<DestinationScreen> {
             borderSide: BorderSide(color: Colors.blueAccent, width: 2),
           ),
           hintText: city,
+          
         ),
         initialValue: city == "Arrival City" ? toCity : fromCity,
         items: cities.map((value) {
@@ -141,6 +160,26 @@ class _DestinationScreenState extends State<DestinationScreen> {
             }
           });
         },
+      ),
+    );
+  }
+
+  Widget _budgetBuild(String title, TextEditingController controller) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      child: TextFormField(
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Color(0xffF9FAFB),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: BorderSide(color: Colors.blueAccent, width: 2),
+          ),
+          hintText: title,
+        ),
+        controller: minBudget,
+        keyboardType: TextInputType.number,
       ),
     );
   }
