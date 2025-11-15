@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:swift_trip_app/screens/customBar.dart';
+import 'package:swift_trip_app/screens/Agency.dart';
+import 'package:swift_trip_app/widgets/custom_app_bar.dart';
+import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
 
 class DestinationScreen extends StatefulWidget {
   const DestinationScreen({super.key});
@@ -9,17 +11,31 @@ class DestinationScreen extends StatefulWidget {
 }
 
 class _DestinationScreenState extends State<DestinationScreen> {
-  final List<String> cities = ["Islamabad", "Lahore", "Karachi", "Peshawar"];
+  final List<String> cities = [
+    // Punjab
+    "Lahore", "Faisalabad", "Rawalpindi",  "Gujranwala", "Multan", "Sialkot", "Bahawalpur", "Sargodha",
+    "Sahiwal", "Jhang", "Dera Ghazi Khan", "Sheikhupura", "Rahim Yar Khan",
+    // Sindh
+    "Karachi", "Hyderabad", "Sukkur", "Larkana", "Nawabshah", "Mirpurkhas", "Khairpur",
+    // Khyber Pakhtunkhwa (KP)
+    "Peshawar", "Mardan", "Abbottabad", "Swat", "Kohat", "Dera Ismail Khan", "Charsadda", "Chitral",
+    // Balochistan
+    "Quetta", "Gwadar", "Turbat", "Zhob", "Khuzdar", "Sibi", 
+    // Islamabad Capital Territory
+    "Islamabad",
+    // Gilgit-Baltistan
+    "Gilgit","Skardu","Hunza",
+    // Azad Jammu & Kashmir
+    "Muzaffarabad","Mirpur","Kotli",
+  ];
+
   late String fromCity = cities[0];
   late String toCity = cities[1];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(130),
-        child: customBar(selectedIndex: 1),
-      ),
+      appBar: CustomAppBar(currentStep: 0),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
@@ -48,7 +64,7 @@ class _DestinationScreenState extends State<DestinationScreen> {
                       _dropdownbuild("Departure City"),
                       _labelbuild("Arrival City"),
                       _dropdownbuild("Arrival City"),
-                      _routePreviewBuild()
+                      _routePreviewBuild(),
                     ],
                   ),
                 ),
@@ -56,7 +72,12 @@ class _DestinationScreenState extends State<DestinationScreen> {
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => AgencyScreen()),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.blueAccent,
@@ -74,6 +95,7 @@ class _DestinationScreenState extends State<DestinationScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: CustomBottomBar(currentIndex: 1),
     );
   }
 
@@ -113,10 +135,10 @@ class _DestinationScreenState extends State<DestinationScreen> {
         onChanged: (value) {
           setState(() {
             if (city == "Arrival City") {
-            toCity = value.toString();
-          } else {
-            fromCity = value.toString();
-          }
+              toCity = value.toString();
+            } else {
+              fromCity = value.toString();
+            }
           });
         },
       ),
@@ -145,7 +167,10 @@ class _DestinationScreenState extends State<DestinationScreen> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(left: 5),
-                          child: Icon(Icons.directions_bus, color: Colors.blueGrey),
+                          child: Icon(
+                            Icons.directions_bus,
+                            color: Colors.blueGrey,
+                          ),
                         ),
                         Text(
                           "Route Preview",
