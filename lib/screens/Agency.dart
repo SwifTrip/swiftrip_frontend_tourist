@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:swift_trip_app/screens/Destination.dart';
 import 'package:swift_trip_app/screens/Plannig.dart';
-import 'package:swift_trip_app/screens/customBar.dart';
 import 'package:swift_trip_app/widgets/custom_app_bar.dart';
 import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
 
