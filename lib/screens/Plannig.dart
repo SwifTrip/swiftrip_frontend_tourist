@@ -27,7 +27,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
           children: [
             Padding(
               padding: EdgeInsets.only(top: 20),
-              child: Text("Plan Your Journey ${widget.agencyId}, ${widget.destination}, ${widget.budget}", style: TextStyle(fontSize: 18)),
+              child: Text("Plan Your Journey for ${widget.destination}", style: TextStyle(fontSize: 18)),
             ),
             Column(
               children: [
