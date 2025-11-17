@@ -131,41 +131,53 @@ class _AgencyScreenState extends State<AgencyScreen> {
   }
 
   Widget buildAgencyCard(int agencyId, String agencyName) {
+    bool selected = this.agencyId == agencyId;
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Card(
+         color: selected ? const Color(0xffEFF6FF) : Colors.white,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(
+            color: selected ? Colors.blueAccent : Colors.grey.shade300,
+            width: 2,
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
         child: InkWell(
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.add_a_photo, size: 50, color: Colors.brown),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 15),
-                    child: Text(agencyName),
-                  ),
-                ],
-              ),
-              Text("⭐ 4.8 (200 reviews)"),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SizedBox(
-                  width: 300,
-                  child: GridView(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 5,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.add_a_photo, size: 50, color: Colors.brown),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15),
+                      child: Text(agencyName),
                     ),
-                    shrinkWrap: true,
-                    children: [
-                      Card(child: Center(child: Text("Mountain Tours"))),
-                      Card(child: Center(child: Text("Adventure Travels"))),
-                      Card(child: Center(child: Text("Photography"))),
-                    ],
+                  ],
+                ),
+                Text("⭐ 4.8 (200 reviews)"),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: 300,
+                    child: GridView(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 5,
+                      ),
+                      shrinkWrap: true,
+                      children: [
+                        Card(child: Center(child: Text("Mountain Tours"))),
+                        Card(child: Center(child: Text("Adventure Travels"))),
+                        Card(child: Center(child: Text("Photography"))),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           onTap: () {
             setState(() {
