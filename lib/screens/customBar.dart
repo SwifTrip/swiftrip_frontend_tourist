@@ -93,9 +93,9 @@ class customBar extends StatelessWidget {
           // }));
         }
         else if(index==3){
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-            return  PlanningScreen();
-          }));
+          // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+          //   return  PlanningScreen();
+          // }));
         }
       },
       child: Text(title, style: TextStyle(color: isSelected ? Colors.blue : Colors.black, fontSize: 16)),

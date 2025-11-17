@@ -133,7 +133,7 @@ class _DestinationScreenState extends State<DestinationScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                            AgencyScreen(agencies: results)
+                            AgencyScreen(agencies: results, budget: min, destination: toCity)
                         ),
                       );
                     } catch (e) {

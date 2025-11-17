@@ -5,6 +5,13 @@ import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
 
 
 class PlanningScreen extends StatefulWidget {
+  final int agencyId;
+  final String destination;
+  final int budget;
+
+  const PlanningScreen({super.key,required this.agencyId, required this.destination, required this.budget});
+  
+
   @override
   _PlanningScreenState createState() => _PlanningScreenState();
 }

@@ -6,13 +6,18 @@ import 'package:swift_trip_app/widgets/custom_app_bar.dart';
 import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
 
 class AgencyScreen extends StatefulWidget {
+  final int budget;
+  final String destination;
+
   final List<Agency> agencies;
-  const AgencyScreen({super.key, required this.agencies});
+  const AgencyScreen({super.key, required this.agencies, required this.budget, required this.destination});
   @override
   _AgencyScreenState createState() => _AgencyScreenState();
 }
 
 class _AgencyScreenState extends State<AgencyScreen> {
+   late int agencyId=0;
+   late String category="";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,7 +93,7 @@ class _AgencyScreenState extends State<AgencyScreen> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => PlanningScreen(),
+                            builder: (context) => PlanningScreen(agencyId: agencyId,destination: widget.destination,budget: widget.budget),
                           ),
                         );
                       },
@@ -123,8 +128,7 @@ class _AgencyScreenState extends State<AgencyScreen> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(15),
+        child: InkWell(
           child: Column(
             children: [
               Row(
@@ -157,6 +161,9 @@ class _AgencyScreenState extends State<AgencyScreen> {
               ),
             ],
           ),
+          onTap: () {
+            
+          },
         ),
       ),
     );
