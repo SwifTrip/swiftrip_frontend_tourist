@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:swift_trip_app/models/Agency.dart';
-import 'package:swift_trip_app/screens/Destination.dart';
 import 'package:swift_trip_app/screens/Plannig.dart';
 import 'package:swift_trip_app/widgets/custom_app_bar.dart';
 import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
@@ -10,20 +9,25 @@ class AgencyScreen extends StatefulWidget {
   final String destination;
 
   final List<Agency> agencies;
-  const AgencyScreen({super.key, required this.agencies, required this.budget, required this.destination});
+  const AgencyScreen({
+    super.key,
+    required this.agencies,
+    required this.budget,
+    required this.destination,
+  });
   @override
   _AgencyScreenState createState() => _AgencyScreenState();
 }
 
 class _AgencyScreenState extends State<AgencyScreen> {
-   late int agencyId=0;
-   late String category="";
+  late int agencyId = 0;
+  late String category = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(currentStep: 1),
       body: SingleChildScrollView(
-        child: Container(
+        child: SizedBox(
           width: double.infinity,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -45,6 +49,7 @@ class _AgencyScreenState extends State<AgencyScreen> {
                   itemBuilder: (context, index) {
                     final agency = widget.agencies[index];
                     return buildAgencyCard(
+                      agency.companyId,
                       agency.companyName,
                     );
                   },
@@ -62,12 +67,7 @@ class _AgencyScreenState extends State<AgencyScreen> {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DestinationScreen(),
-                          ),
-                        );
+                        Navigator.pop(context);
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
@@ -90,10 +90,16 @@ class _AgencyScreenState extends State<AgencyScreen> {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => PlanningScreen(agencyId: agencyId,destination: widget.destination,budget: widget.budget),
+                            builder: (context) {
+                              return PlanningScreen(
+                                agencyId: agencyId,
+                                destination: widget.destination,
+                                budget: widget.budget,
+                              );
+                            },
                           ),
                         );
                       },
@@ -124,7 +130,7 @@ class _AgencyScreenState extends State<AgencyScreen> {
     );
   }
 
-  Widget buildAgencyCard(String agencyName) {
+  Widget buildAgencyCard(int agencyId, String agencyName) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Card(
@@ -162,7 +168,9 @@ class _AgencyScreenState extends State<AgencyScreen> {
             ],
           ),
           onTap: () {
-            
+            setState(() {
+              this.agencyId = agencyId;
+            });
           },
         ),
       ),

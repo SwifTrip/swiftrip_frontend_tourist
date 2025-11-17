@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:swift_trip_app/screens/Destination.dart';
-import 'package:swift_trip_app/screens/Plannig.dart';
 import 'package:swift_trip_app/screens/Signin.dart';
 
 class customBar extends StatelessWidget {
