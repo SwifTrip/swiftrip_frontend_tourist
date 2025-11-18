@@ -1,186 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:swift_trip_app/models/agency_response_model.dart';
-import 'package:swift_trip_app/screens/summary_screen.dart';
 import 'package:swift_trip_app/widgets/custom_app_bar.dart';
 import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
 
-
-class PlanningScreen extends StatefulWidget {
+class PlanningScreen extends StatelessWidget {
   final TourResponse tourResponse;
 
-  const PlanningScreen({super.key,required this.tourResponse});
-  
+  const PlanningScreen({super.key, required this.tourResponse});
 
-  @override
-  _PlanningScreenState createState() => _PlanningScreenState();
-}
-
-class _PlanningScreenState extends State<PlanningScreen> {
-  int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
+    final base = tourResponse.basePackage;
+    final itineraries = base.itineraries;
+
     return Scaffold(
       appBar: CustomAppBar(currentStep: 2),
+      backgroundColor: Colors.grey.shade100,
       body: SingleChildScrollView(
         child: Column(
           children: [
+            const SizedBox(height: 15),
+
+            /// -------------------------
+            /// PACKAGE HEADER
+            /// -------------------------
+            PackageHeader(base: base),
+
+            const SizedBox(height: 10),
+
+            /// -------------------------
+            /// ITINERARIES
+            /// -------------------------
             Padding(
-              padding: EdgeInsets.only(top: 20),
-              child: Text("Plan Your Journey for ${widget.tourResponse.agency.name}", style: TextStyle(fontSize: 18)),
-            ),
-            Column(
-              children: [
-                Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Arrival Day: ",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            "Arrival 6pm",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      child: Card(
-                        color: Color.fromARGB(255, 234, 193, 193),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "10hrs drive from Lhr to Arival",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.red,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      child: Card(
-                        color: Color.fromARGB(255, 248, 243, 214),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Meals dinner",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: const Color.fromARGB(
-                                    255,
-                                    104,
-                                    100,
-                                    66,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                        "Accommodation",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    builAccomodationCard(1),
-                    builAccomodationCard(2),
-                    builAccomodationCard(3),
-                    buildDay(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 25,
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.arrow_back, color: Colors.black),
-                            Text("Back", style: TextStyle(color: Colors.black)),
-                          ],
-                        ),
-                      ),
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => SummaryScreen()),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 25,
-                        ),
-                        child: Row(
-                          children: [
-                            Text(
-                              "Continue",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            Icon(Icons.arrow_forward, color: Colors.white),
-                          ],
-                        ),
-                      ),
-                    ),
-                  
-                      ],
-                    )
-                  ],
-                ),
-              ],
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                children: itineraries
+                    .map((day) => ItineraryDayCard(itinerary: day))
+                    .toList(),
+              ),
             ),
           ],
         ),
@@ -188,173 +45,188 @@ class _PlanningScreenState extends State<PlanningScreen> {
       bottomNavigationBar: CustomBottomBar(currentIndex: 1),
     );
   }
+}
 
-  Widget builAccomodationCard(int index) {
-    bool selected = selectedIndex == index;
-    return Container(
-      height: 100,
-      margin: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-      child: Card(
-        color: selected ? const Color(0xffEFF6FF) : Colors.white,
-        shape: RoundedRectangleBorder(
-          side: BorderSide(
-            color: selected ? Colors.blueAccent : Colors.grey.shade300,
-            width: 2,
-          ),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: InkWell(
-          onTap: () {
-            setState(() {
-              selectedIndex = index;
-            });
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(15),
-            child: Column(
+///////////////////////////////////////////////////////////
+///                 PACKAGE HEADER                      ///
+///////////////////////////////////////////////////////////
+
+class PackageHeader extends StatelessWidget {
+  final BasePackage base;
+
+  const PackageHeader({super.key, required this.base});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 3,
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// Title
+            Text(
+              base.title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            /// Description
+            Text(
+              base.description,
+              style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+            ),
+
+            const SizedBox(height: 12),
+
+            /// Chips (Category + Price + Locations)
+            Wrap(
+              spacing: 8,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Hotel Stay Resort \n ⭐4.5(150 reviews)"),
-                    Text("Rs 8000/Night"),
-                  ],
+                Chip(
+                  label: Text(base.category),
+                  backgroundColor: Colors.blue.shade50,
+                ),
+                Chip(
+                  label: Text("${base.currency} ${base.basePrice}"),
+                  backgroundColor: Colors.green.shade50,
+                ),
+                Chip(
+                  label: Text("${base.fromLocation} → ${base.toLocation}"),
+                  backgroundColor: Colors.purple.shade50,
                 ),
               ],
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildDay() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Card(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Day 1",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFF3E0),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.close, color: Colors.orange, size: 18),
-                    SizedBox(width: 6),
-                    Text(
-                      "Meals: Breakfast",
-                      style: TextStyle(color: Colors.orange),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 15),
-
-              const Text(
-                "Activities",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              buildActivity("Shangrila Lake Visit", "3 hours", "Rs. 5,000"),
-              buildActivity("Mountain Hiking", "5 hours", "Rs. 6,000"),
-              const SizedBox(height: 10),
-              Text("Add Activities",style: TextStyle(fontWeight: FontWeight.bold),),
-              const SizedBox(height: 15),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade400),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.add, color: Colors.blue),
-                    SizedBox(width: 8),
-                    Text("Cultural Village Visit"),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 15),
-
-              const Text(
-                "Accommodation",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              buildAccommodation(
-                "Mountain View Resort",
-                "4.5",
-                "Rs. 15,000/night",
-                selected: true,
-              ),
-              buildAccommodation("Comfort Inn", "4.2", "Rs. 8,000/night"),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  static Widget buildActivity(String title, String duration, String price) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE8F5E9),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: ListTile(
-        leading: const Icon(Icons.check_circle, color: Colors.green),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-        subtitle: Text(duration),
-        trailing: Text(
-          price,
-          style: const TextStyle(
-            color: Colors.green,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-
-  static Widget buildAccommodation(
-    String name,
-    String rating,
-    String price, {
-    bool selected = false,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade300, width: 2),
-      ),
-      child: ListTile(
-        title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Row(
-          children: [
-            const Icon(Icons.star, color: Colors.amber, size: 16),
-            Text(" $rating"),
           ],
         ),
+      ),
+    );
+  }
+}
+
+///////////////////////////////////////////////////////////
+///                ITINERARY DAY CARD                   ///
+///////////////////////////////////////////////////////////
+
+class ItineraryDayCard extends StatelessWidget {
+  final Itinerary itinerary;
+
+  const ItineraryDayCard({super.key, required this.itinerary});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.only(bottom: 14),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// Day Title
+            Text(
+              itinerary.title ?? "Day ${itinerary.dayNumber}",
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+
+            const SizedBox(height: 6),
+
+            /// Description
+            if (itinerary.description != null)
+              Text(
+                itinerary.description!,
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+              ),
+
+            const SizedBox(height: 12),
+
+            /// Items List (Meals, Activities, Stay)
+            Column(
+              children: itinerary.itineraryItems
+                  .map((item) => ItineraryItemTile(item: item))
+                  .toList(),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+///////////////////////////////////////////////////////////
+///                ITINERARY ITEM TILE                  ///
+///////////////////////////////////////////////////////////
+
+class ItineraryItemTile extends StatelessWidget {
+  final ItineraryItem item;
+
+  const ItineraryItemTile({super.key, required this.item});
+
+  IconData _getIcon(String type) {
+    switch (type) {
+      case "MEAL":
+        return Icons.restaurant;
+      case "STAY":
+        return Icons.hotel;
+      case "ACTIVITY":
+        return Icons.hiking;
+      default:
+        return Icons.info;
+    }
+  }
+
+  Color _getColor(String type) {
+    switch (type) {
+      case "MEAL":
+        return Colors.orange;
+      case "STAY":
+        return Colors.blue;
+      case "ACTIVITY":
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _getColor(item.type);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        leading: Icon(_getIcon(item.type), color: color, size: 30),
+
+        /// Name
+        title: Text(
+          item.name ?? "",
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+
+        /// Description
+        subtitle: Text(
+          item.description ?? "",
+          style: TextStyle(color: Colors.grey.shade600),
+        ),
+
+        /// Price
         trailing: Text(
-          price,
+          item.price == 0 ? "Free" : "\$${item.price}",
           style: TextStyle(
-            color: Colors.grey.shade600,
+            color: color,
             fontWeight: FontWeight.bold,
           ),
         ),
