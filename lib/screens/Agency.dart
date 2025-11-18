@@ -1,6 +1,8 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:swift_trip_app/models/Agency.dart';
 import 'package:swift_trip_app/screens/Plannig.dart';
+import 'package:swift_trip_app/services/get_packages.dart';
 import 'package:swift_trip_app/widgets/custom_app_bar.dart';
 import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
 
@@ -89,19 +91,28 @@ class _AgencyScreenState extends State<AgencyScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return PlanningScreen(
-                                agencyId: agencyId,
-                                destination: widget.destination,
-                                budget: widget.budget,
-                              );
-                            },
-                          ),
-                        );
+                      onPressed: () async {
+                        try {
+                          final service = PackageService();
+                          final result = await service.getPackages(
+                            agencyId: agencyId,
+                            toCity: widget.destination,
+                            minBudget: widget.budget,
+                          );
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return PlanningScreen(tourResponse: result);
+                              },
+                            ),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Search failed: $e")),
+                          );
+                        }
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
@@ -135,7 +146,7 @@ class _AgencyScreenState extends State<AgencyScreen> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Card(
-         color: selected ? const Color(0xffEFF6FF) : Colors.white,
+        color: selected ? const Color(0xffEFF6FF) : Colors.white,
         shape: RoundedRectangleBorder(
           side: BorderSide(
             color: selected ? Colors.blueAccent : Colors.grey.shade300,

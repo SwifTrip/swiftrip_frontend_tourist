@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:swift_trip_app/models/agency_response_model.dart';
 import 'package:swift_trip_app/screens/summary_screen.dart';
 import 'package:swift_trip_app/widgets/custom_app_bar.dart';
 import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
 
 
 class PlanningScreen extends StatefulWidget {
-  final int agencyId;
-  final String destination;
-  final int budget;
+  final TourResponse tourResponse;
 
-  const PlanningScreen({super.key,required this.agencyId, required this.destination, required this.budget});
+  const PlanningScreen({super.key,required this.tourResponse});
   
 
   @override
@@ -27,7 +26,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
           children: [
             Padding(
               padding: EdgeInsets.only(top: 20),
-              child: Text("Plan Your Journey for ${widget.destination}", style: TextStyle(fontSize: 18)),
+              child: Text("Plan Your Journey for ${widget.tourResponse.agency.name}", style: TextStyle(fontSize: 18)),
             ),
             Column(
               children: [

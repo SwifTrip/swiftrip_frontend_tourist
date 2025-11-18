@@ -5,6 +5,7 @@ import 'package:swift_trip_app/widgets/custom_app_bar.dart';
 import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
 
 class DestinationScreen extends StatefulWidget {
+  
   const DestinationScreen({super.key});
 
   @override
