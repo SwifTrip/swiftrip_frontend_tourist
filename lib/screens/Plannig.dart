@@ -26,6 +26,35 @@ class _PlanningScreenState extends State<PlanningScreen> {
     }
   }
 
+  void toggleItemSelection(int dayNumber, int itemId, bool selected) {
+    final list = selectedOptionalItems[dayNumber] ?? [];
+    setState(() {
+      if (selected) {
+        if (!list.contains(itemId)) list.add(itemId);
+      } else {
+        list.remove(itemId);
+      }
+      selectedOptionalItems[dayNumber] = list;
+    });
+  }
+
+  double computeAddOnTotal() {
+    double sum = 0.0;
+    for (var day in widget.tourResponse.basePackage.itineraries) {
+      final ids = selectedOptionalItems[day.dayNumber] ?? [];
+      for (var item in day.itineraryItems) {
+        if (ids.contains(item.id)) {
+          sum += item.price.toDouble();
+        }
+      }
+    }
+    return sum;
+  }
+
+  double computeBaseTotal() {
+    return widget.tourResponse.basePackage.basePrice.toDouble() * travelerCount;
+  }
+
   @override
   Widget build(BuildContext context) {
     final base = widget.tourResponse.basePackage;
