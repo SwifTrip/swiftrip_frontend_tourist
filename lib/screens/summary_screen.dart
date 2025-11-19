@@ -4,6 +4,8 @@ import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
 import 'package:swift_trip_app/screens/app-theme.dart';
 import 'package:swift_trip_app/screens/payment_screen.dart';
 import 'package:swift_trip_app/models/agency_response_model.dart';
+import 'package:swift_trip_app/models/custom_tour_request.dart';
+import 'package:swift_trip_app/services/custom_tour_service.dart';
 
 class SummaryScreen extends StatelessWidget {
   final TourResponse tourResponse;
@@ -194,34 +196,32 @@ class SummaryScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 16),
-            _buildItinerary(),
-            const SizedBox(height: 20),
-            _buildCostBreakdown(),
+            const SizedBox(height: 24),
 
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => PaymentScreen()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.blueAccent,
+            /// Confirm Button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 120,
-                      vertical: 15,
-                    ),
-                    child: const Text("Continue"),
+                  backgroundColor: Colors.blue,
+                ),
+                onPressed: () => _handleConfirmBooking(context),
+                child: const Text(
+                  'Confirm & Book',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
               ),
             ),
+
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -256,6 +256,95 @@ class SummaryScreen extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Future<void> _handleConfirmBooking(BuildContext context) async {
+    // Show loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      // Build request
+      final request = CustomTourRequest(
+        companyId: tourResponse.agency.id,
+        basePackageId: tourResponse.basePackage.id,
+        startDate: startDate.toIso8601String(),
+        endDate: endDate.toIso8601String(),
+        travelerCount: travelerCount,
+        itineraries: tourResponse.basePackage.itineraries.map((day) {
+          return ItineraryDay(
+            dayNumber: day.dayNumber,
+            selectedOptionalItems: selectedOptionalItems[day.dayNumber] ?? [],
+          );
+        }).toList(),
+      );
+
+      // Call backend
+      final service = CustomTourService();
+      final result = await service.createCustomTour(
+        companyId: request.companyId,
+        basePackageId: request.basePackageId,
+        startDate: request.startDate,
+        endDate: request.endDate,
+        travelerCount: request.travelerCount,
+        itineraries: request.itineraries,
+      );
+
+      // Close loading
+      if (context.mounted) Navigator.pop(context);
+
+      // Handle response
+      if (result['success'] == true) {
+        if (context.mounted) {
+          showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: const Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.green, size: 32),
+                  SizedBox(width: 12),
+                  Text('Booking Confirmed!'),
+                ],
+              ),
+              content: Text(
+                result['message'] ??
+                    'Your custom tour has been created successfully.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.popUntil(context, (route) => route.isFirst);
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result['message'] ?? 'Failed to create booking'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) Navigator.pop(context);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }
 
