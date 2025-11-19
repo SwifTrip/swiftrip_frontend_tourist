@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:swift_trip_app/models/agency_response_model.dart';
 import 'package:swift_trip_app/widgets/custom_app_bar.dart';
 import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
+import 'package:swift_trip_app/screens/summary_screen.dart';
 
 class PlanningScreen extends StatefulWidget {
   final TourResponse tourResponse;
@@ -254,10 +255,17 @@ class _PlanningScreenState extends State<PlanningScreen> {
                             );
                             return;
                           }
-                          // TODO: Navigate to SummaryScreen
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Summary screen coming next'),
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SummaryScreen(
+                                tourResponse: widget.tourResponse,
+                                travelerCount: travelerCount,
+                                startDate: dateRange!.start,
+                                endDate: dateRange!.end,
+                                selectedOptionalItems: selectedOptionalItems,
+                              ),
                             ),
                           );
                         },
