@@ -229,8 +229,15 @@ class ItineraryDayCard extends StatelessWidget {
 
 class ItineraryItemTile extends StatelessWidget {
   final ItineraryItem item;
+  final bool selected;
+  final ValueChanged<bool>? onToggle;
 
-  const ItineraryItemTile({super.key, required this.item});
+  const ItineraryItemTile({
+    super.key,
+    required this.item,
+    this.selected = false,
+    this.onToggle,
+  });
 
   IconData _getIcon(String type) {
     switch (type) {
@@ -240,6 +247,8 @@ class ItineraryItemTile extends StatelessWidget {
         return Icons.hotel;
       case "ACTIVITY":
         return Icons.hiking;
+      case "TRANSPORT":
+        return Icons.directions_car;
       default:
         return Icons.info;
     }
@@ -253,6 +262,8 @@ class ItineraryItemTile extends StatelessWidget {
         return Colors.blue;
       case "ACTIVITY":
         return Colors.green;
+      case "TRANSPORT":
+        return Colors.purple;
       default:
         return Colors.grey;
     }
@@ -265,29 +276,63 @@ class ItineraryItemTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.06),
+        color: color.withOpacity(selected ? 0.15 : 0.06),
         borderRadius: BorderRadius.circular(12),
+        border: selected ? Border.all(color: color, width: 2) : null,
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         leading: Icon(_getIcon(item.type), color: color, size: 30),
 
-        /// Name
-        title: Text(
-          item.name ?? "",
-          style: const TextStyle(fontWeight: FontWeight.bold),
+        /// Name with optional badge
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                item.name.isNotEmpty ? item.name : "Unnamed",
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            if (item.optional)
+              const Chip(
+                label: Text('Optional', style: TextStyle(fontSize: 10)),
+                padding: EdgeInsets.symmetric(horizontal: 6),
+                backgroundColor: Colors.amber,
+              ),
+          ],
         ),
 
         /// Description
         subtitle: Text(
-          item.description ?? "",
+          item.description.isNotEmpty ? item.description : "No description",
           style: TextStyle(color: Colors.grey.shade600),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
         ),
 
-        /// Price
-        trailing: Text(
-          item.price == 0 ? "Free" : "\$${item.price}",
-          style: TextStyle(color: color, fontWeight: FontWeight.bold),
+        /// Price and checkbox
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              item.price == 0 ? "Free" : "\$${item.price}",
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+            if (item.optional && onToggle != null) ...[
+              const SizedBox(width: 8),
+              Checkbox(
+                value: selected,
+                onChanged: (v) {
+                  if (onToggle != null) onToggle!(v ?? false);
+                },
+                activeColor: color,
+              ),
+            ],
+          ],
         ),
       ),
     );
