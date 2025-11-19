@@ -13,6 +13,19 @@ class PlanningScreen extends StatefulWidget {
 }
 
 class _PlanningScreenState extends State<PlanningScreen> {
+  int travelerCount = 1;
+  DateTimeRange? dateRange;
+  Map<int, List<int>> selectedOptionalItems = {};
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize selectedOptionalItems for each day
+    for (var day in widget.tourResponse.basePackage.itineraries) {
+      selectedOptionalItems[day.dayNumber] = [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final base = widget.tourResponse.basePackage;
