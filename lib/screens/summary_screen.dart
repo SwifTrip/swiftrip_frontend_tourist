@@ -3,9 +3,39 @@ import 'package:swift_trip_app/widgets/custom_app_bar.dart';
 import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
 import 'package:swift_trip_app/screens/app-theme.dart';
 import 'package:swift_trip_app/screens/payment_screen.dart';
+import 'package:swift_trip_app/models/agency_response_model.dart';
 
 class SummaryScreen extends StatelessWidget {
-  const SummaryScreen({super.key});
+  final TourResponse tourResponse;
+  final int travelerCount;
+  final DateTime startDate;
+  final DateTime endDate;
+  final Map<int, List<int>> selectedOptionalItems;
+
+  const SummaryScreen({
+    super.key,
+    required this.tourResponse,
+    required this.travelerCount,
+    required this.startDate,
+    required this.endDate,
+    required this.selectedOptionalItems,
+  });
+
+  double computeBaseTotal() =>
+      tourResponse.basePackage.basePrice.toDouble() * travelerCount;
+
+  double computeAddOnTotal() {
+    double sum = 0.0;
+    for (var day in tourResponse.basePackage.itineraries) {
+      final ids = selectedOptionalItems[day.dayNumber] ?? [];
+      for (var item in day.itineraryItems) {
+        if (ids.contains(item.id)) {
+          sum += item.price.toDouble();
+        }
+      }
+    }
+    return sum;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,10 +76,10 @@ class SummaryScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(10),
                 child: ElevatedButton(
                   onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => PaymentScreen()),
-                      );
-                    },
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => PaymentScreen()),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.blueAccent,
