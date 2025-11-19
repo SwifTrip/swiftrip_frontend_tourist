@@ -3,14 +3,19 @@ import 'package:swift_trip_app/models/agency_response_model.dart';
 import 'package:swift_trip_app/widgets/custom_app_bar.dart';
 import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
 
-class PlanningScreen extends StatelessWidget {
+class PlanningScreen extends StatefulWidget {
   final TourResponse tourResponse;
 
   const PlanningScreen({super.key, required this.tourResponse});
 
   @override
+  State<PlanningScreen> createState() => _PlanningScreenState();
+}
+
+class _PlanningScreenState extends State<PlanningScreen> {
+  @override
   Widget build(BuildContext context) {
-    final base = tourResponse.basePackage;
+    final base = widget.tourResponse.basePackage;
     final itineraries = base.itineraries;
 
     return Scaffold(
@@ -70,10 +75,7 @@ class PackageHeader extends StatelessWidget {
             /// Title
             Text(
               base.title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 8),
@@ -153,7 +155,7 @@ class ItineraryDayCard extends StatelessWidget {
               children: itinerary.itineraryItems
                   .map((item) => ItineraryItemTile(item: item))
                   .toList(),
-            )
+            ),
           ],
         ),
       ),
@@ -225,10 +227,7 @@ class ItineraryItemTile extends StatelessWidget {
         /// Price
         trailing: Text(
           item.price == 0 ? "Free" : "\$${item.price}",
-          style: TextStyle(
-            color: color,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: color, fontWeight: FontWeight.bold),
         ),
       ),
     );
