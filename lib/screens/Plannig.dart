@@ -82,10 +82,122 @@ class _PlanningScreenState extends State<PlanningScreen> {
               padding: const EdgeInsets.all(12),
               child: Column(
                 children: itineraries
-                    .map((day) => ItineraryDayCard(itinerary: day))
+                    .map(
+                      (day) => ItineraryDayCard(
+                        itinerary: day,
+                        selectedItemIds:
+                            selectedOptionalItems[day.dayNumber] ?? [],
+                        onToggleItem: (itemId, selected) {
+                          toggleItemSelection(day.dayNumber, itemId, selected);
+                        },
+                      ),
+                    )
                     .toList(),
               ),
             ),
+
+            const SizedBox(height: 16),
+
+            /// -------------------------
+            /// TRAVELER COUNT & DATE PICKER
+            /// -------------------------
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Trip Details',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Traveler count
+                          Row(
+                            children: [
+                              const Text(
+                                'Travelers:',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    if (travelerCount > 1) travelerCount--;
+                                  });
+                                },
+                                icon: const Icon(Icons.remove_circle_outline),
+                                color: Colors.red,
+                              ),
+                              Text(
+                                '$travelerCount',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    travelerCount++;
+                                  });
+                                },
+                                icon: const Icon(Icons.add_circle_outline),
+                                color: Colors.green,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      // Date picker
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () async {
+                            final picked = await showDateRangePicker(
+                              context: context,
+                              firstDate: DateTime.now(),
+                              lastDate: DateTime.now().add(
+                                const Duration(days: 365),
+                              ),
+                              initialDateRange: dateRange,
+                            );
+                            if (picked != null) {
+                              setState(() => dateRange = picked);
+                            }
+                          },
+                          icon: const Icon(Icons.calendar_today, size: 18),
+                          label: Text(
+                            dateRange == null
+                                ? 'Select Travel Dates'
+                                : '${dateRange!.start.toLocal().toString().split(' ')[0]} - ${dateRange!.end.toLocal().toString().split(' ')[0]}',
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
           ],
         ),
       ),
