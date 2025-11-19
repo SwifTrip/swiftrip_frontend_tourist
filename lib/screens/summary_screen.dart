@@ -143,6 +143,58 @@ class SummaryScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
+
+            /// Price Breakdown Card
+            Card(
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Price Breakdown',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildPriceRow('Base Package (x$travelerCount)', baseTotal),
+                    if (addOnTotal > 0) ...[
+                      const SizedBox(height: 8),
+                      _buildPriceRow('Optional Add-ons', addOnTotal),
+                    ],
+                    const SizedBox(height: 8),
+                    Divider(color: Colors.grey.shade300),
+                    const SizedBox(height: 8),
+                    _buildPriceRow(
+                      'Subtotal',
+                      baseTotal + addOnTotal,
+                      isBold: true,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildPriceRow(
+                      'Tax (10%)',
+                      (baseTotal + addOnTotal) * 0.10,
+                    ),
+                    const SizedBox(height: 12),
+                    Divider(color: Colors.grey.shade300, thickness: 2),
+                    const SizedBox(height: 12),
+                    _buildPriceRow(
+                      'Total',
+                      (baseTotal + addOnTotal) * 1.10,
+                      isTotal: true,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
             _buildItinerary(),
             const SizedBox(height: 20),
             _buildCostBreakdown(),
@@ -174,6 +226,35 @@ class SummaryScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: CustomBottomBar(currentIndex: 1),
+    );
+  }
+
+  Widget _buildPriceRow(
+    String label,
+    double amount, {
+    bool isBold = false,
+    bool isTotal = false,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: isTotal ? 18 : 14,
+            fontWeight: isTotal || isBold ? FontWeight.bold : FontWeight.normal,
+            color: isTotal ? Colors.black : Colors.grey.shade700,
+          ),
+        ),
+        Text(
+          '\$${amount.toStringAsFixed(2)}',
+          style: TextStyle(
+            fontSize: isTotal ? 20 : 14,
+            fontWeight: isTotal || isBold ? FontWeight.bold : FontWeight.w600,
+            color: isTotal ? Colors.blue : Colors.black87,
+          ),
+        ),
+      ],
     );
   }
 }
