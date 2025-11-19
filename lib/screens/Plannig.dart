@@ -161,8 +161,15 @@ class PackageHeader extends StatelessWidget {
 
 class ItineraryDayCard extends StatelessWidget {
   final Itinerary itinerary;
+  final List<int> selectedItemIds;
+  final Function(int itemId, bool selected)? onToggleItem;
 
-  const ItineraryDayCard({super.key, required this.itinerary});
+  const ItineraryDayCard({
+    super.key,
+    required this.itinerary,
+    this.selectedItemIds = const [],
+    this.onToggleItem,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -177,16 +184,18 @@ class ItineraryDayCard extends StatelessWidget {
           children: [
             /// Day Title
             Text(
-              itinerary.title ?? "Day ${itinerary.dayNumber}",
+              itinerary.title.isNotEmpty
+                  ? itinerary.title
+                  : "Day ${itinerary.dayNumber}",
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 6),
 
             /// Description
-            if (itinerary.description != null)
+            if (itinerary.description.isNotEmpty)
               Text(
-                itinerary.description!,
+                itinerary.description,
                 style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
               ),
 
@@ -194,9 +203,18 @@ class ItineraryDayCard extends StatelessWidget {
 
             /// Items List (Meals, Activities, Stay)
             Column(
-              children: itinerary.itineraryItems
-                  .map((item) => ItineraryItemTile(item: item))
-                  .toList(),
+              children: itinerary.itineraryItems.map((item) {
+                final selected = selectedItemIds.contains(item.id);
+                return ItineraryItemTile(
+                  item: item,
+                  selected: selected,
+                  onToggle: item.optional
+                      ? (sel) {
+                          if (onToggleItem != null) onToggleItem!(item.id, sel);
+                        }
+                      : null,
+                );
+              }).toList(),
             ),
           ],
         ),
