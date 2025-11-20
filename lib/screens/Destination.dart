@@ -18,16 +18,14 @@ class _DestinationScreenState extends State<DestinationScreen> {
 
   final List<String> cities = [
     // Punjab
+    "Sargodha",
     "Lahore",
-    "Geneva",
-    "Zermatt",
     "Faisalabad",
     "Rawalpindi",
     "Gujranwala",
     "Multan",
     "Sialkot",
     "Bahawalpur",
-    "Sargodha",
     "Sahiwal", "Jhang", "Dera Ghazi Khan", "Sheikhupura", "Rahim Yar Khan",
     // Sindh
     "Karachi",
@@ -46,6 +44,7 @@ class _DestinationScreenState extends State<DestinationScreen> {
     "Dera Ismail Khan",
     "Charsadda",
     "Chitral",
+    "Naran",
     // Balochistan
     "Quetta", "Gwadar", "Turbat", "Zhob", "Khuzdar", "Sibi",
     // Islamabad Capital Territory
