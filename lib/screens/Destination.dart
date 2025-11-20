@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:swift_trip_app/screens/Agency.dart';
 import 'package:swift_trip_app/services/search_service.dart';
+import 'package:swift_trip_app/services/token_service.dart';
 import 'package:swift_trip_app/widgets/custom_app_bar.dart';
 import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
 
 class DestinationScreen extends StatefulWidget {
-  
   const DestinationScreen({super.key});
 
   @override
@@ -13,6 +13,9 @@ class DestinationScreen extends StatefulWidget {
 }
 
 class _DestinationScreenState extends State<DestinationScreen> {
+  String? _storedToken;
+  bool _hasToken = false;
+
   final List<String> cities = [
     // Punjab
     "Lahore",
@@ -64,6 +67,68 @@ class _DestinationScreenState extends State<DestinationScreen> {
     super.initState();
     minBudget = TextEditingController();
     maxBudget = TextEditingController();
+    _checkStoredData();
+  }
+
+  Future<void> _checkStoredData() async {
+    final token = await TokenService.getToken();
+    final hasToken = await TokenService.hasToken();
+
+    setState(() {
+      _storedToken = token;
+      _hasToken = hasToken;
+    });
+
+    // Show token info in a dialog
+    if (mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Local Storage Debug Info'),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Has Token: ${_hasToken ? "Yes ✓" : "No ✗"}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: _hasToken ? Colors.green : Colors.red,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    'Token Value:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 5),
+                  SelectableText(
+                    _storedToken ?? 'No token found',
+                    style: TextStyle(fontSize: 12, fontFamily: 'monospace'),
+                  ),
+                  SizedBox(height: 10),
+                  if (_storedToken != null) ...[
+                    Text('Token Length: ${_storedToken!.length} characters'),
+                    SizedBox(height: 5),
+                    Text(
+                      'First 20 chars: ${_storedToken!.substring(0, _storedToken!.length > 20 ? 20 : _storedToken!.length)}...',
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Close'),
+              ),
+            ],
+          ),
+        );
+      });
+    }
   }
 
   @override
@@ -82,7 +147,29 @@ class _DestinationScreenState extends State<DestinationScreen> {
           child: Column(
             children: [
               Padding(
-                padding: EdgeInsets.only(top: 20),
+                padding: EdgeInsets.only(top: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      _hasToken ? Icons.check_circle : Icons.error,
+                      color: _hasToken ? Colors.green : Colors.red,
+                      size: 20,
+                    ),
+                    SizedBox(width: 5),
+                    Text(
+                      _hasToken ? "Authenticated" : "Not Authenticated",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: _hasToken ? Colors.green : Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 10),
                 child: Text(
                   "Select Your Journey",
                   style: TextStyle(fontSize: 18),
@@ -133,8 +220,11 @@ class _DestinationScreenState extends State<DestinationScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                            AgencyScreen(agencies: results, budget: min, destination: toCity)
+                          builder: (context) => AgencyScreen(
+                            agencies: results,
+                            budget: min,
+                            destination: toCity,
+                          ),
                         ),
                       );
                     } catch (e) {
