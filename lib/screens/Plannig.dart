@@ -1,342 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:swift_trip_app/models/agency_response_model.dart';
 import 'package:swift_trip_app/widgets/custom_app_bar.dart';
-import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
-import 'package:swift_trip_app/screens/summary_screen.dart';
 
 class PlanningScreen extends StatefulWidget {
   final TourResponse tourResponse;
-
-  const PlanningScreen({super.key, required this.tourResponse});
-
+  PlanningScreen({required this.tourResponse});
   @override
-  State<PlanningScreen> createState() => _PlanningScreenState();
+  _PlanningScreenState createState() => _PlanningScreenState();
 }
 
 class _PlanningScreenState extends State<PlanningScreen> {
-  int travelerCount = 1;
-  DateTimeRange? dateRange;
-  Map<int, List<int>> selectedOptionalItems = {};
-
-  @override
-  void initState() {
-    super.initState();
-    // Initialize selectedOptionalItems for each day
-    for (var day in widget.tourResponse.basePackage.itineraries) {
-      selectedOptionalItems[day.dayNumber] = [];
-    }
-  }
-
-  void toggleItemSelection(int dayNumber, int itemId, bool selected) {
-    final list = selectedOptionalItems[dayNumber] ?? [];
-    setState(() {
-      if (selected) {
-        if (!list.contains(itemId)) list.add(itemId);
-      } else {
-        list.remove(itemId);
-      }
-      selectedOptionalItems[dayNumber] = list;
-    });
-  }
-
-  double computeAddOnTotal() {
-    double sum = 0.0;
-    for (var day in widget.tourResponse.basePackage.itineraries) {
-      final ids = selectedOptionalItems[day.dayNumber] ?? [];
-      for (var item in day.itineraryItems) {
-        if (ids.contains(item.id)) {
-          sum += item.price.toDouble();
-        }
-      }
-    }
-    return sum;
-  }
-
-  double computeBaseTotal() {
-    return widget.tourResponse.basePackage.basePrice.toDouble() * travelerCount;
-  }
-
+  int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
-    final base = widget.tourResponse.basePackage;
-    final itineraries = base.itineraries;
-
     return Scaffold(
       appBar: CustomAppBar(currentStep: 2),
-      backgroundColor: Colors.grey.shade100,
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 15),
-
-            /// -------------------------
-            /// PACKAGE HEADER
-            /// -------------------------
-            PackageHeader(base: base),
-
-            const SizedBox(height: 10),
-
-            /// -------------------------
-            /// ITINERARIES
-            /// -------------------------
             Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                children: itineraries
-                    .map(
-                      (day) => ItineraryDayCard(
-                        itinerary: day,
-                        selectedItemIds:
-                            selectedOptionalItems[day.dayNumber] ?? [],
-                        onToggleItem: (itemId, selected) {
-                          toggleItemSelection(day.dayNumber, itemId, selected);
-                        },
-                      ),
-                    )
-                    .toList(),
-              ),
+              padding: EdgeInsets.only(top: 20),
+              child: Text("Plan Your Journey", style: TextStyle(fontSize: 18)),
             ),
-
-            const SizedBox(height: 16),
-
-            /// -------------------------
-            /// TRAVELER COUNT & DATE PICKER
-            /// -------------------------
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Card(
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Trip Details',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // Traveler count
-                          Row(
-                            children: [
-                              const Text(
-                                'Travelers:',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    if (travelerCount > 1) travelerCount--;
-                                  });
-                                },
-                                icon: const Icon(Icons.remove_circle_outline),
-                                color: Colors.red,
-                              ),
-                              Text(
-                                '$travelerCount',
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    travelerCount++;
-                                  });
-                                },
-                                icon: const Icon(Icons.add_circle_outline),
-                                color: Colors.green,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      // Date picker
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: () async {
-                            final picked = await showDateRangePicker(
-                              context: context,
-                              firstDate: DateTime.now(),
-                              lastDate: DateTime.now().add(
-                                const Duration(days: 365),
-                              ),
-                              initialDateRange: dateRange,
-                            );
-                            if (picked != null) {
-                              setState(() => dateRange = picked);
-                            }
-                          },
-                          icon: const Icon(Icons.calendar_today, size: 18),
-                          label: Text(
-                            dateRange == null
-                                ? 'Select Travel Dates'
-                                : '${dateRange!.start.toLocal().toString().split(' ')[0]} - ${dateRange!.end.toLocal().toString().split(' ')[0]}',
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            /// -------------------------
-            /// PRICE SUMMARY BAR
-            /// -------------------------
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Base Total: \$${computeBaseTotal().toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Add-ons: \$${computeAddOnTotal().toStringAsFixed(2)}',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey.shade600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        onPressed: () {
-                          if (dateRange == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Please select travel dates'),
-                              ),
-                            );
-                            return;
-                          }
-
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SummaryScreen(
-                                tourResponse: widget.tourResponse,
-                                travelerCount: travelerCount,
-                                startDate: dateRange!.start,
-                                endDate: dateRange!.end,
-                                selectedOptionalItems: selectedOptionalItems,
-                              ),
-                            ),
-                          );
-                        },
-                        child: const Text('Continue'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 24),
-          ],
-        ),
-      ),
-      bottomNavigationBar: CustomBottomBar(currentIndex: 1),
-    );
-  }
-}
-
-///////////////////////////////////////////////////////////
-///                 PACKAGE HEADER                      ///
-///////////////////////////////////////////////////////////
-
-class PackageHeader extends StatelessWidget {
-  final BasePackage base;
-
-  const PackageHeader({super.key, required this.base});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 3,
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// Title
-            Text(
-              base.title,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-
-            const SizedBox(height: 8),
-
-            /// Description
-            Text(
-              base.description,
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
-            ),
-
-            const SizedBox(height: 12),
-
-            /// Chips (Category + Price + Locations)
-            Wrap(
-              spacing: 8,
+            Column(
               children: [
-                Chip(
-                  label: Text(base.category),
-                  backgroundColor: Colors.blue.shade50,
+                buildHeader(
+                  widget.tourResponse.basePackage.title,
+                  widget.tourResponse.basePackage.description,
+                  widget.tourResponse.basePackage.category,
+                  widget.tourResponse.basePackage.basePrice.toDouble(),
+                  widget.tourResponse.basePackage.toLocation,
+                  widget.tourResponse.basePackage.fromLocation,
                 ),
-                Chip(
-                  label: Text("${base.currency} ${base.basePrice}"),
-                  backgroundColor: Colors.green.shade50,
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                    ),
+                  ],
                 ),
-                Chip(
-                  label: Text("${base.fromLocation} → ${base.toLocation}"),
-                  backgroundColor: Colors.purple.shade50,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                    ),
+                    buildDay(),
+                  ],
                 ),
               ],
             ),
@@ -345,186 +67,169 @@ class PackageHeader extends StatelessWidget {
       ),
     );
   }
-}
 
-///////////////////////////////////////////////////////////
-///                ITINERARY DAY CARD                   ///
-///////////////////////////////////////////////////////////
+  Widget buildDay() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Card(
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Day 1",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
 
-class ItineraryDayCard extends StatelessWidget {
-  final Itinerary itinerary;
-  final List<int> selectedItemIds;
-  final Function(int itemId, bool selected)? onToggleItem;
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF3E0),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.close, color: Colors.orange, size: 18),
+                    SizedBox(width: 6),
+                    Text(
+                      "Meals: Breakfast",
+                      style: TextStyle(color: Colors.orange),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 15),
 
-  const ItineraryDayCard({
-    super.key,
-    required this.itinerary,
-    this.selectedItemIds = const [],
-    this.onToggleItem,
-  });
+              const Text(
+                "Activities",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              buildActivity("Shangrila Lake Visit", "3 hours", "Rs. 5,000"),
+              buildActivity("Mountain Hiking", "5 hours", "Rs. 6,000"),
+              const SizedBox(height: 10),
+              Text(
+                "Add Activities",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 15),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade400),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.add, color: Colors.blue),
+                    SizedBox(width: 8),
+                    Text("Cultural Village Visit"),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 15),
 
-  @override
-  Widget build(BuildContext context) {
+              const Text(
+                "Accommodation",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildHeader(
+    String title,
+    String description,
+    String category,
+    double price,
+    String to,
+    String from,
+  ) {
     return Card(
       elevation: 2,
-      margin: const EdgeInsets.only(bottom: 14),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// Day Title
+            // Title
             Text(
-              itinerary.title.isNotEmpty
-                  ? itinerary.title
-                  : "Day ${itinerary.dayNumber}",
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              title,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
 
-            /// Description
-            if (itinerary.description.isNotEmpty)
-              Text(
-                itinerary.description,
-                style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
-              ),
+            // Description
+            Text(
+              description,
+              style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+            ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
 
-            /// Items List (Meals, Activities, Stay)
-            Column(
-              children: itinerary.itineraryItems.map((item) {
-                final selected = selectedItemIds.contains(item.id);
-                return ItineraryItemTile(
-                  item: item,
-                  selected: selected,
-                  onToggle: item.optional
-                      ? (sel) {
-                          if (onToggleItem != null) onToggleItem!(item.id, sel);
-                        }
-                      : null,
-                );
-              }).toList(),
+            // Category
+            Row(
+              children: [
+                const Icon(Icons.category, size: 18, color: Colors.blue),
+                const SizedBox(width: 6),
+                Text(category, style: const TextStyle(fontSize: 14)),
+              ],
+            ),
+
+            const SizedBox(height: 8),
+
+            // Price
+            Row(
+              children: [
+                const Icon(Icons.attach_money, size: 18, color: Colors.green),
+                const SizedBox(width: 6),
+                Text("PKR $price", style: const TextStyle(fontSize: 14)),
+              ],
+            ),
+
+            const SizedBox(height: 8),
+
+            // Route
+            Row(
+              children: [
+                const Icon(Icons.location_on, size: 18, color: Colors.red),
+                const SizedBox(width: 6),
+                Text("$from  →  $to", style: const TextStyle(fontSize: 14)),
+              ],
             ),
           ],
         ),
       ),
     );
   }
-}
 
-///////////////////////////////////////////////////////////
-///                ITINERARY ITEM TILE                  ///
-///////////////////////////////////////////////////////////
-
-class ItineraryItemTile extends StatelessWidget {
-  final ItineraryItem item;
-  final bool selected;
-  final ValueChanged<bool>? onToggle;
-
-  const ItineraryItemTile({
-    super.key,
-    required this.item,
-    this.selected = false,
-    this.onToggle,
-  });
-
-  IconData _getIcon(String type) {
-    switch (type) {
-      case "MEAL":
-        return Icons.restaurant;
-      case "STAY":
-        return Icons.hotel;
-      case "ACTIVITY":
-        return Icons.hiking;
-      case "TRANSPORT":
-        return Icons.directions_car;
-      default:
-        return Icons.info;
-    }
-  }
-
-  Color _getColor(String type) {
-    switch (type) {
-      case "MEAL":
-        return Colors.orange;
-      case "STAY":
-        return Colors.blue;
-      case "ACTIVITY":
-        return Colors.green;
-      case "TRANSPORT":
-        return Colors.purple;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final color = _getColor(item.type);
-
+  static Widget buildActivity(String title, String duration, String price) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(selected ? 0.15 : 0.06),
-        borderRadius: BorderRadius.circular(12),
-        border: selected ? Border.all(color: color, width: 2) : null,
+        color: const Color(0xFFE8F5E9),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-        leading: Icon(_getIcon(item.type), color: color, size: 30),
-
-        /// Name with optional badge
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                item.name.isNotEmpty ? item.name : "Unnamed",
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            if (item.optional)
-              const Chip(
-                label: Text('Optional', style: TextStyle(fontSize: 10)),
-                padding: EdgeInsets.symmetric(horizontal: 6),
-                backgroundColor: Colors.amber,
-              ),
-          ],
-        ),
-
-        /// Description
-        subtitle: Text(
-          item.description.isNotEmpty ? item.description : "No description",
-          style: TextStyle(color: Colors.grey.shade600),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-
-        /// Price and checkbox
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              item.price == 0 ? "Free" : "\$${item.price}",
-              style: TextStyle(
-                color: color,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
-            ),
-            if (item.optional && onToggle != null) ...[
-              const SizedBox(width: 8),
-              Checkbox(
-                value: selected,
-                onChanged: (v) {
-                  if (onToggle != null) onToggle!(v ?? false);
-                },
-                activeColor: color,
-              ),
-            ],
-          ],
+        leading: const Icon(Icons.check_circle, color: Colors.green),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
+        subtitle: Text(duration),
+        trailing: Text(
+          price,
+          style: const TextStyle(
+            color: Colors.green,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
