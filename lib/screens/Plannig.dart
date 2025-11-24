@@ -31,25 +31,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
                   widget.tourResponse.basePackage.basePrice.toDouble(),
                   widget.tourResponse.basePackage.toLocation,
                   widget.tourResponse.basePackage.fromLocation,
-                ),
-                Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                    ),
-                  ],
+                  widget.tourResponse.basePackage.maxGroupSize ?? 0,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,7 +39,14 @@ class _PlanningScreenState extends State<PlanningScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                     ),
-                    buildDay(),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: 1,
+                      itemBuilder: (context, index) {
+                        return buildDay(widget.tourResponse.basePackage);
+                      },
+                    ),
                   ],
                 ),
               ],
@@ -68,79 +57,96 @@ class _PlanningScreenState extends State<PlanningScreen> {
     );
   }
 
-  Widget buildDay() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Card(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Day 1",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
+  Widget buildDay(BasePackage basePackage) {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: basePackage.itineraries.length,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Card(
+            color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    basePackage.itineraries[index].title,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
 
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFF3E0),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.close, color: Colors.orange, size: 18),
-                    SizedBox(width: 6),
-                    Text(
-                      "Meals: Breakfast",
-                      style: TextStyle(color: Colors.orange),
+                  Text(
+                    basePackage.itineraries[index].description,
+                    style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                  ),
+                  const SizedBox(height: 15),
+
+                   Text(
+                    "Start time  ${basePackage.itineraries[index].startTime} - End time  ${basePackage.itineraries[index].endTime}",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFF3E0),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 15),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.close, color: Colors.orange, size: 18),
+                        SizedBox(width: 6),
+                        Text(
+                          "Meals: Breakfast",
+                          style: TextStyle(color: Colors.orange),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 15),
 
-              const Text(
-                "Activities",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              buildActivity("Shangrila Lake Visit", "3 hours", "Rs. 5,000"),
-              buildActivity("Mountain Hiking", "5 hours", "Rs. 6,000"),
-              const SizedBox(height: 10),
-              Text(
-                "Add Activities",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 15),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade400),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.add, color: Colors.blue),
-                    SizedBox(width: 8),
-                    Text("Cultural Village Visit"),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 15),
+                  const Text(
+                    "Activities",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  buildActivity("Shangrila Lake Visit", "3 hours", "Rs. 5,000"),
+                  buildActivity("Mountain Hiking", "5 hours", "Rs. 6,000"),
+                  const SizedBox(height: 10),
+                  Text(
+                    "Add Activities",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 15),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade400),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.add, color: Colors.blue),
+                        SizedBox(width: 8),
+                        Text("Cultural Village Visit"),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 15),
 
-              const Text(
-                "Accommodation",
-                style: TextStyle(fontWeight: FontWeight.bold),
+                  const Text(
+                    "Accommodation",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                ],
               ),
-              const SizedBox(height: 8),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -151,6 +157,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
     double price,
     String to,
     String from,
+    int groupSize,
   ) {
     return Card(
       elevation: 2,
@@ -183,6 +190,20 @@ class _PlanningScreenState extends State<PlanningScreen> {
                 const Icon(Icons.category, size: 18, color: Colors.blue),
                 const SizedBox(width: 6),
                 Text(category, style: const TextStyle(fontSize: 14)),
+              ],
+            ),
+
+            const SizedBox(height: 8),
+
+            // Group Size
+            Row(
+              children: [
+                const Icon(Icons.group, size: 18, color: Colors.purple),
+                const SizedBox(width: 6),
+                Text(
+                  "Group Size: $groupSize",
+                  style: const TextStyle(fontSize: 14),
+                ),
               ],
             ),
 
