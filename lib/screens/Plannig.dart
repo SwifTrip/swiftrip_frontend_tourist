@@ -72,7 +72,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
                     "Start time  ${basePackage.itineraries[index].startTime} - End time  ${basePackage.itineraries[index].endTime}",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  
+
                   const SizedBox(height: 15),
 
                   const Text(
@@ -81,13 +81,11 @@ class _PlanningScreenState extends State<PlanningScreen> {
                   ),
                   const SizedBox(height: 8),
                   Column(
-                    children: basePackage.itineraries[index].itineraryItems.map((activity) {
-                      return buildActivity(
-                        activity.name,
-                        activity.duration,
-                        "PKR ${activity.price}",
-                      );
-                    }).toList(),
+                    children: basePackage.itineraries[index].itineraryItems.map(
+                      (activity) {
+                        return buildActivity(activity);
+                      },
+                    ).toList(),
                   ),
                 ],
               ),
@@ -182,25 +180,38 @@ class _PlanningScreenState extends State<PlanningScreen> {
     );
   }
 
-  static Widget buildActivity(String title, int duration, String price) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE8F5E9),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: ListTile(
-        leading: const Icon(Icons.check_circle, color: Colors.green),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-        subtitle: Text(duration.toString()),
-        trailing: Text(
-          price,
-          style: const TextStyle(
-            color: Colors.green,
-            fontWeight: FontWeight.bold,
+  static Widget buildActivity(ItineraryItem activity) {
+    return ListView.builder(
+        shrinkWrap: true,
+        itemCount: 1,
+        itemBuilder: (context, index) => Card(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  activity.name,
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  activity.description,
+                  style: const TextStyle(color: Colors.grey),
+                ),
+                Text(activity.duration.toString()),
+                Text(
+                  "PKR ${activity.price}",
+                  style: const TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+            ),
           ),
         ),
-      ),
     );
   }
+
 }
