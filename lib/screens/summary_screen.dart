@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:swift_trip_app/widgets/custom_app_bar.dart';
 import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
 import 'package:swift_trip_app/screens/app-theme.dart';
-import 'package:swift_trip_app/screens/payment_screen.dart';
 import 'package:swift_trip_app/models/agency_response_model.dart';
 import 'package:swift_trip_app/models/custom_tour_request.dart';
 import 'package:swift_trip_app/services/custom_tour_service.dart';

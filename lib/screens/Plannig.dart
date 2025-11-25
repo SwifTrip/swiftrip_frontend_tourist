@@ -33,22 +33,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
                   widget.tourResponse.basePackage.fromLocation,
                   widget.tourResponse.basePackage.maxGroupSize ?? 0,
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                    ),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: 1,
-                      itemBuilder: (context, index) {
-                        return buildDay(widget.tourResponse.basePackage);
-                      },
-                    ),
-                  ],
-                ),
+                buildDay(widget.tourResponse.basePackage),
               ],
             ),
           ],
@@ -83,28 +68,11 @@ class _PlanningScreenState extends State<PlanningScreen> {
                   ),
                   const SizedBox(height: 15),
 
-                   Text(
+                  Text(
                     "Start time  ${basePackage.itineraries[index].startTime} - End time  ${basePackage.itineraries[index].endTime}",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFF3E0),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.close, color: Colors.orange, size: 18),
-                        SizedBox(width: 6),
-                        Text(
-                          "Meals: Breakfast",
-                          style: TextStyle(color: Colors.orange),
-                        ),
-                      ],
-                    ),
-                  ),
+                  
                   const SizedBox(height: 15),
 
                   const Text(
@@ -112,35 +80,15 @@ class _PlanningScreenState extends State<PlanningScreen> {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  buildActivity("Shangrila Lake Visit", "3 hours", "Rs. 5,000"),
-                  buildActivity("Mountain Hiking", "5 hours", "Rs. 6,000"),
-                  const SizedBox(height: 10),
-                  Text(
-                    "Add Activities",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Column(
+                    children: basePackage.itineraries[index].itineraryItems.map((activity) {
+                      return buildActivity(
+                        activity.name,
+                        activity.duration,
+                        "PKR ${activity.price}",
+                      );
+                    }).toList(),
                   ),
-                  const SizedBox(height: 15),
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade400),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.add, color: Colors.blue),
-                        SizedBox(width: 8),
-                        Text("Cultural Village Visit"),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-
-                  const Text(
-                    "Accommodation",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
                 ],
               ),
             ),
@@ -234,7 +182,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
     );
   }
 
-  static Widget buildActivity(String title, String duration, String price) {
+  static Widget buildActivity(String title, int duration, String price) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
@@ -244,7 +192,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
       child: ListTile(
         leading: const Icon(Icons.check_circle, color: Colors.green),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-        subtitle: Text(duration),
+        subtitle: Text(duration.toString()),
         trailing: Text(
           price,
           style: const TextStyle(
