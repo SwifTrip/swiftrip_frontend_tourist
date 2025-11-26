@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:swift_trip_app/models/agency_response_model.dart';
 import 'package:swift_trip_app/widgets/custom_app_bar.dart';
+import 'package:intl/intl.dart';
 
 class PlanningScreen extends StatefulWidget {
   final TourResponse tourResponse;
@@ -10,7 +11,7 @@ class PlanningScreen extends StatefulWidget {
 }
 
 class _PlanningScreenState extends State<PlanningScreen> {
-  int selectedIndex = 0;
+  int selectedIndex = -1;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -220,37 +221,65 @@ class _PlanningScreenState extends State<PlanningScreen> {
   }
 
   Widget buildAccomadation(List<stayDetail> stayDetail,bool optional,bool isAddOn) {
+    final dateFormat = DateFormat(
+      'dd MMM, hh:mm a',
+    );
     return ListView.builder(
       shrinkWrap: true,
       itemCount: stayDetail.length,
       itemBuilder: (context, index) => Card(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                stayDetail[index].hotelName ?? '',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+        color: optional ? Colors.white : (selectedIndex == index ? Colors.blue.shade50 : Colors.white),
+        child: InkWell(
+          onTap: () {
+            if(optional){
+            setState(() {
+              if(selectedIndex == index){
+                selectedIndex = -1;
+              } else {
+                selectedIndex = index;
+              }
+            });
+          }
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  stayDetail[index].hotelName ?? '',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              Text(
-                stayDetail[index].location ?? '',
-                style: const TextStyle(color: Colors.grey),
-              ),
-              Text(
-                "check-in:  + ${stayDetail[index].checkInTime} check-out:  + ${stayDetail[index].checkOutTime}",
-              ),
-              Text(
-                "Room Type: ${stayDetail[index].roomType}",
-              ),
-
-              Text(
-                "Rating: ${stayDetail[index].rating}"),
-            ],
+                Text(
+                  stayDetail[index].location ?? '',
+                  style: const TextStyle(
+                    color: Colors.grey,
+                  ),
+                ),
+                Text(
+                  "check-in: ${stayDetail[index].checkInTime != null ? dateFormat.format(stayDetail[index].checkInTime!) : 'N/A'}  check-out: ${stayDetail[index].checkOutTime != null ? dateFormat.format(stayDetail[index].checkOutTime!) : 'N/A'}",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  "Room Type: ${stayDetail[index].roomType}",
+                  style: const TextStyle(
+                    color: Colors.grey,
+                  ),
+                ),
+        
+                Text(
+                  "Rating: ${stayDetail[index].rating}",
+                  style: const TextStyle(
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
