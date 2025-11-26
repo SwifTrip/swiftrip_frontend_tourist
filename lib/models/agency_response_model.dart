@@ -129,9 +129,9 @@ class ItineraryItem {
   final bool optional;
   final bool isAddOn;
   final int sortOrder;
-  // Keeping these as dynamic lists for now as they are empty in the JSON
-  final List<dynamic> mealDetails;
-  final List<dynamic> stayDetails;
+  
+  final List<mealDetail> mealDetails;
+  final List<stayDetail> stayDetails;
   final List<dynamic> transportDetails;
 
   ItineraryItem({
@@ -164,9 +164,79 @@ class ItineraryItem {
       optional: json['optional'] ?? false,
       isAddOn: json['isAddOn'] ?? false,
       sortOrder: json['sortOrder'] ?? 0,
-      mealDetails: json['mealDetails'] ?? [],
-      stayDetails: json['stayDetails'] ?? [],
+      mealDetails: (json['mealDetails'] as List<dynamic>?)
+              ?.map((e) => mealDetail.fromJson(e))
+              .toList() ??
+          [],
+      stayDetails: (json['stayDetails'] as List<dynamic>?)
+              ?.map((e) => stayDetail.fromJson(e))
+              .toList() ??
+          [] ,
       transportDetails: json['transportDetails'] ?? [],
+    );
+  }
+}
+
+class mealDetail {
+  final int id;
+  final int itineraryItemId;
+  final String mealType;
+  final String cuisine;
+  final bool included;
+
+  mealDetail({
+    required this.id,
+    required this.itineraryItemId,
+    required this.mealType,
+    required this.cuisine,
+    required this.included,
+  });
+
+  factory mealDetail.fromJson(Map<String, dynamic> json) {
+    return mealDetail(
+      id: json['id'] ?? 0,
+      itineraryItemId: json['itineraryItemId'] ?? 0,
+      mealType: json['mealType'] ?? '',
+      cuisine: json['cuisine'] ?? '',
+      included: json['included'] ?? false,
+    );
+  }
+}
+
+class stayDetail{
+  final int id;
+  final int itineraryItemId;
+  final String stayType;
+  final String? hotelName;
+  final String? roomType;
+  final double? rating;
+  final DateTime? checkInTime;
+  final DateTime? checkOutTime;
+  final String? location;
+  
+  stayDetail({
+    required this.id,
+    required this.itineraryItemId,
+    required this.stayType,
+    required this.hotelName,
+    required this.roomType,
+    required this.rating,
+    required this.checkInTime,
+    required this.checkOutTime,
+    required this.location,
+  });
+
+  factory stayDetail.fromJson(Map<String, dynamic> json) {
+    return stayDetail(  
+      id: json['id'] ?? 0,
+      itineraryItemId: json['itineraryItemId'] ?? 0,
+      stayType: json['stayType'] ?? '',
+      hotelName: json['hotelName'],
+      roomType: json['roomType'],
+      rating: json['rating'] != null ? json['rating'].toDouble() : null,
+      checkInTime: json['checkInTime'] != null ? DateTime.parse(json['checkInTime']) : null,
+      checkOutTime: json['checkOutTime'] != null ? DateTime.parse(json['checkOutTime']) : null,
+      location: json['location'],
     );
   }
 }

@@ -180,38 +180,80 @@ class _PlanningScreenState extends State<PlanningScreen> {
     );
   }
 
-  static Widget buildActivity(ItineraryItem activity) {
+  Widget buildActivity(ItineraryItem activity) {
     return ListView.builder(
-        shrinkWrap: true,
-        itemCount: 1,
-        itemBuilder: (context, index) => Card(
-          color: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  activity.name,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  activity.description,
-                  style: const TextStyle(color: Colors.grey),
-                ),
-                Text(activity.duration.toString()),
-                Text(
-                  "PKR ${activity.price}",
-                  style: const TextStyle(
-                    color: Colors.green,
-                    fontWeight: FontWeight.bold,
+      shrinkWrap: true,
+      itemCount: 1,
+      itemBuilder: (context, index) => Card(
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                activity.name,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
+              Text(
+                activity.description,
+                style: const TextStyle(color: Colors.grey),
+              ),
+              Text(activity.duration.toString()),
+              Text(
+                "PKR ${activity.price}",
+                style: const TextStyle(
+                  color: Colors.green,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              if (activity.stayDetails.isNotEmpty)
+                buildAccomadation(activity.stayDetails, activity.optional, activity.isAddOn),
             ],
-            ),
           ),
         ),
+      ),
     );
   }
 
+  Widget buildAccomadation(List<stayDetail> stayDetail,bool optional,bool isAddOn) {
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: stayDetail.length,
+      itemBuilder: (context, index) => Card(
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                stayDetail[index].hotelName ?? '',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                stayDetail[index].location ?? '',
+                style: const TextStyle(color: Colors.grey),
+              ),
+              Text(
+                "check-in:  + ${stayDetail[index].checkInTime} check-out:  + ${stayDetail[index].checkOutTime}",
+              ),
+              Text(
+                "Room Type: ${stayDetail[index].roomType}",
+              ),
+
+              Text(
+                "Rating: ${stayDetail[index].rating}"),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
