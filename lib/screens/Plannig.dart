@@ -186,34 +186,36 @@ class _PlanningScreenState extends State<PlanningScreen> {
       shrinkWrap: true,
       itemCount: 1,
       itemBuilder: (context, index) => Card(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                activity.name,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+        color: activity.optional ? Colors.white : Color(0xFFE0F2F1),
+        child: InkWell(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  activity.name,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              Text(
-                activity.description,
-                style: const TextStyle(color: Colors.grey),
-              ),
-              Text(activity.duration.toString()),
-              Text(
-                "PKR ${activity.price}",
-                style: const TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.bold,
+                Text(
+                  activity.description,
+                  style: const TextStyle(color: Colors.grey),
                 ),
-              ),
-              if (activity.stayDetails.isNotEmpty)
-                buildAccomadation(activity.stayDetails, activity.optional, activity.isAddOn),
-            ],
+                Text(activity.duration.toString()),
+                Text(
+                  "PKR ${activity.price}",
+                  style: const TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (activity.stayDetails.isNotEmpty)
+                  buildAccomadation(activity.stayDetails, activity.optional, activity.isAddOn),
+              ],
+            ),
           ),
         ),
       ),
@@ -228,7 +230,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
       shrinkWrap: true,
       itemCount: stayDetail.length,
       itemBuilder: (context, index) => Card(
-        color: optional ? Colors.white : (selectedIndex == index ? Colors.blue.shade50 : Colors.white),
+        color: optional ? (selectedIndex == index ? Colors.blue.shade50 : Colors.white) : Color(0xFFE0F2F1),
         child: InkWell(
           onTap: () {
             if(optional){
@@ -254,15 +256,15 @@ class _PlanningScreenState extends State<PlanningScreen> {
                   ),
                 ),
                 Text(
-                  stayDetail[index].location ?? '',
+                  stayDetail[index].location ?? 'Location not specified',
                   style: const TextStyle(
                     color: Colors.grey,
                   ),
                 ),
                 Text(
-                  "check-in: ${stayDetail[index].checkInTime != null ? dateFormat.format(stayDetail[index].checkInTime!) : 'N/A'}  check-out: ${stayDetail[index].checkOutTime != null ? dateFormat.format(stayDetail[index].checkOutTime!) : 'N/A'}",
+                  "Check-in: ${stayDetail[index].checkInTime != null ? dateFormat.format(stayDetail[index].checkInTime!) : 'N/A'}  Check-out: ${stayDetail[index].checkOutTime != null ? dateFormat.format(stayDetail[index].checkOutTime!) : 'N/A'}",
                   style: const TextStyle(
-                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
                   ),
                 ),
                 Text(
