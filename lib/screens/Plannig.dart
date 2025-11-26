@@ -201,6 +201,91 @@ class _PlanningScreenState extends State<PlanningScreen> {
             ],
           )),
         ),
+        Text("Activities", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
+        const SizedBox(height: 8),
+        ListView.builder(
+          itemCount: item.length,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) => (Column(
+            children: [
+              if (item[index].type == 'ACTIVITY') buildActivity(item[index]),
+            ],
+          )),
+        ),
+      ],
+    );
+  }
+
+   Widget buildActivity(ItineraryItem activity) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ListView.builder(
+          shrinkWrap: true,
+          itemCount: activity.stayDetails.length,
+          physics: const NeverScrollableScrollPhysics(),
+
+          itemBuilder: (context, index) => Container(
+            margin: const EdgeInsets.symmetric(vertical: 10),
+            decoration: BoxDecoration(
+              color: selectedStayDetailsIndex == index
+                  ? Color.fromARGB(255, 208, 250, 222)
+                  : Colors.white,
+              border: Border.all(
+                color: selectedStayDetailsIndex == index
+                    ?  Color(0xFF00A63E)
+                    : Colors.grey.shade300,
+                width: 2,
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
+
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  if (selectedStayDetailsIndex == index) {
+                    selectedStayDetailsIndex = -1;
+                  } else {
+                    selectedStayDetailsIndex = index;
+                  }
+                });
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          activity.stayDetails[index].hotelName ?? 'N/A',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          "Rs ${activity.price}",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      "Rating: ${activity.stayDetails[index].rating}",
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
