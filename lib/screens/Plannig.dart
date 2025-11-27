@@ -180,12 +180,11 @@ class _PlanningScreenState extends State<PlanningScreen> {
       item.where((element) => element.type == 'STAY').toList();
 
   final breakfastDetails =
-      meals.where((meal) => meal.name == "Breakfast").toList();
+      meals.where((meal) => meal.mealDetails[0].mealType.toLowerCase() == "breakfast").toList();
   final lunchDetails =
-      meals.where((meal) => meal.name == "Lunch").toList();
+      meals.where((meal) => meal.mealDetails[0].mealType.toLowerCase() == "lunch").toList();
   final dinnerDetails =
-      meals.where((meal) => meal.name == "Dinner").toList();
-
+      meals.where((meal) => meal.mealDetails[0].mealType.toLowerCase() == "dinner").toList();
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [

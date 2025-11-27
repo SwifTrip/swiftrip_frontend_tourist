@@ -56,7 +56,7 @@ class MealItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      details?.mealType ?? meal.name,
+                      meal.name,
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
