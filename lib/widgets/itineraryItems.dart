@@ -15,66 +15,94 @@ class MealItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ListView.builder(
-          shrinkWrap: true,
-          itemCount: meal.mealDetails.length,
-          physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) => Container(
-            decoration: BoxDecoration(
-              color: meal.optional
-                  ? (isSelected
-                        ? const Color.fromARGB(255, 208, 250, 222)
-                        : Colors.white)
-                  : const Color.fromARGB(255, 208, 250, 222),
-              border: Border.all(
-                color: isSelected
-                    ? const Color(0xFF00A63E)
-                    : Colors.grey.shade300,
-                width: 2,
+    final details = meal.mealDetails.isNotEmpty ? meal.mealDetails.first : null;
+    final bool isOptional = meal.optional == true;
+    final bool effectiveSelected = !isOptional || isSelected;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      decoration: BoxDecoration(
+        color: effectiveSelected ? Colors.lightBlue.shade50 : Colors.white,
+        border: Border.all(
+          color: isSelected ? (effectiveSelected ? Colors.blue.shade600 : Colors.grey.shade300) : Colors.lightBlue.shade50,
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: InkWell(
+        onTap: isOptional ? onTap : null,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.restaurant,
+                  size: 18,
+                  color: Colors.blue.shade600,
+                ),
               ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: InkWell(
-              onTap: onTap,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
+              const SizedBox(width: 10),
+
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          meal.mealDetails[index].mealType,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          "Rs ${meal.price}",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
                     Text(
-                      "Cuisine: ${meal.mealDetails[index].cuisine}",
-                      style: const TextStyle(color: Colors.grey),
+                      details?.mealType ?? meal.name,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.blue.shade600,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      details?.cuisine != null
+                          ? "Cuisine: ${details!.cuisine}"
+                          : "",
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
                     ),
                   ],
                 ),
               ),
-            ),
+
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    "Rs. ${meal.price}",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.blue.shade600,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    isOptional ? "Optional" : "Fixed",
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 }
@@ -166,7 +194,7 @@ class ActivityItem extends StatelessWidget {
           decoration: BoxDecoration(
             color: const Color(0xFFE6F8EB),
             border: Border.all(
-              color: const Color(0xFF00A63E),
+              color: isOptional ? Color(0xFF00A63E) : Color(0xFFE6F8EB),
               width: 2,
             ),
             borderRadius: BorderRadius.circular(12),
@@ -217,7 +245,7 @@ class ActivityItem extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "${(activity.duration ?? 0) ~/ 60} hours",
+                    "${(activity.duration) ~/ 60} hours",
                     style: const TextStyle(
                       fontSize: 12,
                       color: Color(0xFF0D7A35),
@@ -247,65 +275,101 @@ class AccommodationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ListView.builder(
-          shrinkWrap: true,
-          itemCount: accommodation.stayDetails.length,
-          physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) => Container(
-            margin: const EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? const Color.fromARGB(255, 208, 250, 222)
-                  : Colors.white,
-              border: Border.all(
-                color: isSelected
-                    ? const Color(0xFF00A63E)
-                    : Colors.grey.shade300,
-                width: 2,
+    final stay = accommodation.stayDetails.isNotEmpty
+        ? accommodation.stayDetails.first
+        : null;
+
+    final bool isOptional = accommodation.optional == true;
+    final bool effectiveSelected = !isOptional || isSelected;
+
+    const purple = Color(0xFF9C27B0);
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      decoration: BoxDecoration(
+        color: effectiveSelected ? Color(0xFFF8E9FF) : Colors.white,
+        border: Border.all(
+          color: isOptional ? (effectiveSelected ? purple : Colors.grey.shade300) : Color(0xFFF8E9FF),
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: InkWell(
+        onTap: isOptional ? onTap : null,
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Row(
+            children: [
+              Icon(
+                Icons.hotel,
+                size: 40,
+                color: effectiveSelected
+                    ? purple
+                    : Colors.grey.shade400,
               ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: InkWell(
-              onTap: onTap,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
+              const SizedBox(width: 10),
+
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      stay?.hotelName ?? 'N/A',
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          accommodation.stayDetails[index].hotelName ?? 'N/A',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        const Icon(
+                          Icons.star,
+                          size: 14,
+                          color: Color(0xFFFFC107),
                         ),
+                        const SizedBox(width: 4),
                         Text(
-                          "Rs ${accommodation.price}",
+                          (stay?.rating ?? 0).toString(),
                           style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                            color: Colors.grey,
                           ),
                         ),
                       ],
                     ),
-                    Text(
-                      "Rating: ${accommodation.stayDetails[index].rating}",
-                      style: const TextStyle(color: Colors.grey),
-                    ),
                   ],
                 ),
               ),
-            ),
+
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    "Rs. ${accommodation.price}/night",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: purple,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    isOptional ? "Optional" : "Fixed",
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 }
