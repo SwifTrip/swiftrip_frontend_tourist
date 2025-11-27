@@ -15,11 +15,7 @@ class MealItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return // paste your buildMeal UI here, but:
-    // - use isSelected instead of selectedMeals.contains
-    // - call onTap() instead of setState(...)
-    // example:
-    Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ListView.builder(
@@ -98,8 +94,7 @@ class ActivityItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return // paste your buildActivity UI, use isSelected + onTap;
-    Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ListView.builder(
@@ -176,8 +171,7 @@ class AccommodationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return // paste your buildAccomadation UI, use isSelected + onTap;
-    Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ListView.builder(

@@ -12,8 +12,6 @@ class PlanningScreen extends StatefulWidget {
 }
 
 class _PlanningScreenState extends State<PlanningScreen> {
-  // int selectedStayDetailsIndex = -1;
-  // bool isSelected = false;
   List<int> selectedMeals = [];
   List<int> selectedActivities = [];
   List<int> selectedAccommodations = [];
