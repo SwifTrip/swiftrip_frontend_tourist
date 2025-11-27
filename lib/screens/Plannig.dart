@@ -172,174 +172,231 @@ class _PlanningScreenState extends State<PlanningScreen> {
   }
 
   Widget buildItinerartyItem(List<ItineraryItem> item) {
-    final meals = item.where((element) => element.type == 'MEAL').toList();
-    final activities = item
-        .where((element) => element.type == 'ACTIVITY')
-        .toList();
-    final accommodations = item
-        .where((element) => element.type == 'STAY')
-        .toList();
-    final breakfastDetails = meals.where((meal) => meal.name == "Breakfast").toList();
-    final lunchDetails = meals.where((meal) => meal.name == "Lunch").toList();
-    final dinnerDetails = meals.where((meal) => meal.name == "Dinner").toList();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Meals",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        ),
-        if (breakfastDetails.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Text(
-            "Breakfast",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-          ),
-          const SizedBox(height: 8),
-          ListView.builder(
-            itemCount: breakfastDetails.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) => (MealItem(
-              meal: breakfastDetails[index],
-              isSelected: selectedMeals.contains(breakfastDetails[index].id),
-              onTap: () {
-                setState(() {
-                  if (selectedMeals.contains(breakfastDetails[index].id)) {
-                    selectedMeals.remove(breakfastDetails[index].id);
-                  } else {
-                    selectedMeals.add(breakfastDetails[index].id);
-                  }
-                });
-              },
-            )),
-          ),
-        ],
-        if (lunchDetails.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Text(
-            "Lunch",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-          ),
-          const SizedBox(height: 8),
-          ListView.builder(
-            itemCount: lunchDetails.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) => (MealItem(
-              meal: lunchDetails[index],
-              isSelected: selectedMeals.contains(lunchDetails[index].id),
-              onTap: () {
-                setState(() {
-                  if (selectedMeals.contains(lunchDetails[index].id)) {
-                    selectedMeals.remove(lunchDetails[index].id);
-                  } else {
-                    selectedMeals.add(lunchDetails[index].id);
-                  }
-                });
-              },
-            )),
-          ),
-        ],
-        if (dinnerDetails.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Text(
-            "Dinner",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-          ),
-          const SizedBox(height: 8),
-          ListView.builder(
-            itemCount: dinnerDetails.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) => (MealItem(
-              meal: dinnerDetails[index],
-              isSelected: selectedMeals.contains(dinnerDetails[index].id),
-              onTap: () {
-                setState(() {
-                  if (selectedMeals.contains(dinnerDetails[index].id)) {
-                    selectedMeals.remove(dinnerDetails[index].id);
-                  } else {
-                    selectedMeals.add(dinnerDetails[index].id);
-                  }
-                });
-              },
-            )),
-          ),
-        ],
-        const SizedBox(height:  15),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
+  final meals =
+      item.where((element) => element.type == 'MEAL').toList();
+  final activities =
+      item.where((element) => element.type == 'ACTIVITY').toList();
+  final accommodations =
+      item.where((element) => element.type == 'STAY').toList();
 
-            Text(
-              "Activities",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-          ],
+  final breakfastDetails =
+      meals.where((meal) => meal.name == "Breakfast").toList();
+  final lunchDetails =
+      meals.where((meal) => meal.name == "Lunch").toList();
+  final dinnerDetails =
+      meals.where((meal) => meal.name == "Dinner").toList();
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // MEALS
+      const Text(
+        "Meals",
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+      ),
+
+      if (breakfastDetails.isNotEmpty) ...[
+        const SizedBox(height: 8),
+        const Text(
+          "Breakfast",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
         ),
         const SizedBox(height: 8),
         ListView.builder(
-          itemCount: activities.length,
+          itemCount: breakfastDetails.length,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) => (Column(
-            children: [
-              if (activities[index].type == 'ACTIVITY')
-                ActivityItem(
-                  activity: activities[index],
-                  isSelected: selectedActivities.contains(activities[index].id),
-                  onTap: () {
-                    setState(() {
-                      if (selectedActivities.contains(activities[index].id)) {
-                        selectedActivities.remove(activities[index].id);
-                      } else {
-                        selectedActivities.add(activities[index].id);
-                      }
-                    });
-                  },
-                ),
-            ],
-          )),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "Accommodations",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        ListView.builder(
-          itemCount: accommodations.length,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) => (Column(
-            children: [
-              if (accommodations[index].type == 'STAY')
-                AccommodationItem(
-                  accommodation: accommodations[index],
-                  isSelected: selectedAccommodations.contains(
-                    accommodations[index].id,
-                  ),
-                  onTap: () {
-                    setState(() {
-                      if (selectedAccommodations.contains(
-                        accommodations[index].id,
-                      )) {
-                        selectedAccommodations.remove(accommodations[index].id);
-                      } else {
-                        selectedAccommodations.add(accommodations[index].id);
-                      }
-                    });
-                  },
-                ),
-            ],
-          )),
+          itemBuilder: (context, index) => MealItem(
+            meal: breakfastDetails[index],
+            isSelected: selectedMeals.contains(breakfastDetails[index].id),
+            onTap: () {
+              setState(() {
+                final id = breakfastDetails[index].id;
+                if (selectedMeals.contains(id)) {
+                  selectedMeals.remove(id);
+                } else {
+                  selectedMeals.add(id);
+                }
+              });
+            },
+          ),
         ),
       ],
-    );
-  }
+
+      if (lunchDetails.isNotEmpty) ...[
+        const SizedBox(height: 8),
+        const Text(
+          "Lunch",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+        ),
+        const SizedBox(height: 8),
+        ListView.builder(
+          itemCount: lunchDetails.length,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) => MealItem(
+            meal: lunchDetails[index],
+            isSelected: selectedMeals.contains(lunchDetails[index].id),
+            onTap: () {
+              setState(() {
+                final id = lunchDetails[index].id;
+                if (selectedMeals.contains(id)) {
+                  selectedMeals.remove(id);
+                } else {
+                  selectedMeals.add(id);
+                }
+              });
+            },
+          ),
+        ),
+      ],
+
+      if (dinnerDetails.isNotEmpty) ...[
+        const SizedBox(height: 8),
+        const Text(
+          "Dinner",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+        ),
+        const SizedBox(height: 8),
+        ListView.builder(
+          itemCount: dinnerDetails.length,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) => MealItem(
+            meal: dinnerDetails[index],
+            isSelected: selectedMeals.contains(dinnerDetails[index].id),
+            onTap: () {
+              setState(() {
+                final id = dinnerDetails[index].id;
+                if (selectedMeals.contains(id)) {
+                  selectedMeals.remove(id);
+                } else {
+                  selectedMeals.add(id);
+                }
+              });
+            },
+          ),
+        ),
+      ],
+
+      const SizedBox(height: 15),
+
+      // ACTIVITIES
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: const [
+          Text(
+            "Activities",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ],
+      ),
+      const SizedBox(height: 8),
+
+      Builder(
+        builder: (context) {
+          // fixed or already added => TOP
+          final mainActivities = activities
+              .where((e) =>
+                  e.optional == false ||
+                  selectedActivities.contains(e.id))
+              .toList();
+
+          // optional and not selected => BELOW as plus cards
+          final addActivities = activities
+              .where((e) =>
+                  e.optional == true &&
+                  !selectedActivities.contains(e.id))
+              .toList();
+
+          return Column(
+            children: [
+              // TOP: fixed + selected optionals (green)
+              ListView.builder(
+                itemCount: mainActivities.length,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  final act = mainActivities[index];
+                  return ActivityItem(
+                    activity: act,
+                    isSelected: selectedActivities.contains(act.id),
+                    onTap: () {
+                      setState(() {
+                        if (act.optional) {
+                          if (selectedActivities.contains(act.id)) {
+                            selectedActivities.remove(act.id);
+                          } else {
+                            selectedActivities.add(act.id);
+                          }
+                        }
+                      });
+                    },
+                  );
+                },
+              ),
+
+              // BELOW: optional not selected (plus cards)
+              if (addActivities.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                ListView.builder(
+                  itemCount: addActivities.length,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    final act = addActivities[index];
+                    return ActivityItem(
+                      activity: act,
+                      isSelected: false, // force plus UI
+                      onTap: () {
+                        setState(() {
+                          selectedActivities.add(act.id);
+                        });
+                      },
+                    );
+                  },
+                ),
+              ],
+            ],
+          );
+        },
+      ),
+
+      // ACCOMMODATIONS
+      const SizedBox(height: 15),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: const [
+          Text(
+            "Accommodations",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ],
+      ),
+      const SizedBox(height: 8),
+      ListView.builder(
+        itemCount: accommodations.length,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemBuilder: (context, index) {
+          final stay = accommodations[index];
+          return AccommodationItem(
+            accommodation: stay,
+            isSelected: selectedAccommodations.contains(stay.id),
+            onTap: () {
+              setState(() {
+                if (selectedAccommodations.contains(stay.id)) {
+                  selectedAccommodations.remove(stay.id);
+                } else {
+                  selectedAccommodations.add(stay.id);
+                }
+              });
+            },
+          );
+        },
+      ),
+    ],
+  );
+}
+
 }

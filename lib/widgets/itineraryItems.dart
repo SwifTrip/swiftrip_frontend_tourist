@@ -93,60 +93,137 @@ class ActivityItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ListView.builder(
-          shrinkWrap: true,
-          itemCount: 1,
-          physics: const NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) => Container(
-            margin: const EdgeInsets.symmetric(vertical: 10),
+    final bool isOptional = activity.optional == true;
+
+    // plus card for optional & not selected
+    if (isOptional && !isSelected) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              color: isSelected
-                  ? const Color.fromARGB(255, 208, 250, 222)
-                  : Colors.white,
+              color: Colors.white,
               border: Border.all(
-                color: isSelected
-                    ? const Color(0xFF00A63E)
-                    : Colors.grey.shade300,
+                color: Colors.grey.shade300,
                 width: 2,
               ),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: InkWell(
               onTap: onTap,
+              borderRadius: BorderRadius.circular(12),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                child: Row(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          activity.name,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                    Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: Colors.grey.shade400,
+                          width: 1.5,
                         ),
-                        Text(
-                          "Rs ${activity.price}",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                      ),
+                      child: Icon(
+                        Icons.add,
+                        size: 18,
+                        color: Colors.grey.shade600,
+                      ),
                     ),
-                    Text(
-                      activity.description,
-                      style: const TextStyle(color: Colors.grey),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        activity.name,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    // green card (fixed or selected optional) with label under price
+    final String labelText = isOptional ? "Optional" : "Fixed";
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: const Color(0xFFE6F8EB),
+            border: Border.all(
+              color: const Color(0xFF00A63E),
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: InkWell(
+            onTap: isOptional ? onTap : null,
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        activity.name,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF0D7A35),
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            "Rs. ${activity.price}",
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF0D7A35),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            labelText,
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.grey.shade600,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "${(activity.duration ?? 0) ~/ 60} hours",
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF0D7A35),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
