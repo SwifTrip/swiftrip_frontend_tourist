@@ -23,7 +23,6 @@ class MealItem extends StatelessWidget {
           itemCount: meal.mealDetails.length,
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) => Container(
-            margin: const EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
               color: meal.optional
                   ? (isSelected
