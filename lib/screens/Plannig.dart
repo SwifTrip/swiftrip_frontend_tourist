@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:swift_trip_app/models/agency_response_model.dart';
 import 'package:swift_trip_app/widgets/custom_app_bar.dart';
 import 'package:intl/intl.dart';
+import 'package:swift_trip_app/widgets/itineraryItems.dart';
 
 class PlanningScreen extends StatefulWidget {
   final TourResponse tourResponse;
@@ -11,8 +12,8 @@ class PlanningScreen extends StatefulWidget {
 }
 
 class _PlanningScreenState extends State<PlanningScreen> {
-  int selectedStayDetailsIndex = -1;
-  bool isSelected = false;
+  // int selectedStayDetailsIndex = -1;
+  // bool isSelected = false;
   List<int> selectedMeals = [];
   List<int> selectedActivities = [];
   List<int> selectedAccommodations = [];
@@ -186,7 +187,22 @@ class _PlanningScreenState extends State<PlanningScreen> {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) => (Column(
-            children: [if (item[index].type == 'MEAL') buildMeal(item[index])],
+            children: [
+              if (item[index].type == 'MEAL')
+                MealItem(
+                  meal: item[index],
+                  isSelected: selectedMeals.contains(item[index].id),
+                  onTap: () {
+                    setState(() {
+                      if (selectedMeals.contains(item[index].id)) {
+                        selectedMeals.remove(item[index].id);
+                      } else {
+                        selectedMeals.add(item[index].id);
+                      }
+                    });
+                  },
+                ),
+            ],
           )),
         ),
         Row(
@@ -205,7 +221,20 @@ class _PlanningScreenState extends State<PlanningScreen> {
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) => (Column(
             children: [
-              if (item[index].type == 'ACTIVITY') buildActivity(item[index]),
+              if (item[index].type == 'ACTIVITY')
+                ActivityItem(
+                  activity: item[index],
+                  isSelected: selectedActivities.contains(item[index].id),
+                  onTap: () {
+                    setState(() {
+                      if (selectedActivities.contains(item[index].id)) {
+                        selectedActivities.remove(item[index].id);
+                      } else {
+                        selectedActivities.add(item[index].id);
+                      }
+                    });
+                  },
+                ),
             ],
           )),
         ),
@@ -225,213 +254,22 @@ class _PlanningScreenState extends State<PlanningScreen> {
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) => (Column(
             children: [
-              if (item[index].type == 'STAY') buildAccomadation(item[index]),
+              if (item[index].type == 'STAY')
+                AccommodationItem(
+                  accommodation: item[index],
+                  isSelected: selectedAccommodations.contains(item[index].id),
+                  onTap: () {
+                    setState(() {
+                      if (selectedAccommodations.contains(item[index].id)) {
+                        selectedAccommodations.remove(item[index].id);
+                      } else {
+                        selectedAccommodations.add(item[index].id);
+                      }
+                    });
+                  },
+                ),
             ],
           )),
-        ),
-      ],
-    );
-  }
-
-  Widget buildMeal(ItineraryItem meal) {
-    final bool isSelected = selectedMeals.contains(meal.id);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ListView.builder(
-          shrinkWrap: true,
-          itemCount: meal.mealDetails.length,
-          physics: const NeverScrollableScrollPhysics(),
-
-          itemBuilder: (context, index) => Container(
-            margin: const EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(
-              color: meal.optional ?(isSelected
-                  ? Color.fromARGB(255, 208, 250, 222)
-                  : Colors.white) : Color.fromARGB(255,208, 250, 222),
-              border: Border.all(
-                color: isSelected
-                    ? Color(0xFF00A63E)
-                    : Colors.grey.shade300,
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-
-            child: InkWell(
-              onTap: () {
-                setState(() {
-                  if(meal.optional){
-                  if (selectedMeals.contains(meal.id)) {
-                    selectedMeals.remove(meal.id);
-                  } else {
-                    selectedMeals.add(meal.id);
-                  }}
-                });
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          meal.mealDetails[index].mealType,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      "Cuisine: ${meal.mealDetails[index].cuisine}",
-                      style: const TextStyle(color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget buildActivity(ItineraryItem activity) {
-    final bool isSelected = selectedActivities.contains(activity.id);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ListView.builder(
-          shrinkWrap: true,
-          itemCount: 1,
-          physics: const NeverScrollableScrollPhysics(),
-
-          itemBuilder: (context, index) => Container(
-            margin: const EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? Color.fromARGB(255, 208, 250, 222)
-                  : Colors.white,
-              border: Border.all(
-                color: isSelected
-                    ? Color(0xFF00A63E)
-                    : Colors.grey.shade300,
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-
-            child: InkWell(
-              onTap: () {
-                setState(() {
-                  if (selectedActivities.contains(activity.id)) {
-                    selectedActivities.remove(activity.id);
-                  } else {
-                    selectedActivities.add(activity.id);
-                  }
-                });
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          activity.name,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget buildAccomadation(ItineraryItem accomadation) {
-    final bool isSelected = selectedAccommodations.contains(accomadation.id);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ListView.builder(
-          shrinkWrap: true,
-          itemCount: accomadation.stayDetails.length,
-          physics: const NeverScrollableScrollPhysics(),
-
-          itemBuilder: (context, index) => Container(
-            margin: const EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? Color.fromARGB(255, 208, 250, 222)
-                  : Colors.white,
-              border: Border.all(
-                color: isSelected
-                    ? Color(0xFF00A63E)
-                    : Colors.grey.shade300,
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-
-            child: InkWell(
-              onTap: () {
-                setState(() {
-                  if (selectedAccommodations.contains(accomadation.id)) {
-                    selectedAccommodations.remove(accomadation.id);
-                  } else {
-                    selectedAccommodations.add(accomadation.id);
-                  }
-                });
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          accomadation.stayDetails[index].hotelName ?? 'N/A',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          "Rs ${accomadation.price}",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    Text(
-                      "Rating: ${accomadation.stayDetails[index].rating}",
-                      style: const TextStyle(color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
         ),
       ],
     );
