@@ -64,14 +64,8 @@ class _PlanningScreenState extends State<PlanningScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Day ${index + 1} ${basePackage.itineraries[index].title}",
+                    basePackage.itineraries[index].title,
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-
-                  Text(
-                    basePackage.itineraries[index].description,
-                    style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
                   ),
                   const SizedBox(height: 15),
 
@@ -252,9 +246,9 @@ class _PlanningScreenState extends State<PlanningScreen> {
           itemBuilder: (context, index) => Container(
             margin: const EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
-              color: isSelected
+              color: meal.optional ?(isSelected
                   ? Color.fromARGB(255, 208, 250, 222)
-                  : Colors.white,
+                  : Colors.white) : Color.fromARGB(255,208, 250, 222),
               border: Border.all(
                 color: isSelected
                     ? Color(0xFF00A63E)
@@ -267,11 +261,12 @@ class _PlanningScreenState extends State<PlanningScreen> {
             child: InkWell(
               onTap: () {
                 setState(() {
+                  if(meal.optional){
                   if (selectedMeals.contains(meal.id)) {
                     selectedMeals.remove(meal.id);
                   } else {
                     selectedMeals.add(meal.id);
-                  }
+                  }}
                 });
               },
               child: Padding(
