@@ -13,6 +13,9 @@ class PlanningScreen extends StatefulWidget {
 class _PlanningScreenState extends State<PlanningScreen> {
   int selectedStayDetailsIndex = -1;
   bool isSelected = false;
+  List<bool> selectedMeals = [];
+  List<bool> selectedActivities = [];
+  List<bool> selectedAccommodations = [];
   List<ItineraryItem> selectedStayDetails = [];
   @override
   Widget build(BuildContext context) {
@@ -179,29 +182,30 @@ class _PlanningScreenState extends State<PlanningScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "Accommodations",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            Text("not optional", style: TextStyle(color: Colors.grey),),
-          ],
+        Text(
+          "Meals",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
         const SizedBox(height: 8),
-        Text("Select an accommodation:", style: TextStyle(fontSize: 14)),
         ListView.builder(
           itemCount: item.length,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) => (Column(
             children: [
-              if (item[index].type == 'STAY') buildAccomadation(item[index]),
+              if (item[index].type == 'MEAL') buildMeal(item[index]),
             ],
           )),
         ),
-        Text("Activities", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Activities",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+          ],
+        ),
         const SizedBox(height: 8),
         ListView.builder(
           itemCount: item.length,
@@ -213,17 +217,38 @@ class _PlanningScreenState extends State<PlanningScreen> {
             ],
           )),
         ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Accommodations",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        ListView.builder(
+          itemCount: item.length,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) => (Column(
+            children: [
+              if (item[index].type == 'STAY') buildAccomadation(item[index]),
+            ],
+          )),
+        ),
+        
       ],
     );
   }
 
-   Widget buildActivity(ItineraryItem activity) {
+  Widget buildMeal(ItineraryItem meal) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ListView.builder(
           shrinkWrap: true,
-          itemCount: activity.stayDetails.length,
+          itemCount: meal.mealDetails.length,
           physics: const NeverScrollableScrollPhysics(),
 
           itemBuilder: (context, index) => Container(
@@ -234,7 +259,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
                   : Colors.white,
               border: Border.all(
                 color: selectedStayDetailsIndex == index
-                    ?  Color(0xFF00A63E)
+                    ? Color(0xFF00A63E)
                     : Colors.grey.shade300,
                 width: 2,
               ),
@@ -260,24 +285,16 @@ class _PlanningScreenState extends State<PlanningScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          activity.stayDetails[index].hotelName ?? 'N/A',
+                          meal.mealDetails[index].mealType,
                           style: const TextStyle(
                             fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          "Rs ${activity.price}",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.green,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
                     ),
                     Text(
-                      "Rating: ${activity.stayDetails[index].rating}",
+                      "Cuisine: ${meal.mealDetails[index].cuisine}",
                       style: const TextStyle(color: Colors.grey),
                     ),
                   ],
@@ -290,13 +307,13 @@ class _PlanningScreenState extends State<PlanningScreen> {
     );
   }
 
-  Widget buildAccomadation(ItineraryItem activity) {
+  Widget buildActivity(ItineraryItem activity) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ListView.builder(
           shrinkWrap: true,
-          itemCount: activity.stayDetails.length,
+          itemCount: 1,
           physics: const NeverScrollableScrollPhysics(),
 
           itemBuilder: (context, index) => Container(
@@ -307,7 +324,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
                   : Colors.white,
               border: Border.all(
                 color: selectedStayDetailsIndex == index
-                    ?  Color(0xFF00A63E)
+                    ? Color(0xFF00A63E)
                     : Colors.grey.shade300,
                 width: 2,
               ),
@@ -333,14 +350,76 @@ class _PlanningScreenState extends State<PlanningScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          activity.stayDetails[index].hotelName ?? 'N/A',
+                          activity.name,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+
+  Widget buildAccomadation(ItineraryItem accomadation) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ListView.builder(
+          shrinkWrap: true,
+          itemCount: accomadation.stayDetails.length,
+          physics: const NeverScrollableScrollPhysics(),
+
+          itemBuilder: (context, index) => Container(
+            margin: const EdgeInsets.symmetric(vertical: 10),
+            decoration: BoxDecoration(
+              color: selectedStayDetailsIndex == index
+                  ? Color.fromARGB(255, 208, 250, 222)
+                  : Colors.white,
+              border: Border.all(
+                color: selectedStayDetailsIndex == index
+                    ? Color(0xFF00A63E)
+                    : Colors.grey.shade300,
+                width: 2,
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
+
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  if (selectedStayDetailsIndex == index) {
+                    selectedStayDetailsIndex = -1;
+                  } else {
+                    selectedStayDetailsIndex = index;
+                  }
+                });
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          accomadation.stayDetails[index].hotelName ?? 'N/A',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          "Rs ${activity.price}",
+                          "Rs ${accomadation.price}",
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.green,
@@ -351,7 +430,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
                     ),
 
                     Text(
-                      "Rating: ${activity.stayDetails[index].rating}",
+                      "Rating: ${accomadation.stayDetails[index].rating}",
                       style: const TextStyle(color: Colors.grey),
                     ),
                   ],
