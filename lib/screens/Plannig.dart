@@ -13,10 +13,10 @@ class PlanningScreen extends StatefulWidget {
 class _PlanningScreenState extends State<PlanningScreen> {
   int selectedStayDetailsIndex = -1;
   bool isSelected = false;
-  List<bool> selectedMeals = [];
-  List<bool> selectedActivities = [];
-  List<bool> selectedAccommodations = [];
-  List<ItineraryItem> selectedStayDetails = [];
+  List<int> selectedMeals = [];
+  List<int> selectedActivities = [];
+  List<int> selectedAccommodations = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -192,9 +192,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) => (Column(
-            children: [
-              if (item[index].type == 'MEAL') buildMeal(item[index]),
-            ],
+            children: [if (item[index].type == 'MEAL') buildMeal(item[index])],
           )),
         ),
         Row(
@@ -237,12 +235,12 @@ class _PlanningScreenState extends State<PlanningScreen> {
             ],
           )),
         ),
-        
       ],
     );
   }
 
   Widget buildMeal(ItineraryItem meal) {
+    final bool isSelected = selectedMeals.contains(meal.id);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -254,11 +252,11 @@ class _PlanningScreenState extends State<PlanningScreen> {
           itemBuilder: (context, index) => Container(
             margin: const EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
-              color: selectedStayDetailsIndex == index
+              color: isSelected
                   ? Color.fromARGB(255, 208, 250, 222)
                   : Colors.white,
               border: Border.all(
-                color: selectedStayDetailsIndex == index
+                color: isSelected
                     ? Color(0xFF00A63E)
                     : Colors.grey.shade300,
                 width: 2,
@@ -269,10 +267,10 @@ class _PlanningScreenState extends State<PlanningScreen> {
             child: InkWell(
               onTap: () {
                 setState(() {
-                  if (selectedStayDetailsIndex == index) {
-                    selectedStayDetailsIndex = -1;
+                  if (selectedMeals.contains(meal.id)) {
+                    selectedMeals.remove(meal.id);
                   } else {
-                    selectedStayDetailsIndex = index;
+                    selectedMeals.add(meal.id);
                   }
                 });
               },
@@ -308,6 +306,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
   }
 
   Widget buildActivity(ItineraryItem activity) {
+    final bool isSelected = selectedActivities.contains(activity.id);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -319,11 +318,11 @@ class _PlanningScreenState extends State<PlanningScreen> {
           itemBuilder: (context, index) => Container(
             margin: const EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
-              color: selectedStayDetailsIndex == index
+              color: isSelected
                   ? Color.fromARGB(255, 208, 250, 222)
                   : Colors.white,
               border: Border.all(
-                color: selectedStayDetailsIndex == index
+                color: isSelected
                     ? Color(0xFF00A63E)
                     : Colors.grey.shade300,
                 width: 2,
@@ -334,10 +333,10 @@ class _PlanningScreenState extends State<PlanningScreen> {
             child: InkWell(
               onTap: () {
                 setState(() {
-                  if (selectedStayDetailsIndex == index) {
-                    selectedStayDetailsIndex = -1;
+                  if (selectedActivities.contains(activity.id)) {
+                    selectedActivities.remove(activity.id);
                   } else {
-                    selectedStayDetailsIndex = index;
+                    selectedActivities.add(activity.id);
                   }
                 });
               },
@@ -368,8 +367,8 @@ class _PlanningScreenState extends State<PlanningScreen> {
     );
   }
 
-
   Widget buildAccomadation(ItineraryItem accomadation) {
+    final bool isSelected = selectedAccommodations.contains(accomadation.id);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -381,11 +380,11 @@ class _PlanningScreenState extends State<PlanningScreen> {
           itemBuilder: (context, index) => Container(
             margin: const EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
-              color: selectedStayDetailsIndex == index
+              color: isSelected
                   ? Color.fromARGB(255, 208, 250, 222)
                   : Colors.white,
               border: Border.all(
-                color: selectedStayDetailsIndex == index
+                color: isSelected
                     ? Color(0xFF00A63E)
                     : Colors.grey.shade300,
                 width: 2,
@@ -396,10 +395,10 @@ class _PlanningScreenState extends State<PlanningScreen> {
             child: InkWell(
               onTap: () {
                 setState(() {
-                  if (selectedStayDetailsIndex == index) {
-                    selectedStayDetailsIndex = -1;
+                  if (selectedAccommodations.contains(accomadation.id)) {
+                    selectedAccommodations.remove(accomadation.id);
                   } else {
-                    selectedStayDetailsIndex = index;
+                    selectedAccommodations.add(accomadation.id);
                   }
                 });
               },
