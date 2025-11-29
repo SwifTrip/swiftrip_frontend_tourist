@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'Signup.dart';
-import 'Destination.dart';
+import 'home_screen.dart';
 import '../services/auth_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
@@ -64,9 +64,9 @@ class SigninState extends State<Signin> {
               backgroundColor: Colors.green,
             ),
           );
-          // Navigate to Destination screen on successful login
+          // Navigate to HomeScreen after success
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => DestinationScreen()),
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
