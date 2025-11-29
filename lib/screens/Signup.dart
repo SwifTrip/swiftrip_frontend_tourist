@@ -18,6 +18,7 @@ class _SignupScreenState extends State<SignupScreen> {
   late final TextEditingController _firstNameController;
   late final TextEditingController _lastNameController;
   late final TextEditingController _emailController;
+  late final TextEditingController _phoneController;
   late final TextEditingController _passwordController;
   late final TextEditingController _confirmPasswordController;
   bool _isLoading = false;
@@ -31,6 +32,7 @@ class _SignupScreenState extends State<SignupScreen> {
     _firstNameController = TextEditingController();
     _lastNameController = TextEditingController();
     _emailController = TextEditingController();
+    _phoneController = TextEditingController();
     _passwordController = TextEditingController();
     _confirmPasswordController = TextEditingController();
   }
@@ -40,6 +42,7 @@ class _SignupScreenState extends State<SignupScreen> {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
