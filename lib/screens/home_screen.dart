@@ -233,6 +233,41 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                     ),
+
+                    // Upcoming Trips Header
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 32, 16, 12),
+                      child: Text(
+                        'My Upcoming Trips',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+
+                    // Upcoming Trips List
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        children: [
+                          _buildUpcomingTripCard(
+                            title: 'Adventure in the Alps',
+                            date: 'Sep 15 - Sep 22, 2024',
+                            imageUrl:
+                                'https://lh3.googleusercontent.com/aida-public/AB6AXuD3v-eQ0bCf7AUA2yHx5z7vx97CP8VtbiJpcuNL3sk2X0Qju0GZ5z67d-jsbDXC27uizBSJnxB05l47amJtOBgPX5Ly1ZFDKZxzuGjUDgsWWLcUQgGJg-Q9qTYE6UEkaCHPdv-2fnGQpCIrSB8Rpy5tPxGeJigHQm__PAP3E1bdMY-SNzpKO_OOzwY6wyUHl1QTnp-tbp6CmKDe7KWTsAZ1uBbg6H6sVO7FsGPY6VamL5m3lOJ5b9-znjmrgmCdg9kIQpvjufQiVDw',
+                          ),
+                          const SizedBox(height: 12),
+                          _buildUpcomingTripCard(
+                            title: 'Bali Beach Retreat',
+                            date: 'Nov 01 - Nov 08, 2024',
+                            imageUrl:
+                                'https://lh3.googleusercontent.com/aida-public/AB6AXuAmyJq2tgg9i4YHCjmJY8cKiJPm7N-d4bYpvisZD1LE-qyVHVgm-Ixtoc91-PLQA86xp9nup98PtQYynYvIwOQi1GEI4x5JsZIT9ToyFdCxKk1s16EC02aZZeBvYMOQ70A0dThQaetf93ippgYO3BJ2L0VF6RIiVzGrO18nqjgS0Rt2xOaOPoDjgEz7FHLWtNy2zoHqTT3SJt1mANE_IvWWxZc_CjJbSEc_Bz80-qS6K3WpjlY00xX9BbkdQwsnpTnw6Iqv7-SPAos',
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
             ),
@@ -352,6 +387,67 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildUpcomingTripCard(
+      {required String title, required String date, required String imageUrl}) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              image: DecorationImage(
+                image: NetworkImage(imageUrl),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                Text(
+                  date,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(
+            Icons.chevron_right,
+            color: AppColors.textSecondary,
+          ),
+        ],
       ),
     );
   }
