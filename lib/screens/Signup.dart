@@ -148,40 +148,30 @@ class _SignupScreenState extends State<SignupScreen> {
 
                 const SizedBox(height: 40),
 
-                // Fields will be styled in next commit
                 // First Name
-                TextFormField(
+                CustomTextFormField(
                   controller: _firstNameController,
-                  decoration: const InputDecoration(
-                    hintText: 'First Name',
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
+                  hintText: 'First Name',
+                  icon: Icons.person_outline,
                   validator: (value) => value!.isEmpty ? 'Required' : null,
                 ),
                 const SizedBox(height: 16),
                 
                  // Last Name
-                TextFormField(
+                CustomTextFormField(
                   controller: _lastNameController,
-                  decoration: const InputDecoration(
-                    hintText: 'Last Name',
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
+                  hintText: 'Last Name',
+                  icon: Icons.person_outline,
                   validator: (value) => value!.isEmpty ? 'Required' : null,
                 ),
                 const SizedBox(height: 16),
 
                 // Email
-                TextFormField(
+                CustomTextFormField(
                   controller: _emailController,
-                  decoration: const InputDecoration(
-                    hintText: 'Email',
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                   validator: (value) {
+                  hintText: 'Email',
+                  icon: Icons.email_outlined,
+                  validator: (value) {
                     if (value == null || value.trim().isEmpty) return 'Email is required';
                     if (!value.contains('@')) return 'Invalid email';
                     return null;
@@ -189,43 +179,71 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Phone (Preserving layout)
-                 const TextField(
-                   decoration: InputDecoration(
-                     hintText: 'Phone Number',
-                     filled: true,
-                     fillColor: Colors.white,
-                   ),
+                // Phone
+                 CustomTextFormField(
+                   controller: _phoneController,
+                   hintText: 'Phone Number',
+                   icon: Icons.phone_outlined,
+                   inputType: TextInputType.phone,
+                   validator: (value) {
+                     if (value == null || value.trim().isEmpty) return 'Phone number is required';
+                     if (!RegExp(r'^\+?[0-9]{7,15}$').hasMatch(value)) return 'Invalid phone number';
+                     return null;
+                   },
                  ),
                  const SizedBox(height: 16),
 
                 // Password
-                TextFormField(
+                CustomTextFormField(
                   controller: _passwordController,
+                  hintText: 'Password',
+                  icon: Icons.lock_outline,
                   obscureText: true,
-                  decoration: const InputDecoration(
-                    hintText: 'Password',
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
                   validator: (value) => value!.length < 6 ? 'Min 6 chars' : null,
                 ),
                 const SizedBox(height: 16),
 
                 // Confirm Password
-                TextFormField(
+                CustomTextFormField(
                   controller: _confirmPasswordController,
+                  hintText: 'Confirm Password',
+                  icon: Icons.lock_outline,
                   obscureText: true,
-                  decoration: const InputDecoration(
-                    hintText: 'Confirm Password',
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                 validator: (value) {
+                  validator: (value) {
                     if (value != _passwordController.text) return 'Mismatch';
                     return null;
                   },
                 ),
+                const SizedBox(height: 16),
+
+                // Language Dropdown
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: DropdownButtonFormField<String>(
+                    dropdownColor: AppColors.surface,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      icon: Icon(Icons.language, color: AppColors.textSecondary),
+                    ),
+                    hint: const Text(
+                      'Select your language',
+                      style: TextStyle(color: AppColors.textSecondary),
+                    ),
+                    style: const TextStyle(color: AppColors.textPrimary),
+                    items: const [
+                      DropdownMenuItem(value: 'en', child: Text('English')),
+                      DropdownMenuItem(value: 'ur', child: Text('Urdu')),
+                      DropdownMenuItem(value: 'ar', child: Text('Arabic')),
+                    ],
+                    onChanged: (value) {},
+                  ),
+                ),
+
                 const SizedBox(height: 24),
 
                 // Sign Up Button
@@ -264,3 +282,59 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 }
 
+class CustomTextFormField extends StatelessWidget {
+  final IconData icon;
+  final String hintText;
+  final bool obscureText;
+  final TextEditingController? controller;
+  final String? Function(String?)? validator;
+  final TextInputType? inputType;
+
+  const CustomTextFormField({
+    super.key,
+    required this.icon,
+    required this.hintText,
+    this.obscureText = false,
+    this.controller,
+    this.validator,
+    this.inputType,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      keyboardType: inputType,
+      style: const TextStyle(color: AppColors.textPrimary),
+      validator: validator,
+      decoration: InputDecoration(
+        prefixIcon: Icon(icon, color: AppColors.textSecondary),
+        hintText: hintText,
+        hintStyle: const TextStyle(color: AppColors.textSecondary),
+        filled: true,
+        fillColor: AppColors.surface,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.accent),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
+      ),
+    );
+  }
+}
