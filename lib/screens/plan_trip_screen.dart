@@ -65,11 +65,15 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.only(bottom: 100),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
             // Trip Type Toggle
             _buildTripTypeToggle(),
             const SizedBox(height: 32),
@@ -140,8 +144,36 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
             ),
             const SizedBox(height: 12),
             _buildPackageStyles(),
-          ],
-        ),
+                ],
+              ),
+            ),
+          ),
+
+          // Bottom Button
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppColors.background.withValues(alpha: 0.9),
+                border: const Border(
+                  top: BorderSide(color: AppColors.border, width: 0.5),
+                ),
+              ),
+              child: CommonButton(
+                text: 'Find Adventures',
+                onPressed: () {
+                  // TODO: Navigate to TourResultsScreen once migrated
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Tour results coming soon!"))
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
