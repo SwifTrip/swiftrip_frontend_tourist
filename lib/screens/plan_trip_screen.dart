@@ -12,6 +12,8 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
   bool isPublicTrip = true;
   String selectedMonth = 'Anytime';
   DateTime? selectedDate;
+  int adultsCount = 2;
+  int childrenCount = 0;
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -96,9 +98,144 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
             const SizedBox(height: 16),
             _buildMonthSelector(),
             const SizedBox(height: 32),
+
+            // Travelers Section
+            const Text(
+              'Travelers',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildTravelersSection(),
+            const SizedBox(height: 32),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTravelersSection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        children: [
+          _buildTravelerRow(
+            label: 'Adults',
+            subtitle: 'Age 18+',
+            count: adultsCount,
+            icon: Icons.person,
+            iconBg: Colors.blue.withValues(alpha: 0.1),
+            iconColor: Colors.blue,
+            onIncrement: () => setState(() => adultsCount++),
+            onDecrement: () => setState(() => adultsCount > 1 ? adultsCount-- : null),
+          ),
+          const Divider(color: AppColors.border, height: 32),
+          _buildTravelerRow(
+            label: 'Children',
+            subtitle: 'Age 0-17',
+            count: childrenCount,
+            icon: Icons.child_care,
+            iconBg: Colors.orange.withValues(alpha: 0.1),
+            iconColor: Colors.orange,
+            onIncrement: () => setState(() => childrenCount++),
+            onDecrement: () => setState(() => childrenCount > 0 ? childrenCount-- : null),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTravelerRow({
+    required String label,
+    required String subtitle,
+    required int count,
+    required IconData icon,
+    required Color iconBg,
+    required Color iconColor,
+    required VoidCallback onIncrement,
+    required VoidCallback onDecrement,
+  }) {
+    return Row(
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: iconBg,
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: iconColor, size: 20),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          height: 36,
+          decoration: BoxDecoration(
+            color: AppColors.background.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Row(
+            children: [
+              IconButton(
+                onPressed: onDecrement,
+                icon: const Icon(Icons.remove, size: 16, color: AppColors.textSecondary),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 32),
+              ),
+              SizedBox(
+                width: 20,
+                child: Text(
+                  count.toString(),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: onIncrement,
+                icon: const Icon(Icons.add, size: 16, color: Colors.white),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 32),
+                style: IconButton.styleFrom(
+                  backgroundColor: AppColors.accent,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
