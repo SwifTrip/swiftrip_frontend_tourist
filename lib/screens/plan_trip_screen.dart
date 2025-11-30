@@ -10,6 +10,37 @@ class PlanTripScreen extends StatefulWidget {
 
 class _PlanTripScreenState extends State<PlanTripScreen> {
   bool isPublicTrip = true;
+  String selectedMonth = 'Anytime';
+  DateTime? selectedDate;
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now().add(const Duration(days: 1)),
+      firstDate: DateTime.now().add(const Duration(days: 1)),
+      lastDate: DateTime(2101),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.dark(
+              primary: AppColors.accent,
+              onPrimary: AppColors.background,
+              surface: AppColors.surface,
+              onSurface: AppColors.textPrimary,
+            ),
+            dialogBackgroundColor: AppColors.background,
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+        selectedMonth = "${picked.day}/${picked.month}/${picked.year}";
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +83,95 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
             const SizedBox(height: 16),
             _buildLocationInputs(),
             const SizedBox(height: 32),
+
+            // When Section
+            const Text(
+              'When?',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildMonthSelector(),
+            const SizedBox(height: 32),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildMonthSelector() {
+    final months = [
+      {'label': 'ANYTIME', 'value': 'Flexible'},
+      {'label': 'JUN', 'value': 'Next Month'},
+      {'label': 'JUL', 'value': 'Summer'},
+    ];
+
+    return SizedBox(
+      height: 80,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: [
+          ...months.map((m) {
+            final isSelected = selectedMonth == m['value'];
+            return GestureDetector(
+              onTap: () => setState(() => selectedMonth = m['value']!),
+              child: Container(
+                width: 110,
+                margin: const EdgeInsets.only(right: 12),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColors.accent.withValues(alpha: 0.1) : AppColors.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isSelected ? AppColors.accent : AppColors.border,
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      m['label']!,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: isSelected ? AppColors.accent : AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      m['value']!,
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }),
+          GestureDetector(
+            onTap: () => _selectDate(context),
+            child: Container(
+              width: 50,
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: selectedDate != null ? AppColors.accent : AppColors.border,
+                ),
+              ),
+              child: Icon(
+                Icons.calendar_month,
+                color: selectedDate != null ? AppColors.accent : AppColors.textSecondary,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
