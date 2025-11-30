@@ -14,6 +14,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
   DateTime? selectedDate;
   int adultsCount = 2;
   int childrenCount = 0;
+  String selectedStyle = 'Adventure';
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -111,6 +112,143 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
             const SizedBox(height: 16),
             _buildTravelersSection(),
             const SizedBox(height: 32),
+
+            // Package Style Section
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Package Style',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    'COMPARE',
+                    style: TextStyle(
+                      color: AppColors.accent,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _buildPackageStyles(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPackageStyles() {
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      childAspectRatio: 1.05,
+      crossAxisSpacing: 12,
+      mainAxisSpacing: 12,
+      children: [
+        _buildStyleCard(
+          title: 'Adventure',
+          description: 'Hiking, camping and outdoor activities.',
+          icon: Icons.landscape,
+          iconColor: Colors.blue,
+          isPopular: true,
+        ),
+        _buildStyleCard(
+          title: 'Cultural',
+          description: 'Historical sites and local traditions.',
+          icon: Icons.museum,
+          iconColor: Colors.purple,
+          isPopular: false,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStyleCard({
+    required String title,
+    required String description,
+    required IconData icon,
+    required Color iconColor,
+    bool isPopular = false,
+  }) {
+    final isSelected = selectedStyle == title;
+    return GestureDetector(
+      onTap: () => setState(() => selectedStyle = title),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? AppColors.accent : AppColors.border,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: iconColor.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: iconColor, size: 18),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  description,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 10,
+                  ),
+                ),
+              ],
+            ),
+            if (isPopular)
+              Positioned(
+                top: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.accent,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    'Popular',
+                    style: TextStyle(
+                      color: AppColors.background,
+                      fontSize: 8,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
