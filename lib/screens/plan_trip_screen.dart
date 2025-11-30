@@ -1,5 +1,6 @@
-import 'package:swift_trip_app/theme/app_colors.dart';
+import '../theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import '../widgets/common_button.dart';
 
 class PlanTripScreen extends StatefulWidget {
   const PlanTripScreen({super.key});

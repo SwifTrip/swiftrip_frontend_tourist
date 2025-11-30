@@ -1,4 +1,4 @@
-import 'package:swift_trip_app/theme/app_colors.dart';
+import '../theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class CommonButton extends StatelessWidget {
