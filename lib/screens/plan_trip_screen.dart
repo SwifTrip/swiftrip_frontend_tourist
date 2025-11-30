@@ -39,9 +39,111 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
             // Trip Type Toggle
             _buildTripTypeToggle(),
             const SizedBox(height: 32),
+
+            // Where to Section
+            const Text(
+              'Where to?',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildLocationInputs(),
+            const SizedBox(height: 32),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildLocationInputs() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        children: [
+          _buildLocationField(
+            label: 'FROM',
+            value: 'San Francisco, CA',
+            icon: Icons.circle_outlined,
+            iconColor: Colors.blue,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 26),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Column(
+                children: List.generate(4, (index) => Container(
+                  width: 1,
+                  height: 4,
+                  margin: const EdgeInsets.symmetric(vertical: 2),
+                  color: AppColors.textSecondary.withOpacity(0.3),
+                )),
+              ),
+            ),
+          ),
+          _buildLocationField(
+            label: 'TO',
+            value: '',
+            hint: 'Search Destination',
+            icon: Icons.location_on,
+            iconColor: Colors.red,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLocationField({
+    required String label,
+    required String value,
+    String? hint,
+    required IconData icon,
+    required Color iconColor,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textSecondary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Icon(icon, color: iconColor, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: value.isNotEmpty
+                  ? Text(
+                      value,
+                      style: const TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    )
+                  : Text(
+                      hint ?? '',
+                      style: TextStyle(
+                        color: AppColors.textSecondary.withOpacity(0.5),
+                        fontSize: 16,
+                      ),
+                    ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
