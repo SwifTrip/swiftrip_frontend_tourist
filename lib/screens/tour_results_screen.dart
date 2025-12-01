@@ -167,6 +167,8 @@ class TourResultsScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
   Widget _buildTourCard({
     required BuildContext context,
     required String title,
@@ -185,6 +187,7 @@ class TourResultsScreen extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.border),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -207,7 +210,7 @@ class TourResultsScreen extends StatelessWidget {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        Colors.black.withValues(alpha: 0.4),
+                        Colors.black.withOpacity(0.4),
                       ],
                     ),
                   ),
@@ -224,7 +227,7 @@ class TourResultsScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: isPublic ? AppColors.background.withValues(alpha: 0.6) : Colors.purple.withValues(alpha: 0.3),
+                        color: isPublic ? AppColors.background.withOpacity(0.6) : Colors.purple.withOpacity(0.3),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
@@ -264,7 +267,7 @@ class TourResultsScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.3),
+                        color: Colors.black.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
@@ -331,7 +334,7 @@ class TourResultsScreen extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: Colors.yellow.withValues(alpha: 0.1),
+                            color: Colors.yellow.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Row(
@@ -367,7 +370,7 @@ class TourResultsScreen extends StatelessWidget {
                   children: tags.map((tag) => Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: isPublic ? Colors.blue.withValues(alpha: 0.1) : Colors.deepPurple.withValues(alpha: 0.1),
+                      color: isPublic ? Colors.blue.withOpacity(0.1) : Colors.deepPurple.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
