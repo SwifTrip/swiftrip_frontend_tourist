@@ -24,11 +24,105 @@ class TourResultsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Center(
-        child: Text(
-          'Tour Results for $destination',
-          style: const TextStyle(color: AppColors.textPrimary),
+      appBar: AppBar(
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          onPressed: () => Navigator.pop(context),
         ),
+        title: Column(
+          children: [
+            Text(
+              '$destination ${isPublic ? 'Public' : 'Private'} Tours',
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              '$dates • $guests Guests',
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.tune, color: AppColors.textPrimary),
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          const SizedBox(height: 8),
+          _buildFilterBar(),
+          const Expanded(
+            child: Center(
+              child: Text(
+                'Tour results list coming next...',
+                style: TextStyle(color: AppColors.textSecondary),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterBar() {
+    return SizedBox(
+      height: 40,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        children: [
+          _buildFilterChip('Recommended', isActive: true, hasDropdown: true),
+          const SizedBox(width: 8),
+          _buildFilterChip('Price: Low to High'),
+          const SizedBox(width: 8),
+          _buildFilterChip('Duration'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(String label, {bool isActive = false, bool hasDropdown = false}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: isActive ? AppColors.surface : Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isActive ? AppColors.accent : AppColors.border,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+              color: isActive ? AppColors.accent : AppColors.textSecondary,
+            ),
+          ),
+          if (hasDropdown) ...[
+            const SizedBox(width: 4),
+            Icon(
+              Icons.keyboard_arrow_down,
+              size: 16,
+              color: isActive ? AppColors.accent : AppColors.textSecondary,
+            ),
+          ],
+        ],
       ),
     );
   }
