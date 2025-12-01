@@ -1,6 +1,7 @@
 import '../theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../widgets/common_button.dart';
+import 'tour_results_screen.dart';
 
 class PlanTripScreen extends StatefulWidget {
   const PlanTripScreen({super.key});
@@ -166,9 +167,18 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
               child: CommonButton(
                 text: 'Find Adventures',
                 onPressed: () {
-                  // TODO: Navigate to TourResultsScreen once migrated
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Tour results coming soon!"))
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TourResultsScreen(
+                        isPublic: isPublicTrip, // Changed from isPublic to isPublicTrip
+                        destination: 'Hunza', // Example, normally from state
+                        dates: selectedDate != null 
+                            ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
+                            : selectedMonth, // Adjusted date string logic
+                        guests: adultsCount + childrenCount,
+                      ),
+                    ),
                   );
                 },
               ),
