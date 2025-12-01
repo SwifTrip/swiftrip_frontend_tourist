@@ -125,5 +125,32 @@ class TourResultsScreen extends StatelessWidget {
         ],
       ),
     );
+  Widget _buildTourCard({
+    required BuildContext context,
+    required String title,
+    required String locations,
+    required int price,
+    required double rating,
+    required int reviews,
+    required String duration,
+    required String imageUrl,
+    required List<String> tags,
+    bool isPopular = false,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Content will be added in subsequent commits
+          const SizedBox(height: 100, child: Center(child: Text("Tour Card Content"))),
+        ],
+      ),
+    );
   }
 }
