@@ -63,12 +63,54 @@ class TourResultsScreen extends StatelessWidget {
         children: [
           const SizedBox(height: 8),
           _buildFilterBar(),
-          const Expanded(
-            child: Center(
-              child: Text(
-                'Tour results list coming next...',
-                style: TextStyle(color: AppColors.textSecondary),
-              ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                _buildTourCard(
+                  context: context,
+                  title: isPublic ? 'Classic Hunza Expedition' : 'Classic Hunza Private Expedition',
+                  locations: 'Karimabad, Altit, Baltit',
+                  price: isPublic ? 450 : 950,
+                  rating: 4.8,
+                  reviews: 128,
+                  duration: '5 Days',
+                  imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCJ63yU4pc9m4bcYiIRArzFDSP_KI3AUe5IOfp2OPRbK0WFJrIq9oZLq2MJlkHnUlKc7_gSDi0ZDtT8Qgjqlt1KdpJ3kT8ZKTdUTV3n86Ao5glkAvkNvpKz5mFdmcdBbu_E5BkzpbU2VWmHO1JDXoYKy8cRSSqiZWTlVFboXax5qolrS3ZhApq-YbGOkgcuV7T-ig44eFIHE3pqCqrzlNWfJBeHAO-Jn8b7jv-I5sPGUZNVxg9F02GWis-boOAMc5Q2rUbJ3D4NdtZU',
+                  tags: isPublic 
+                      ? ['Transportation', 'Hotels', 'Guide'] 
+                      : ['Private Car', 'Luxury Hotels', 'Dedicated Guide'],
+                ),
+                const SizedBox(height: 20),
+                _buildTourCard(
+                  context: context,
+                  title: isPublic ? 'Attabad & Passu Adventure' : 'Attabad & Passu Luxury Private',
+                  locations: 'Attabad Lake, Passu Cones',
+                  price: isPublic ? 620 : 1200,
+                  rating: 4.9,
+                  reviews: 84,
+                  duration: '7 Days',
+                  imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDeaQ9BAz698k59yniB4d6C2z2ywKuBqhjVSDAcd9Ntj664CjGA1sw1imif_dIw8evhs0E58snAcPnDT_Pr8vYB-Ll9i-OPQ-4aoJVhDCTUYPKQbILC_8OMI2oh9xtaJ_gqGVcEBFcYXFG5r074QxscACVwhT3-MktmsZXjyaULwzgib2iIk3nkaryP0Yw5w9Dy-BwBZpNvnrBM-6GI29CZ9ImF4yYthMR7vEDy-JxUqjSMVlAy_N1DHassPk-OBM7Upk321K2zD7Kg',
+                  tags: isPublic 
+                      ? ['Boating', 'Hiking', 'Breakfast'] 
+                      : ['Private Boat', 'Hiking', 'Breakfast Included'],
+                  isPopular: true,
+                ),
+                const SizedBox(height: 20),
+                _buildTourCard(
+                  context: context,
+                  title: isPublic ? 'Cultural Heritage Tour' : 'Cultural Private Tour',
+                  locations: 'Ganish, Altit Fort',
+                  price: isPublic ? 380 : 780,
+                  rating: 4.6,
+                  reviews: 45,
+                  duration: '3 Days',
+                  imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDJjHyHnTeWrSSeTZaAuHj1nfzxx7r_qWJLl6CWuaUWTu6qmL2_GMiKfWnw1MtVQ_lrYN0EvMbGsn5EBcZwSpGVzHZS66auuUQXGnAGwVHcLLXfkMrTFaUojO46gfjKbosV5KV70XuvWI1q4anY--PUEtSYimyYt8sxD1bLSuXiSaQa9_in5hl9b4sYkHJUZjFZdMBJgg7sRjLvFO8ripDgDOPhjAFPkAeR2_txXtJIgu1n1QzXUBd3q72PS__48YKQxQ9YDrdMh7U1',
+                  tags: isPublic 
+                      ? ['History', 'Museums', 'Local Food'] 
+                      : ['Private Guide', 'Exclusive Access', 'Local Cuisine'],
+                ),
+                const SizedBox(height: 80),
+              ],
             ),
           ),
         ],
