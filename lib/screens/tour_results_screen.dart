@@ -181,6 +181,9 @@ class TourResultsScreen extends StatelessWidget {
     required List<String> tags,
     bool isPopular = false,
   }) {
+    final buttonText = isPublic ? 'View Details' : 'Choose Start Date';
+    final pricingUnit = isPublic ? '/ person' : '/ group (up to 4)';
+
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
