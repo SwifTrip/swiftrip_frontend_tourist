@@ -79,13 +79,92 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildHeroSection(),
-                const SizedBox(height: 100, child: Center(child: Text("Details coming..."))),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 24),
+                      _buildInfoGrid(),
+                      const SizedBox(height: 32),
+                      _buildOverview(),
+                      const SizedBox(height: 100, child: Center(child: Text("Itinerary and more coming..."))),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
           _buildStickyBottomBar(),
         ],
       ),
+    );
+  }
+
+  Widget _buildInfoGrid() {
+    return Row(
+      children: [
+        _buildInfoItem(Icons.calendar_month, 'DURATION', widget.package.duration),
+        const SizedBox(width: 12),
+        _buildInfoItem(
+          widget.isPublic ? Icons.group_add : Icons.person, 
+          widget.isPublic ? 'GROUP SIZE' : 'GROUP TYPE', 
+          widget.isPublic ? 'Max 12' : 'Private'
+        ),
+        const SizedBox(width: 12),
+        _buildInfoItem(
+          widget.isPublic ? Icons.directions_bus : Icons.directions_car, 
+          'TRANSPORT', 
+          widget.isPublic ? 'AC Coaster' : 'Luxury SUV'
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoItem(IconData icon, String label, String value) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: _accentColor, size: 22),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: const TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: const TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOverview() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Overview',
+          style: TextStyle(color: AppColors.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          widget.isPublic 
+              ? 'Experience the magic of Hunza Valley in this classic expedition. From the ancient forts of Altit and Baltit to the bustling streets of Karimabad, immerse yourself in the rich culture and breathtaking landscapes.'
+              : 'Indulge in an exclusive private escape to the legendary Hunza Valley. This premium itinerary is crafted for those who value privacy, comfort, and flexibility. Travel in a dedicated Luxury SUV with a personal guide.',
+          style: const TextStyle(color: AppColors.textSecondary, fontSize: 14, height: 1.6),
+        ),
+      ],
     );
   }
 
