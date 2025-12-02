@@ -83,7 +83,79 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
               ],
             ),
           ),
+          _buildStickyBottomBar(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildStickyBottomBar() {
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          border: const Border(top: BorderSide(color: AppColors.border)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.4),
+              blurRadius: 20,
+              offset: const Offset(0, -10),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  widget.isPublic ? 'BASE PRICE' : 'STARTING FROM',
+                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(
+                      widget.package.price.startsWith('Rs') ? '\$450' : widget.package.price,
+                      style: const TextStyle(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      ' / person',
+                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                    ),
+                  ],
+                ),
+                Text(
+                  widget.isPublic ? 'Deposit: \$100 today' : 'Deposit: \$250 today',
+                  style: const TextStyle(color: Color(0xFF10B981), fontSize: 10, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: SizedBox(
+                height: 56,
+                child: CommonButton(
+                  text: widget.isPublic ? 'Choose Departure' : 'Choose Start Date',
+                  onPressed: () {
+                    // Navigation will be implemented in later commits
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Booking flow coming soon!")),
+                    );
+                  },
+                  backgroundColor: _accentColor,
+                  textColor: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
