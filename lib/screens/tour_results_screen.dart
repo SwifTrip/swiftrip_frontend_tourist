@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
 import '../models/tour_package.dart';
-// import 'package_details_screen.dart'; // To be migrated in Phase 3
+import 'package_details_screen.dart';
 
 class TourResultsScreen extends StatelessWidget {
   final String destination;
@@ -440,9 +440,41 @@ class TourResultsScreen extends StatelessWidget {
                         fontSize: 13,
                         height: 40,
                         onPressed: () {
-                          // TODO: Navigate to PackageDetailsScreen once migrated
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Package details coming soon!"))
+                          // Create a dummy package object based on the card info for now
+                          // In a real app, this would come from a list of TourPackage objects
+                          final package = TourPackage(
+                            title: title,
+                            price: '\$$price',
+                            duration: duration,
+                            rating: rating.toString(),
+                            reviewsCount: reviews,
+                            imageUrl: imageUrl,
+                            highlights: ['Ancient Forts', 'Local Culture', 'Scenic Views'],
+                            included: [
+                              {'icon': Icons.directions_bus, 'text': 'Transportation included'},
+                              {'icon': Icons.hotel, 'text': '3-star hotels'},
+                              {'icon': Icons.restaurant, 'text': 'Breakfast & Dinner'},
+                              {'icon': Icons.person, 'text': 'Professional Guide'},
+                            ],
+                            perfectFor: ['Families', 'Couples', 'Solo Travelers'],
+                            itinerary: [
+                              ItineraryDay(day: 'Day 01', title: 'Arrival in Hunza', subtitle: 'Transfer to Karimabad, check-in to hotel.', icon: Icons.landscape),
+                              ItineraryDay(day: 'Day 02', title: 'Forts Exploration', subtitle: 'Visit Altit and Baltit forts.', icon: Icons.fort),
+                              ItineraryDay(day: 'Day 03', title: 'Local Markets', subtitle: 'Explore Karimabad bazaar and local cuisine.', icon: Icons.shopping_bag),
+                            ],
+                            reviews: [
+                              Review(initial: 'A', name: 'Ali Khan', date: '2 weeks ago', stars: 5, comment: 'Amazing experience! The guide was very helpful.'),
+                            ],
+                          );
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PackageDetailsScreen(
+                                package: package,
+                                isPublic: isPublic,
+                              ),
+                            ),
                           );
                         },
                       ),
