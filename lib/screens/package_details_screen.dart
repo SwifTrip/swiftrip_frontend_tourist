@@ -88,7 +88,9 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                       _buildInfoGrid(),
                       const SizedBox(height: 32),
                       _buildOverview(),
-                      const SizedBox(height: 100, child: Center(child: Text("Itinerary and more coming..."))),
+                      const SizedBox(height: 32),
+                      _buildItinerarySection(),
+                      const SizedBox(height: 100, child: Center(child: Text("Almost there..."))),
                     ],
                   ),
                 ),
@@ -96,6 +98,112 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
             ),
           ),
           _buildStickyBottomBar(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildItinerarySection() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Itinerary',
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            GestureDetector(
+              onTap: () {},
+              child: Text(
+                'View Full Itinerary',
+                style: TextStyle(color: _accentColor, fontSize: 12, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        ...widget.package.itinerary.asMap().entries.map((entry) {
+          final index = entry.key;
+          final day = entry.value;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: _buildExpandableDay(index, day),
+          );
+        }).toList(),
+      ],
+    );
+  }
+
+  Widget _buildExpandableDay(int index, ItineraryDay day) {
+    bool isExpanded = _isDayExpanded[index];
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isExpanded ? _accentColor.withOpacity(0.3) : AppColors.border,
+        ),
+      ),
+      child: Column(
+        children: [
+          ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            leading: CircleAvatar(
+              backgroundColor: isExpanded ? _accentColor : AppColors.background,
+              radius: 14,
+              child: Text(
+                (index + 1).toString().padLeft(2, '0'),
+                style: TextStyle(
+                  color: isExpanded ? Colors.white : AppColors.textSecondary, 
+                  fontSize: 10, 
+                  fontWeight: FontWeight.bold
+                ),
+              ),
+            ),
+            title: Text(
+              day.title,
+              style: const TextStyle(
+                color: AppColors.textPrimary, 
+                fontSize: 14, 
+                fontWeight: FontWeight.bold
+              ),
+            ),
+            trailing: Icon(
+              isExpanded ? Icons.expand_less : Icons.expand_more, 
+              color: isExpanded ? _accentColor : AppColors.textSecondary,
+              size: 20,
+            ),
+            onTap: () {
+              setState(() {
+                _isDayExpanded[index] = !isExpanded;
+              });
+            },
+          ),
+          if (isExpanded)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Divider(color: AppColors.border, height: 1),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      const Icon(Icons.schedule, color: AppColors.textSecondary, size: 14),
+                      const SizedBox(width: 4),
+                      Text(day.subtitle.contains('drive') ? day.subtitle.split(',')[0] : 'Activity Day', 
+                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    day.subtitle,
+                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.5),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );
