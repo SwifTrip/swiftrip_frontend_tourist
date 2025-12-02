@@ -90,7 +90,11 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                       _buildOverview(),
                       const SizedBox(height: 32),
                       _buildItinerarySection(),
-                      const SizedBox(height: 100, child: Center(child: Text("Almost there..."))),
+                      const SizedBox(height: 32),
+                      _buildIncludedSection(),
+                      const SizedBox(height: 32),
+                      _buildCustomizableCard(),
+                      const SizedBox(height: 140), // Spacing for bottom bar
                     ],
                   ),
                 ),
@@ -99,6 +103,113 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
           ),
           _buildStickyBottomBar(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildIncludedSection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.check_circle, color: Color(0xFF10B981), size: 18),
+              SizedBox(width: 8),
+              Text(
+                'What\'s Included',
+                style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ...widget.package.included.take(4).map((item) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                children: [
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: const BoxDecoration(
+                      color: AppColors.textSecondary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      item['text'] as String,
+                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCustomizableCard() {
+    final bgColor = widget.isPublic ? const Color(0xFF137FEC).withOpacity(0.05) : Colors.transparent;
+    final borderColor = widget.isPublic ? const Color(0xFF137FEC).withOpacity(0.2) : Colors.transparent;
+
+    return Container(
+      padding: EdgeInsets.all(widget.isPublic ? 0 : 1),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: widget.isPublic ? null : LinearGradient(
+          colors: [Colors.purple.withOpacity(0.5), Colors.blue.withOpacity(0.5)],
+        ),
+        color: widget.isPublic ? bgColor : null,
+        border: widget.isPublic ? Border.all(color: borderColor) : null,
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: widget.isPublic ? Colors.transparent : AppColors.surface,
+          borderRadius: BorderRadius.circular(19),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: _accentColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(widget.isPublic ? Icons.tune : Icons.auto_fix_high, color: _accentColor),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.isPublic ? 'Customizable Options' : 'What\'s Customizable?',
+                    style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    widget.isPublic 
+                        ? 'Add airport transfers or single supplements.'
+                        : 'Dates, routes, and hotels are all flexible.',
+                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, color: _accentColor.withOpacity(0.5)),
+          ],
+        ),
       ),
     );
   }
