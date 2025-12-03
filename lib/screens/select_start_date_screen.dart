@@ -56,7 +56,70 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
                 _buildCalendarHeader(),
                 const SizedBox(height: 16),
                 _buildCalendarView(),
-                const SizedBox(height: 100, child: Center(child: Text("Almost there..."))),
+                const SizedBox(height: 24),
+                _buildLegend(),
+                const SizedBox(height: 24),
+                _buildInfoBox(),
+                const SizedBox(height: 140), // Spacing for footer
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLegend() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _buildLegendItem(_privateAccent, 'Start Date'),
+        const SizedBox(width: 24),
+        _buildLegendItem(_privateAccent.withOpacity(0.15), 'Trip Duration', isRange: true),
+      ],
+    );
+  }
+
+  Widget _buildLegendItem(Color color, String label, {bool isRange = false}) {
+    return Row(
+      children: [
+        Container(
+          width: isRange ? 32 : 12,
+          height: 12,
+          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(isRange ? 4 : 999)),
+        ),
+        const SizedBox(width: 8),
+        Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w500)),
+      ],
+    );
+  }
+
+  Widget _buildInfoBox() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.blue.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.blue.withOpacity(0.1)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.info_outline, color: Colors.blue, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  'Flexible Start Dates',
+                  style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 12),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Since this is a private tour, you can start on any date that suits you. The 7-day itinerary will automatically adjust.',
+                  style: TextStyle(color: Colors.white54, fontSize: 11, height: 1.5),
+                ),
               ],
             ),
           ),
