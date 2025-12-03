@@ -111,7 +111,67 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
               ],
             ),
           ),
+          _buildStickyFooter(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildStickyFooter() {
+    final selectedDeparture = _departures[_selectedDepartureIndex];
+    
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          border: const Border(top: BorderSide(color: AppColors.border)),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 20, offset: const Offset(0, -10))
+          ],
+        ),
+        child: Row(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'SELECTED DATE',
+                  style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                ),
+                Text(
+                  selectedDeparture['fullRange'],
+                  style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  widget.package.price + ' total',
+                  style: const TextStyle(color: _accentColor, fontSize: 10, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(width: 24),
+            Expanded(
+              child: SizedBox(
+                height: 56,
+                child: CommonButton(
+                  text: 'Continue',
+                  onPressed: () {
+                    // TODO: Navigate to PassengerDetailsScreen once migrated
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Passenger details coming soon!")),
+                    );
+                  },
+                  backgroundColor: _accentColor,
+                  textColor: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
