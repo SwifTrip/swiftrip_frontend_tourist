@@ -54,12 +54,169 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
                 _buildTripSummaryCard(),
                 const SizedBox(height: 24),
                 _buildCalendarHeader(),
-                const SizedBox(height: 100, child: Center(child: Text("Calendar selection coming..."))),
+                const SizedBox(height: 16),
+                _buildCalendarView(),
+                const SizedBox(height: 100, child: Center(child: Text("Almost there..."))),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCalendarView() {
+    final daysInMonth = 31;
+    final firstDayOffset = 2; // Oct 1, 2024 starts on Tuesday
+    final weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: weekdays.map((day) => Text(
+            day,
+            style: const TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.bold),
+          )).toList(),
+        ),
+        const SizedBox(height: 16),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 7,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 0,
+          ),
+          itemCount: daysInMonth + firstDayOffset,
+          itemBuilder: (context, index) {
+            if (index < firstDayOffset) return const SizedBox.shrink();
+            
+            final day = index - firstDayOffset + 1;
+            final date = DateTime(2024, 10, day);
+            final isPast = day < 12;
+            final isSelected = _selectedDate != null && date.isAtSameMomentAs(_selectedDate!);
+            
+            // Range logic
+            bool isInRange = false;
+            bool isRangeEnd = false;
+            if (_selectedDate != null) {
+              final rangeEnd = _selectedDate!.add(Duration(days: _durationDays - 1));
+              isInRange = date.isAfter(_selectedDate!) && date.isBefore(rangeEnd);
+              isRangeEnd = date.isAtSameMomentAs(rangeEnd);
+            }
+
+            return GestureDetector(
+              onTap: isPast ? null : () => setState(() => _selectedDate = date),
+              child: Stack(
+                alignment: Alignment.center,
+                clipBehavior: Clip.none,
+                children: [
+                  // Middle range background
+                  if (isInRange)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: _privateAccent.withOpacity(0.15),
+                      ),
+                    ),
+                  
+                  // Start date background extention
+                  if (isSelected)
+                    Positioned(
+                      right: 0,
+                      left: 20,
+                      top: 0,
+                      bottom: 0,
+                      child: Container(color: _privateAccent.withOpacity(0.15)),
+                    ),
+
+                  // End date background extension
+                  if (isRangeEnd)
+                    Positioned(
+                      left: 0,
+                      right: 20,
+                      top: 0,
+                      bottom: 0,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: _privateAccent.withOpacity(0.15),
+                          borderRadius: const BorderRadius.only(
+                            topRight: Radius.circular(999),
+                            bottomRight: Radius.circular(999),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isSelected ? _privateAccent : Colors.transparent,
+                      boxShadow: isSelected ? [
+                        BoxShadow(color: _privateAccent.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4))
+                      ] : null,
+                    ),
+                    child: Center(
+                      child: Text(
+                        day.toString(),
+                        style: TextStyle(
+                          color: isPast 
+                              ? AppColors.textSecondary.withOpacity(0.3)
+                              : (isSelected ? Colors.white : (isInRange || isRangeEnd ? _privateAccent : AppColors.textPrimary)),
+                          fontWeight: isSelected || isInRange || isRangeEnd ? FontWeight.bold : FontWeight.normal,
+                          decoration: isPast ? TextDecoration.lineThrough : null,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  if (isSelected)
+                    Positioned(
+                      top: -30,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            const Text(
+                              'Start',
+                              style: TextStyle(color: Color(0xFF101922), fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
+                            Positioned(
+                              bottom: -8,
+                              left: 0,
+                              right: 0,
+                              child: Center(
+                                child: Transform.rotate(
+                                  angle: 0.785, // 45 degrees
+                                  child: Container(width: 8, height: 8, color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                  if (isRangeEnd)
+                    Positioned(
+                      bottom: 4,
+                      child: Container(
+                        width: 4,
+                        height: 4,
+                        decoration: const BoxDecoration(color: _privateAccent, shape: BoxShape.circle),
+                      ),
+                    ),
+                ],
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 
