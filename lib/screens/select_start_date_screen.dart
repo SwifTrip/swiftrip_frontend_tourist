@@ -64,7 +64,95 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
               ],
             ),
           ),
+          _buildStickyFooter(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildStickyFooter() {
+    final rangeEnd = _selectedDate?.add(Duration(days: _durationDays - 1));
+    
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          border: const Border(top: BorderSide(color: AppColors.border)),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 20, offset: const Offset(0, -10))
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'SELECTED DATES',
+                      style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Text(
+                          _formatDate(_selectedDate),
+                          style: const TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(width: 8),
+                        const Icon(Icons.arrow_forward, color: AppColors.textSecondary, size: 14),
+                        const SizedBox(width: 8),
+                        Text(
+                          _formatDate(rangeEnd),
+                          style: const TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const Text(
+                      'DURATION',
+                      style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '$_durationDays Days / ${_durationDays - 1} Nights',
+                      style: const TextStyle(color: _privateAccent, fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: CommonButton(
+                text: 'Continue',
+                onPressed: () {
+                  if (_selectedDate != null) {
+                    // TODO: Navigate to PassengerDetailsScreen once migrated
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Passenger details coming soon!")),
+                    );
+                  }
+                },
+                backgroundColor: _privateAccent,
+                textColor: Colors.white,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
