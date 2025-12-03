@@ -85,7 +85,91 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
         ),
         centerTitle: true,
       ),
-      body: const Center(child: Text("Select Departure Skeleton")),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 8),
+                _buildTripSummaryCard(),
+                const SizedBox(height: 100, child: Center(child: Text("Departure selection coming..."))),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTripSummaryCard() {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              widget.package.imageUrl,
+              width: 64,
+              height: 64,
+              fit: BoxFit.cover,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.package.title,
+                  style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: _accentColor.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        widget.package.duration,
+                        style: const TextStyle(color: _accentColor, fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Public Group Tour',
+                      style: TextStyle(color: AppColors.textSecondary, fontSize: 10),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '\$550',
+                style: TextStyle(color: AppColors.textSecondary.withOpacity(0.5), fontSize: 12, decoration: TextDecoration.lineThrough),
+              ),
+              Text(
+                widget.package.price,
+                style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
