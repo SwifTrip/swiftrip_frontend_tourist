@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../models/tour_package.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
+import 'select_departure_screen.dart';
+import 'select_start_date_screen.dart';
 
 class PackageDetailsScreen extends StatefulWidget {
   final TourPackage package;
@@ -442,9 +444,13 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                 child: CommonButton(
                   text: widget.isPublic ? 'Choose Departure' : 'Choose Start Date',
                   onPressed: () {
-                    // Navigation will be implemented in later commits
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Booking flow coming soon!")),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => widget.isPublic 
+                            ? SelectDepartureScreen(package: widget.package)
+                            : SelectStartDateScreen(package: widget.package),
+                      ),
                     );
                   },
                   backgroundColor: _accentColor,
