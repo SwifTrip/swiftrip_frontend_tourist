@@ -139,6 +139,132 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
     );
   }
 
+  Widget _buildDepartureCard(int index, Map<String, dynamic> data) {
+    bool isSelected = _selectedDepartureIndex == index;
+    bool isFull = data['seats'] == 0;
+    
+    return GestureDetector(
+      onTap: isFull ? null : () => setState(() => _selectedDepartureIndex = index),
+      child: Opacity(
+        opacity: isFull ? 0.4 : 1.0,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isSelected ? _accentColor.withOpacity(0.05) : AppColors.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isSelected ? _accentColor : AppColors.border,
+              width: isSelected ? 2 : 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 48,
+                child: Column(
+                  children: [
+                    Text(
+                      data['month'],
+                      style: TextStyle(
+                        color: isSelected ? _accentColor : AppColors.textSecondary,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      data['day'],
+                      style: const TextStyle(color: AppColors.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                height: 32,
+                width: 1,
+                color: isSelected ? _accentColor.withOpacity(0.2) : AppColors.border,
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      data['range'],
+                      style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      data['fullRange'],
+                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 10),
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  _buildStatusBadge(data),
+                  const SizedBox(height: 8),
+                  Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isSelected ? _accentColor : Colors.transparent,
+                      border: Border.all(
+                        color: isSelected ? _accentColor : AppColors.textSecondary.withOpacity(0.5),
+                        width: 2,
+                      ),
+                    ),
+                    child: isSelected ? const Icon(Icons.check, color: Colors.white, size: 12) : null,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge(Map<String, dynamic> data) {
+    Color color;
+    IconData? icon;
+    String label = data['status'];
+
+    if (data['seats'] == 0) {
+      color = AppColors.textSecondary.withOpacity(0.5);
+    } else if (data['seats'] <= 5) {
+      color = const Color(0xFFF59E0B);
+      icon = Icons.local_fire_department;
+      label = '${data['seats']} seats left';
+    } else {
+      color = const Color(0xFF10B981);
+      label = '${data['seats']} seats left';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, color: color, size: 10),
+            const SizedBox(width: 4),
+          ],
+          Text(
+            label,
+            style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildTripSummaryCard() {
     return Container(
       padding: const EdgeInsets.all(8),
