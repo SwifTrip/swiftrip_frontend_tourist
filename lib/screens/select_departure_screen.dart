@@ -96,12 +96,59 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
                 _buildTripSummaryCard(),
                 const SizedBox(height: 24),
                 _buildMonthSelector(),
-                const SizedBox(height: 100, child: Center(child: Text("Departure selection coming..."))),
+                const SizedBox(height: 24),
+                _buildSectionLabel('AVAILABLE DATES'),
+                const SizedBox(height: 16),
+                ..._departures.asMap().entries.map((entry) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _buildDepartureCard(entry.key, entry.value),
+                  );
+                }).toList(),
+                const SizedBox(height: 24),
+                _buildLegend(),
+                const SizedBox(height: 140), // Spacing for footer
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSectionLabel(String label) {
+    return Row(
+      children: [
+        const Icon(Icons.calendar_month, color: AppColors.textSecondary, size: 16),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: const TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLegend() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _buildLegendItem(const Color(0xFF10B981), 'Available'),
+        const SizedBox(width: 16),
+        _buildLegendItem(const Color(0xFFF59E0B), 'Selling Fast'),
+        const SizedBox(width: 16),
+        _buildLegendItem(AppColors.textSecondary.withOpacity(0.5), 'Sold Out'),
+      ],
+    );
+  }
+
+  Widget _buildLegendItem(Color color, String label) {
+    return Row(
+      children: [
+        Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        const SizedBox(width: 6),
+        Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.w500)),
+      ],
     );
   }
 
