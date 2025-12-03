@@ -94,11 +94,47 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
               children: [
                 const SizedBox(height: 8),
                 _buildTripSummaryCard(),
+                const SizedBox(height: 24),
+                _buildMonthSelector(),
                 const SizedBox(height: 100, child: Center(child: Text("Departure selection coming..."))),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMonthSelector() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: _months.asMap().entries.map((entry) {
+          bool isSelected = _selectedMonthIndex == entry.key;
+          return GestureDetector(
+            onTap: () => setState(() => _selectedMonthIndex = entry.key),
+            child: Container(
+              margin: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.textPrimary : AppColors.surface,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: isSelected ? Colors.transparent : AppColors.border),
+                boxShadow: isSelected ? [
+                  BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4))
+                ] : null,
+              ),
+              child: Text(
+                entry.value,
+                style: TextStyle(
+                  color: isSelected ? AppColors.background : AppColors.textSecondary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
