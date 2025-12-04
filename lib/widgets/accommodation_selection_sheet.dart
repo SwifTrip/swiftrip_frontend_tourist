@@ -105,10 +105,81 @@ class _AccommodationSelectionSheetState extends State<AccommodationSelectionShee
               ],
             ),
           ),
-          Divider(color: AppColors.border.withOpacity(0.5), height: 1),
-          const SizedBox(height: 20),
-          const Text("Hotel List Placeholder", style: TextStyle(color: Colors.white)),
-          const SizedBox(height: 20),
+          // Hotel List
+          Flexible(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: _hotels.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final hotel = entry.value;
+                  final isSelected = _selectedIndex == index;
+
+                  return GestureDetector(
+                    onTap: () => setState(() => _selectedIndex = index),
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: isSelected ? _accentColor.withOpacity(0.05) : Colors.transparent,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: isSelected ? _accentColor : AppColors.border,
+                          width: isSelected ? 2 : 1,
+                        ),
+                        boxShadow: isSelected ? [
+                          BoxShadow(color: _accentColor.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))
+                        ] : null,
+                      ),
+                      child: Row(
+                        children: [
+                          _buildHotelImage(hotel),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    _buildRatingBadge(hotel['rating']),
+                                    const SizedBox(width: 6),
+                                    if (hotel['status'] != null)
+                                      _buildStatusTag(hotel),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  hotel['name'],
+                                  style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 14),
+                                ),
+                                Text(
+                                  hotel['room'],
+                                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  hotel['priceLabel'],
+                                  style: TextStyle(
+                                    color: hotel['isSavings'] == true 
+                                        ? const Color(0xFF10B981) 
+                                        : AppColors.textPrimary,
+                                    fontWeight: hotel['isSavings'] == true || hotel['isUpgrade'] == true 
+                                        ? FontWeight.bold : FontWeight.w500,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          _buildRadioCircle(isSelected),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
         ],
       ),
   Widget _buildHotelImage(Map<String, dynamic> hotel) {
