@@ -67,13 +67,96 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                 const SizedBox(height: 16),
                 _buildItinerarySummary(),
                 const SizedBox(height: 32),
-                const Center(child: Text("Price Breakdown Placeholder")),
+                _buildPriceBreakdown(),
+                const SizedBox(height: 24),
+                const Center(
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(text: 'By proceeding, you agree to our '),
+                        TextSpan(text: 'Terms of Service', style: TextStyle(decoration: TextDecoration.underline)),
+                        TextSpan(text: ' and '),
+                        TextSpan(text: 'Cancellation Policy', style: TextStyle(decoration: TextDecoration.underline)),
+                        TextSpan(text: '.'),
+                      ],
+                    ),
+                    style: TextStyle(color: AppColors.textSecondary, fontSize: 10),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
                 const SizedBox(height: 120), // Spacing for footer
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildPriceBreakdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Price Breakdown',
+          style: TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Column(
+            children: [
+              _buildPriceRow('Base Tour Price (2 Adults)', widget.package.price),
+              const SizedBox(height: 12),
+              _buildPriceRow('Accommodation Upgrades', '+\$220'),
+              const SizedBox(height: 12),
+              _buildPriceRow('Activities & Extras', '+\$35'),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Divider(color: AppColors.border, height: 1),
+              ),
+              _buildPriceRow('Total Amount', '\$3,450', isTotal: true),
+              const SizedBox(height: 8),
+              const Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  'Including all taxes and fees',
+                  style: TextStyle(color: Color(0xFF10B981), fontSize: 10, fontWeight: FontWeight.w500),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPriceRow(String label, String value, {bool isTotal = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: isTotal ? AppColors.textPrimary : AppColors.textSecondary,
+            fontSize: isTotal ? 16 : 13,
+            fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            color: isTotal ? AppColors.textPrimary : AppColors.textPrimary,
+            fontSize: isTotal ? 20 : 13,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
     );
   }
 
