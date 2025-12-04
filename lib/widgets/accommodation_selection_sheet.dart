@@ -66,7 +66,51 @@ class _AccommodationSelectionSheetState extends State<AccommodationSelectionShee
         color: AppColors.surface,
         borderRadius: BorderRadius.only(topRight: Radius.circular(32), topLeft: Radius.circular(32)),
       ),
-      child: const Center(child: Text("Accommodation Selection Sheet")),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Drag handle
+          Container(
+            margin: const EdgeInsets.only(top: 12, bottom: 8),
+            width: 48,
+            height: 6,
+            decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(99)),
+          ),
+          
+          // Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Change Accommodation',
+                      style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 18),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${widget.day} • ${widget.date} • ${widget.location}',
+                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                    ),
+                  ],
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: AppColors.textSecondary),
+                  onPressed: () => Navigator.pop(context),
+                  style: IconButton.styleFrom(backgroundColor: Colors.white12, padding: const EdgeInsets.all(8)),
+                ),
+              ],
+            ),
+          ),
+          Divider(color: AppColors.border.withOpacity(0.5), height: 1),
+          const SizedBox(height: 20),
+          const Text("Hotel List Placeholder", style: TextStyle(color: Colors.white)),
+          const SizedBox(height: 20),
+        ],
+      ),
     );
   }
 }
