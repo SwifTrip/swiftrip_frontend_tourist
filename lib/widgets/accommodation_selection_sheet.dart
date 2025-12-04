@@ -144,5 +144,44 @@ class _AccommodationSelectionSheetState extends State<AccommodationSelectionShee
         ],
       ),
     );
+  Widget _buildStatusTag(Map<String, dynamic> hotel) {
+    final status = hotel['status'];
+    Color bgColor = _accentColor.withOpacity(0.1);
+    Color textColor = _accentColor;
+    
+    if (hotel['isUpgrade'] == true) {
+      bgColor = const Color(0xFFF59E0B).withOpacity(0.1);
+      textColor = const Color(0xFFF59E0B);
+    } else if (hotel['isSavings'] == true) {
+      bgColor = const Color(0xFF10B981).withOpacity(0.1);
+      textColor = const Color(0xFF10B981);
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(4)),
+      child: Text(
+        status,
+        style: TextStyle(color: textColor, fontSize: 10, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Widget _buildRadioCircle(bool isSelected) {
+    return Container(
+      width: 24,
+      height: 24,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: isSelected ? _accentColor : Colors.white24,
+          width: 2,
+        ),
+        color: isSelected ? _accentColor : Colors.transparent,
+      ),
+      child: isSelected
+          ? const Icon(Icons.check, color: Colors.white, size: 14)
+          : null,
+    );
   }
 }
