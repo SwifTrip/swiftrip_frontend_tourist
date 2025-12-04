@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/tour_package.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
+import 'customize_itinerary_screen.dart';
 
 class SelectStartDateScreen extends StatefulWidget {
   final TourPackage package;
@@ -141,9 +142,15 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
                 text: 'Continue',
                 onPressed: () {
                   if (_selectedDate != null) {
-                    // TODO: Navigate to PassengerDetailsScreen once migrated
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Passenger details coming soon!")),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CustomizeItineraryScreen(
+                          package: widget.package,
+                          isPublic: false,
+                          startDate: _selectedDate!,
+                        ),
+                      ),
                     );
                   }
                 },
