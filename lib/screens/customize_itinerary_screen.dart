@@ -72,10 +72,54 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
           child: Divider(color: AppColors.border, height: 1),
         ),
       ),
-      body: Column(
+      body: Stack(
         children: [
-          _buildDaySelector(dates),
-          const Expanded(child: Center(child: Text("Itinerary Content Placeholder"))),
+          Column(
+            children: [
+              _buildDaySelector(dates),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 24),
+                      _buildDayHeader(dates[_selectedDayIndex]),
+                      const SizedBox(height: 24),
+                      _buildSectionHeader('ACCOMMODATION', isCustomizable: !widget.isPublic),
+                      const SizedBox(height: 12),
+                      _buildHotelCard(),
+                      const SizedBox(height: 24),
+                      _buildSectionHeader('TRANSPORT', isFixed: true),
+                      const SizedBox(height: 12),
+                      _buildTransportCard(),
+                      const SizedBox(height: 24),
+                      _buildSectionHeader('ACTIVITIES & EXTRAS'),
+                      const SizedBox(height: 12),
+                      _buildActivityCard(
+                        title: 'Baltit Fort Guided Tour',
+                        subtitle: 'Historic Landmark visit',
+                        icon: Icons.fort_outlined,
+                        isInPlan: true,
+                      ),
+                      const SizedBox(height: 12),
+                      _buildActivityCard(
+                        title: 'Traditional Hunza Dinner',
+                        subtitle: 'Live music & local cuisine',
+                        icon: Icons.restaurant_outlined,
+                        isPopular: true,
+                        price: '+\$35',
+                      ),
+                      const SizedBox(height: 24),
+                      _buildDayNote(),
+                      const SizedBox(height: 140), // Spacing for footer
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          _buildStickyFooter(),
         ],
       ),
     );
