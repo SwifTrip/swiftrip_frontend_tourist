@@ -366,5 +366,93 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
         ],
       ),
     );
+  Widget _buildDayNote() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'DAY NOTE',
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.edit_note_outlined, color: AppColors.textSecondary.withOpacity(0.5), size: 20),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Text(
+                  'Add a special request or note for this day...',
+                  style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStickyFooter() {
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          border: const Border(top: BorderSide(color: AppColors.border)),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 20, offset: const Offset(0, -10))
+          ],
+        ),
+        child: Row(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'ESTIMATED TOTAL',
+                  style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                ),
+                Text(
+                  widget.isPublic ? widget.package.price : '\$3,450',
+                  style: const TextStyle(color: AppColors.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  widget.isPublic ? 'Fixed Price' : 'Includes + \$220 upgrades',
+                  style: TextStyle(color: widget.isPublic ? AppColors.textSecondary : const Color(0xFF10B981), fontSize: 9, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(width: 24),
+            Expanded(
+              child: SizedBox(
+                height: 56,
+                child: CommonButton(
+                  text: 'Review Trip',
+                  onPressed: () {
+                    // TODO: Navigate to ReviewTripScreen once migrated
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Review summary coming soon!")),
+                    );
+                  },
+                  backgroundColor: _accentColor,
+                  textColor: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
