@@ -136,5 +136,57 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
         ),
       ),
     );
+  Widget _buildDayHeader(DateTime date) {
+    final months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    final weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '${weekdays[date.weekday - 1]}, ${date.day} ${months[date.month - 1]}',
+          style: const TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w500),
+        ),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            Text(
+              widget.package.itinerary[_selectedDayIndex].title,
+              style: const TextStyle(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(width: 8),
+            Icon(Icons.location_on_outlined, color: _accentColor, size: 20),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionHeader(String title, {bool isCustomizable = false, bool isFixed = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+        ),
+        if (isCustomizable)
+          const Text(
+            'CHANGE',
+            style: TextStyle(color: Color(0xFF10B981), fontSize: 10, fontWeight: FontWeight.bold, decoration: TextDecoration.underline),
+          )
+        else if (isFixed)
+          Row(
+            children: [
+              Icon(Icons.lock_outline, color: AppColors.textSecondary.withOpacity(0.5), size: 10),
+              const SizedBox(width: 4),
+              Text(
+                'LOCKED',
+                style: TextStyle(color: AppColors.textSecondary.withOpacity(0.5), fontSize: 9, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+      ],
+    );
   }
 }
