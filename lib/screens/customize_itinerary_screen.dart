@@ -274,5 +274,97 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
         ),
       ),
     );
+  Widget _buildTransportCard() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          Icon(widget.isPublic ? Icons.directions_bus_outlined : Icons.airport_shuttle_outlined, color: AppColors.textSecondary, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              widget.isPublic ? 'Shared AC Coaster' : 'Private Airport Transfer',
+              style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w500, fontSize: 13),
+            ),
+          ),
+          Icon(Icons.lock_outline, color: AppColors.textSecondary.withOpacity(0.5), size: 14),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActivityCard({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    bool isInPlan = false,
+    bool isPopular = false,
+    String? price,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isInPlan ? _accentColor.withOpacity(0.05) : AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: isInPlan ? _accentColor.withOpacity(0.3) : AppColors.border),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: isInPlan ? _accentColor.withOpacity(0.1) : AppColors.background,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: isInPlan ? _accentColor : AppColors.textSecondary, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 13),
+                    ),
+                    if (isPopular)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        decoration: BoxDecoration(color: const Color(0xFF10B981).withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
+                        child: const Text('POPULAR', style: TextStyle(color: Color(0xFF10B981), fontSize: 7, fontWeight: FontWeight.bold)),
+                      ),
+                  ],
+                ),
+                Text(
+                  subtitle,
+                  style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 11),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          if (isInPlan)
+            const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 20)
+          else
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                if (price != null)
+                  Text(price, style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 12)),
+                const Text('ADD', style: TextStyle(color: Color(0xFF10B981), fontSize: 10, fontWeight: FontWeight.bold, decoration: TextDecoration.underline)),
+              ],
+            ),
+        ],
+      ),
+    );
   }
 }
