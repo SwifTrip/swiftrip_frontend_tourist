@@ -111,6 +111,38 @@ class _AccommodationSelectionSheetState extends State<AccommodationSelectionShee
           const SizedBox(height: 20),
         ],
       ),
+  Widget _buildHotelImage(Map<String, dynamic> hotel) {
+    return Container(
+      width: 80,
+      height: 80,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: hotel['imageUrl'] != null
+            ? Image.network(hotel['imageUrl'], fit: BoxFit.cover)
+            : Icon(hotel['icon'] ?? Icons.hotel, color: AppColors.textSecondary, size: 32),
+      ),
+    );
+  }
+
+  Widget _buildRatingBadge(double rating) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+      decoration: BoxDecoration(color: const Color(0xFFF59E0B), borderRadius: BorderRadius.circular(4)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.star, color: Colors.white, size: 10),
+          const SizedBox(width: 2),
+          Text(
+            rating.toString(),
+            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
     );
   }
 }
