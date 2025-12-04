@@ -3,7 +3,7 @@ import '../models/tour_package.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
 import '../widgets/accommodation_selection_sheet.dart';
-// import 'review_trip_screen.dart'; // To be migrated later
+import 'review_trip_screen.dart';
 
 class CustomizeItineraryScreen extends StatefulWidget {
   final TourPackage package;
@@ -484,9 +484,15 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                 child: CommonButton(
                   text: 'Review Trip',
                   onPressed: () {
-                    // TODO: Navigate to ReviewTripScreen once migrated
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Review summary coming soon!")),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ReviewTripScreen(
+                          package: widget.package,
+                          isPublic: widget.isPublic,
+                          startDate: widget.startDate,
+                        ),
+                      ),
                     );
                   },
                   backgroundColor: _accentColor,
