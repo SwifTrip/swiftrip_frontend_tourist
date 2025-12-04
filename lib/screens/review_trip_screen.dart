@@ -88,7 +88,37 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
               ],
             ),
           ),
+          _buildStickyFooter(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildStickyFooter() {
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          border: const Border(top: BorderSide(color: AppColors.border)),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 20, offset: const Offset(0, -10))
+          ],
+        ),
+        child: CommonButton(
+          text: 'Proceed to Payment',
+          onPressed: () {
+            // Future navigation to payment screen
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Payment flow coming in next phase!")),
+            );
+          },
+          backgroundColor: _accentColor,
+          textColor: Colors.white,
+        ),
       ),
     );
   }
