@@ -181,6 +181,20 @@ class _AccommodationSelectionSheetState extends State<AccommodationSelectionShee
               ),
             ),
           ),
+          // Action Button
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
+            child: SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: CommonButton(
+                text: 'Apply Changes',
+                onPressed: () => Navigator.pop(context),
+                backgroundColor: _accentColor,
+                textColor: Colors.white,
+              ),
+            ),
+          ),
         ],
       ),
     );
