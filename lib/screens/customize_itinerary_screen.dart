@@ -72,7 +72,69 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
           child: Divider(color: AppColors.border, height: 1),
         ),
       ),
-      body: const Center(child: Text("Customize Itinerary Skeleton")),
+      body: Column(
+        children: [
+          _buildDaySelector(dates),
+          const Expanded(child: Center(child: Text("Itinerary Content Placeholder"))),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDaySelector(List<DateTime> dates) {
+    return Container(
+      padding: const EdgeInsets.only(top: 16),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: dates.asMap().entries.map((entry) {
+            final index = entry.key;
+            final date = entry.value;
+            final isSelected = _selectedDayIndex == index;
+            final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            return GestureDetector(
+              onTap: () => setState(() => _selectedDayIndex = index),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                margin: const EdgeInsets.only(right: 12),
+                padding: const EdgeInsets.all(10),
+                constraints: const BoxConstraints(minWidth: 70),
+                decoration: BoxDecoration(
+                  color: isSelected ? _accentColor : AppColors.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: isSelected ? Colors.transparent : AppColors.border),
+                  boxShadow: isSelected ? [
+                    BoxShadow(color: _accentColor.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))
+                  ] : null,
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      'DAY ${index + 1}',
+                      style: TextStyle(
+                        color: isSelected ? Colors.white.withOpacity(0.8) : AppColors.textSecondary,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    Text(
+                      '${date.day} ${months[date.month - 1]}',
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : AppColors.textPrimary,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ),
     );
   }
 }
