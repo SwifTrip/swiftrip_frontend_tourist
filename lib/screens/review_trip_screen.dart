@@ -63,13 +63,121 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
               children: [
                 _buildTripSummaryCard(),
                 const SizedBox(height: 32),
-                const Center(child: Text("Itinerary Summary Placeholder")),
-                const SizedBox(height: 120), // Spacing for sticky footer
+                _buildItineraryHeader(),
+                const SizedBox(height: 16),
+                _buildItinerarySummary(),
+                const SizedBox(height: 32),
+                const Center(child: Text("Price Breakdown Placeholder")),
+                const SizedBox(height: 120), // Spacing for footer
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildItineraryHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Trip Itinerary',
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              '${widget.package.itinerary.length} Days Summary',
+              style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+            ),
+          ],
+        ),
+        TextButton(
+          onPressed: () => setState(() => _allExpanded = !_allExpanded),
+          child: Text(
+            _allExpanded ? 'Collapse All' : 'Expand All',
+            style: TextStyle(color: _accentColor, fontSize: 12, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildItinerarySummary() {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: widget.package.itinerary.length,
+      itemBuilder: (context, index) {
+        final day = widget.package.itinerary[index];
+        final date = widget.startDate.add(Duration(days: index));
+        final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              initiallyExpanded: _allExpanded,
+              leading: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: _accentColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Center(
+                  child: Text(
+                    '${date.day}\n${months[date.month - 1]}',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: _accentColor, fontSize: 10, fontWeight: FontWeight.bold, height: 1.1),
+                  ),
+                ),
+              ),
+              title: Text(
+                'Day ${index + 1}: ${day.title}',
+                style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(68, 0, 16, 16),
+                  child: Column(
+                    children: [
+                      _buildSummaryItem(Icons.hotel_outlined, 'Luxus Hunza Resort'),
+                      const SizedBox(height: 8),
+                      _buildSummaryItem(Icons.directions_bus_outlined, 'Shared AC Coaster'),
+                      const SizedBox(height: 8),
+                      _buildSummaryItem(Icons.task_alt, '2 Activities planned'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSummaryItem(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, color: AppColors.textSecondary, size: 16),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+          ),
+        ),
+      ],
     );
   }
 
