@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/tour_package.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
-// import '../widgets/accommodation_selection_sheet.dart'; // To be migrated next
+import '../widgets/accommodation_selection_sheet.dart';
 // import 'review_trip_screen.dart'; // To be migrated later
 
 class CustomizeItineraryScreen extends StatefulWidget {
@@ -187,6 +187,92 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
             ],
           ),
       ],
+    );
+  void _showAccommodationPicker(DateTime date) {
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => AccommodationSelectionSheet(
+        isPublic: widget.isPublic,
+        day: 'Day ${_selectedDayIndex + 1}',
+        date: '${date.day} ${months[date.month - 1]}',
+        location: widget.package.itinerary[_selectedDayIndex].title,
+      ),
+    );
+  }
+
+  Widget _buildHotelCard() {
+    final isCustomizable = !widget.isPublic;
+    
+    return GestureDetector(
+      onTap: isCustomizable ? () => _showAccommodationPicker(widget.startDate.add(Duration(days: _selectedDayIndex))) : null,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                'https://lh3.googleusercontent.com/aida-public/AB6AXuCJ63yU4pc9m4bcYiIRArzFDSP_KI3AUe5IOfp2OPRbK0WFJrIq9oZLq2MJlkHnUlKc7_gSDi0ZDtT8Qgjqlt1KdpJ3kT8ZKTdUTV3n86Ao5glkAvkNvpKz5mFdmcdBbu_E5BkzpbU2VWmHO1JDXoYKy8cRSSqiZWTlVFboXax5qolrS3ZhApq-YbGOkgcuV7T-ig44eFIHE3pqCqrzlNWfJBeHAO-Jn8b7jv-I5sPGUZNVxg9F02GWis-boOAMc5Q2rUbJ3D4NdtZU',
+                width: 60,
+                height: 60,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Luxus Hunza Resort',
+                        style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                      if (isCustomizable)
+                        Icon(Icons.chevron_right, color: AppColors.textSecondary.withOpacity(0.5)),
+                    ],
+                  ),
+                  Text(
+                    'Deluxe Lake View Room',
+                    style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 12),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                        decoration: BoxDecoration(color: const Color(0xFFF59E0B), borderRadius: BorderRadius.circular(4)),
+                        child: Row(
+                          children: const [
+                            Icon(Icons.star, color: Colors.white, size: 8),
+                            SizedBox(width: 2),
+                            Text('4.8', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Current Selection',
+                        style: TextStyle(color: _accentColor, fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
