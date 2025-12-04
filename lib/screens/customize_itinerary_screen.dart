@@ -180,6 +180,8 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
         ),
       ),
     );
+  }
+
   Widget _buildDayHeader(DateTime date) {
     final months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     final weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -232,6 +234,8 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
           ),
       ],
     );
+  }
+
   void _showAccommodationPicker(DateTime date) {
     final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     showModalBottomSheet(
@@ -318,6 +322,8 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
         ),
       ),
     );
+  }
+
   Widget _buildTransportCard() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -410,6 +416,8 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
         ],
       ),
     );
+  }
+
   Widget _buildDayNote() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
