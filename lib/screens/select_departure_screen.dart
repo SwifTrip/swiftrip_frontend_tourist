@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/tour_package.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
+import 'customize_itinerary_screen.dart';
 
 class SelectDepartureScreen extends StatefulWidget {
   final TourPackage package;
@@ -160,9 +161,16 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
                 child: CommonButton(
                   text: 'Continue',
                   onPressed: () {
-                    // TODO: Navigate to PassengerDetailsScreen once migrated
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Passenger details coming soon!")),
+                    final selectedDeparture = _departures[_selectedDepartureIndex];
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CustomizeItineraryScreen(
+                          package: widget.package,
+                          isPublic: true,
+                          startDate: selectedDeparture['date'],
+                        ),
+                      ),
                     );
                   },
                   backgroundColor: _accentColor,
