@@ -14,12 +14,11 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
   bool isPublicTrip = true;
   String selectedMonth = 'Anytime';
   DateTime? selectedDate;
-  int adultsCount = 2;
-  int childrenCount = 0;
+  int groupSize = 1;
   String selectedStyle = 'Adventure';
   String fromLocation = '';
   String toLocation = '';
-  
+
   // List of available locations
   final List<String> locations = [
     'Karachi',
@@ -82,7 +81,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
   void _showLocationPicker(BuildContext context, bool isFromLocation) {
     final TextEditingController searchController = TextEditingController();
     List<String> filteredLocations = List.from(locations);
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -96,8 +95,11 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                   filteredLocations = List.from(locations);
                 } else {
                   filteredLocations = locations
-                      .where((location) =>
-                          location.toLowerCase().contains(query.toLowerCase()))
+                      .where(
+                        (location) => location.toLowerCase().contains(
+                          query.toLowerCase(),
+                        ),
+                      )
                       .toList();
                 }
               });
@@ -124,7 +126,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  
+
                   // Title
                   Padding(
                     padding: const EdgeInsets.all(20),
@@ -132,7 +134,9 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          isFromLocation ? 'Select From Location' : 'Select Destination',
+                          isFromLocation
+                              ? 'Select From Location'
+                              : 'Select Destination',
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -141,12 +145,15 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                         ),
                         IconButton(
                           onPressed: () => Navigator.pop(context),
-                          icon: const Icon(Icons.close, color: AppColors.textSecondary),
+                          icon: const Icon(
+                            Icons.close,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  
+
                   // Search field
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -180,9 +187,9 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 16),
-                  
+
                   // Location list
                   Expanded(
                     child: filteredLocations.isEmpty
@@ -200,10 +207,10 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             itemBuilder: (context, index) {
                               final location = filteredLocations[index];
-                              final isSelected = isFromLocation 
-                                  ? location == fromLocation 
+                              final isSelected = isFromLocation
+                                  ? location == fromLocation
                                   : location == toLocation;
-                              
+
                               return InkWell(
                                 onTap: () {
                                   setState(() {
@@ -222,13 +229,13 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                                   ),
                                   margin: const EdgeInsets.only(bottom: 8),
                                   decoration: BoxDecoration(
-                                    color: isSelected 
+                                    color: isSelected
                                         ? AppColors.accent.withOpacity(0.1)
                                         : AppColors.surface,
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
-                                      color: isSelected 
-                                          ? AppColors.accent 
+                                      color: isSelected
+                                          ? AppColors.accent
                                           : AppColors.border,
                                     ),
                                   ),
@@ -236,8 +243,8 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                                     children: [
                                       Icon(
                                         Icons.location_on,
-                                        color: isSelected 
-                                            ? AppColors.accent 
+                                        color: isSelected
+                                            ? AppColors.accent
                                             : AppColors.textSecondary,
                                         size: 20,
                                       ),
@@ -246,12 +253,12 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                                         child: Text(
                                           location,
                                           style: TextStyle(
-                                            color: isSelected 
-                                                ? AppColors.accent 
+                                            color: isSelected
+                                                ? AppColors.accent
                                                 : AppColors.textPrimary,
                                             fontSize: 16,
-                                            fontWeight: isSelected 
-                                                ? FontWeight.w600 
+                                            fontWeight: isSelected
+                                                ? FontWeight.w600
                                                 : FontWeight.normal,
                                           ),
                                         ),
@@ -307,76 +314,76 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-            // Trip Type Toggle
-            _buildTripTypeToggle(),
-            const SizedBox(height: 32),
+                  // Trip Type Toggle
+                  _buildTripTypeToggle(),
+                  const SizedBox(height: 32),
 
-            // Where to Section
-            const Text(
-              'Where to?',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            _buildLocationInputs(),
-            const SizedBox(height: 32),
-
-            // When Section
-            const Text(
-              'When?',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            _buildMonthSelector(),
-            const SizedBox(height: 32),
-
-            // Travelers Section
-            const Text(
-              'Travelers',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            _buildTravelersSection(),
-            const SizedBox(height: 32),
-
-            // Package Style Section
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Package Style',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {},
-                  child: const Text(
-                    'COMPARE',
+                  // Where to Section
+                  const Text(
+                    'Where to?',
                     style: TextStyle(
-                      color: AppColors.accent,
-                      fontSize: 12,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            _buildPackageStyles(),
+                  const SizedBox(height: 16),
+                  _buildLocationInputs(),
+                  const SizedBox(height: 32),
+
+                  // When Section
+                  const Text(
+                    'When?',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildMonthSelector(),
+                  const SizedBox(height: 32),
+
+                  // Travelers Section
+                  const Text(
+                    'Travelers',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildTravelersSection(),
+                  const SizedBox(height: 32),
+
+                  // Package Style Section
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Package Style',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {},
+                        child: const Text(
+                          'COMPARE',
+                          style: TextStyle(
+                            color: AppColors.accent,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _buildPackageStyles(),
                 ],
               ),
             ),
@@ -402,12 +409,13 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => TourResultsScreen(
-                        isPublic: isPublicTrip, // Changed from isPublic to isPublicTrip
+                        isPublic:
+                            isPublicTrip, // Changed from isPublic to isPublicTrip
                         destination: 'Hunza', // Example, normally from state
-                        dates: selectedDate != null 
+                        dates: selectedDate != null
                             ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
                             : selectedMonth, // Adjusted date string logic
-                        guests: adultsCount + childrenCount,
+                        guests: groupSize,
                       ),
                     ),
                   );
@@ -508,7 +516,10 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                 top: 0,
                 right: 0,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.accent,
                     borderRadius: BorderRadius.circular(4),
@@ -540,25 +551,14 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
       child: Column(
         children: [
           _buildTravelerRow(
-            label: 'Adults',
-            subtitle: 'Age 18+',
-            count: adultsCount,
+            label: 'Group Size',
+            count: groupSize,
             icon: Icons.person,
             iconBg: Colors.blue.withValues(alpha: 0.1),
             iconColor: Colors.blue,
-            onIncrement: () => setState(() => adultsCount++),
-            onDecrement: () => setState(() => adultsCount > 1 ? adultsCount-- : null),
-          ),
-          const Divider(color: AppColors.border, height: 32),
-          _buildTravelerRow(
-            label: 'Children',
-            subtitle: 'Age 0-17',
-            count: childrenCount,
-            icon: Icons.child_care,
-            iconBg: Colors.orange.withValues(alpha: 0.1),
-            iconColor: Colors.orange,
-            onIncrement: () => setState(() => childrenCount++),
-            onDecrement: () => setState(() => childrenCount > 0 ? childrenCount-- : null),
+            onIncrement: () => setState(() => groupSize++),
+            onDecrement: () =>
+                setState(() => groupSize > 1 ? groupSize-- : null),
           ),
         ],
       ),
@@ -567,7 +567,6 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
 
   Widget _buildTravelerRow({
     required String label,
-    required String subtitle,
     required int count,
     required IconData icon,
     required Color iconBg,
@@ -580,10 +579,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
         Container(
           width: 40,
           height: 40,
-          decoration: BoxDecoration(
-            color: iconBg,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
           child: Icon(icon, color: iconColor, size: 20),
         ),
         const SizedBox(width: 12),
@@ -596,13 +592,6 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                 style: const TextStyle(
                   color: AppColors.textPrimary,
                   fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 12,
                 ),
               ),
             ],
@@ -619,7 +608,11 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
             children: [
               IconButton(
                 onPressed: onDecrement,
-                icon: const Icon(Icons.remove, size: 16, color: AppColors.textSecondary),
+                icon: const Icon(
+                  Icons.remove,
+                  size: 16,
+                  color: AppColors.textSecondary,
+                ),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(minWidth: 32),
               ),
@@ -641,7 +634,9 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                 constraints: const BoxConstraints(minWidth: 32),
                 style: IconButton.styleFrom(
                   backgroundColor: AppColors.accent,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                 ),
               ),
             ],
@@ -672,7 +667,9 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                 margin: const EdgeInsets.only(right: 12),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isSelected ? AppColors.accent.withValues(alpha: 0.1) : AppColors.surface,
+                  color: isSelected
+                      ? AppColors.accent.withValues(alpha: 0.1)
+                      : AppColors.surface,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isSelected ? AppColors.accent : AppColors.border,
@@ -686,7 +683,9 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
-                        color: isSelected ? AppColors.accent : AppColors.textSecondary,
+                        color: isSelected
+                            ? AppColors.accent
+                            : AppColors.textSecondary,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -711,12 +710,16 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: selectedDate != null ? AppColors.accent : AppColors.border,
+                  color: selectedDate != null
+                      ? AppColors.accent
+                      : AppColors.border,
                 ),
               ),
               child: Icon(
                 Icons.calendar_month,
-                color: selectedDate != null ? AppColors.accent : AppColors.textSecondary,
+                color: selectedDate != null
+                    ? AppColors.accent
+                    : AppColors.textSecondary,
               ),
             ),
           ),
@@ -738,6 +741,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
           _buildLocationField(
             label: 'FROM',
             value: fromLocation,
+            hint: 'Departure City',
             icon: Icons.circle_outlined,
             iconColor: Colors.blue,
             onTap: () => _showLocationPicker(context, true),
@@ -747,19 +751,22 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Column(
-                children: List.generate(4, (index) => Container(
-                  width: 1,
-                  height: 4,
-                  margin: const EdgeInsets.symmetric(vertical: 2),
-                  color: AppColors.textSecondary.withOpacity(0.3),
-                )),
+                children: List.generate(
+                  4,
+                  (index) => Container(
+                    width: 1,
+                    height: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 2),
+                    color: AppColors.textSecondary.withOpacity(0.3),
+                  ),
+                ),
               ),
             ),
           ),
           _buildLocationField(
             label: 'TO',
             value: toLocation,
-            hint: 'Search Destination',
+            hint: 'Arrival City',
             icon: Icons.location_on,
             iconColor: Colors.red,
             onTap: () => _showLocationPicker(context, false),
@@ -813,7 +820,11 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                         ),
                       ),
               ),
-              Icon(Icons.arrow_drop_down, color: AppColors.textSecondary, size: 24),
+              Icon(
+                Icons.arrow_drop_down,
+                color: AppColors.textSecondary,
+                size: 24,
+              ),
             ],
           ),
         ],
@@ -832,7 +843,9 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
         children: [
           AnimatedAlign(
             duration: const Duration(milliseconds: 250),
-            alignment: isPublicTrip ? Alignment.centerLeft : Alignment.centerRight,
+            alignment: isPublicTrip
+                ? Alignment.centerLeft
+                : Alignment.centerRight,
             child: Container(
               width: MediaQuery.of(context).size.width * 0.44,
               height: 42,
@@ -855,7 +868,9 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                       'Public Trip',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: isPublicTrip ? AppColors.background : AppColors.textSecondary,
+                        color: isPublicTrip
+                            ? AppColors.background
+                            : AppColors.textSecondary,
                       ),
                     ),
                   ),
@@ -871,7 +886,9 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                       'Private Trip',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: !isPublicTrip ? AppColors.background : AppColors.textSecondary,
+                        color: !isPublicTrip
+                            ? AppColors.background
+                            : AppColors.textSecondary,
                       ),
                     ),
                   ),
