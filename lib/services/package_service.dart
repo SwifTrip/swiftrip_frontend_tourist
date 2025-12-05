@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 import '../models/search_result.dart';
+import '../models/package_model.dart';
 
 class PackageService {
   Future<agencyResult?> searchPackages({
@@ -69,6 +70,36 @@ class PackageService {
     } on http.ClientException catch (e) {
       print('Connection error: ${e.message}');
       return null;
+    } catch (e) {
+      print('Network error: ${e.toString()}');
+      return null;
+    }
+  }
+
+  /// Get package details by ID with full itinerary
+  Future<PackageDetailsResponse?> getPackageDetailsWithItinerary(
+      int packageId) async {
+    try {
+      final response = await http
+          .get(
+            Uri.parse('${ApiConfig.touristPackages}/$packageId'),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(ApiConfig.timeout);
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        // Parse the response using the model
+        if (responseData['success'] == true) {
+          return PackageDetailsResponse.fromJson(responseData);
+        } else {
+          print('API returned success: false');
+          return null;
+        }
+      } else {
+        print('Server error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
     } catch (e) {
       print('Network error: ${e.toString()}');
       return null;
