@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'screens/Destination.dart';
 import 'screens/Signin.dart';
 import 'screens/home_screen.dart';
 
@@ -15,7 +14,7 @@ class SwifTripTouristApp extends StatelessWidget {
       title: 'SwifTrip Tourist',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(scaffoldBackgroundColor: Color(0xFFDFF2FE)),
-      home: const HomeScreen(), // Start with Signin screen
+      home: const Signin(), // Start with Signin screen
     );
   }
 }

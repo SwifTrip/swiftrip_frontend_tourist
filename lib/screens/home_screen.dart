@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_colors.dart';
 import '../widgets/custom_bottom_nav.dart';
-import 'create_trip_screen.dart';
 import 'plan_trip_screen.dart';
 import 'fixed_packages_screen.dart';
 import 'guide_list_screen.dart';
