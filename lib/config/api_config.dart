@@ -17,6 +17,10 @@ class ApiConfig {
 // Custom Tour Endpoints
   static const String createCustomTour = '$baseUrl/custom-tour/create';
 
+  // Tourist Package Search Endpoints (Public)
+  static const String searchPackages = '$baseUrl/tourist/packages/search';
+  static const String touristPackages = '$baseUrl/tourist/packages';
+
   // Request timeout duration
   static const Duration timeout = Duration(seconds: 30);
 }

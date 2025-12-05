@@ -1,7 +1,7 @@
 import '../theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../widgets/common_button.dart';
-import 'tour_results_screen.dart';
+import '../services/package_service.dart';
 
 class PlanTripScreen extends StatefulWidget {
   const PlanTripScreen({super.key});
@@ -18,6 +18,9 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
   String selectedStyle = 'Adventure';
   String fromLocation = '';
   String toLocation = '';
+  bool isLoading = false;
+
+  final PackageService _packageService = PackageService();
 
   // List of available locations
   final List<String> locations = [
@@ -31,7 +34,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
     'Quetta',
     'Sialkot',
     'Gujranwala',
-    'Hunza Valley',
+    'Hunza',
     'Skardu',
     'Gilgit',
     'Murree',
@@ -75,6 +78,110 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
         selectedDate = picked;
         selectedMonth = "${picked.day}/${picked.month}/${picked.year}";
       });
+    }
+  }
+
+  Future<void> _searchPackages() async {
+    // Validate required fields
+    if (fromLocation.isEmpty || toLocation.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select both from and to locations'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final result = await _packageService.searchPackages(
+        fromLocation: fromLocation,
+        toLocation: toLocation,
+        travelers: groupSize,
+        category: selectedStyle.toUpperCase(),
+        // tourType: isPublicTrip ? 'PUBLIC' : 'PRIVATE',
+        // startDate: selectedDate?.toIso8601String(),
+      );
+
+      setState(() {
+        isLoading = false;
+      });
+
+      if (result['success'] == true) {
+        final packages = result['data'] as List;
+        final pagination = result['pagination'] as Map?;
+
+        // Show success snackbar with fetched data info
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '✅ Data Fetched Successfully!',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                  const SizedBox(height: 8),
+                  Text('From: $fromLocation'),
+                  Text('To: $toLocation'),
+                  Text('Travelers: $groupSize'),
+                  Text('Category: $selectedStyle'),
+                  Text('Tour Type: ${isPublicTrip ? "Public" : "Private"}'),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Packages Found: ${packages.length}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.greenAccent,
+                    ),
+                  ),
+                  if (pagination != null) ...[
+                    Text('Total: ${pagination['total'] ?? 0}'),
+                    Text('Page: ${pagination['page'] ?? 1}'),
+                  ],
+                ],
+              ),
+              backgroundColor: Colors.green.shade700,
+              duration: const Duration(seconds: 5),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      } else {
+        // Show error snackbar
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '❌ Error: ${result['message'] ?? "Failed to fetch packages"}',
+              ),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('❌ Exception: ${e.toString()}'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
     }
   }
 
@@ -402,25 +509,14 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
                   top: BorderSide(color: AppColors.border, width: 0.5),
                 ),
               ),
-              child: CommonButton(
-                text: 'Find Adventures',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TourResultsScreen(
-                        isPublic:
-                            isPublicTrip, // Changed from isPublic to isPublicTrip
-                        destination: 'Hunza', // Example, normally from state
-                        dates: selectedDate != null
-                            ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
-                            : selectedMonth, // Adjusted date string logic
-                        guests: groupSize,
-                      ),
+              child: isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(color: AppColors.accent),
+                    )
+                  : CommonButton(
+                      text: 'Find Adventures',
+                      onPressed: _searchPackages,
                     ),
-                  );
-                },
-              ),
             ),
           ),
         ],
