@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../models/tour_package.dart';
+import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
 import 'customize_itinerary_screen.dart';
 
 class SelectStartDateScreen extends StatefulWidget {
-  final TourPackage package;
+  final CustomizeItineraryModel package;
 
   const SelectStartDateScreen({super.key, required this.package});
 
@@ -15,13 +15,16 @@ class SelectStartDateScreen extends StatefulWidget {
 
 class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
   DateTime? _selectedDate = DateTime(2024, 10, 14);
-  final int _durationDays = 7;
+  late int _durationDays;
 
   // Private tour accent color (Purple as per mockup)
   static const Color _privateAccent = Color(0xFF8B5CF6);
 
   @override
   Widget build(BuildContext context) {
+    _durationDays = (widget.package.duration is int)
+        ? (widget.package.duration as int)
+        : widget.package.duration.toInt();
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -390,7 +393,7 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: Image.network(
-              widget.package.imageUrl,
+              widget.package.media.isNotEmpty ? widget.package.media.first.url : 'https://via.placeholder.com/300x300.png?text=Trip',
               width: 64,
               height: 64,
               fit: BoxFit.cover,
@@ -420,7 +423,7 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
                     const Icon(Icons.calendar_today, color: AppColors.textSecondary, size: 12),
                     const SizedBox(width: 4),
                     Text(
-                      widget.package.duration,
+                      '${widget.package.duration} days',
                       style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
                     ),
                     const SizedBox(width: 8),

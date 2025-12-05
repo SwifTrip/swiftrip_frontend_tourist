@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import '../models/tour_package.dart';
+import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
 import '../widgets/accommodation_selection_sheet.dart';
 import 'review_trip_screen.dart';
 
 class CustomizeItineraryScreen extends StatefulWidget {
-  final TourPackage package;
+  final CustomizeItineraryModel package;
   final bool isPublic;
   final DateTime startDate;
 
@@ -36,7 +36,9 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
   @override
   Widget build(BuildContext context) {
     // Generate dates based on start date and duration
-    final duration = int.parse(widget.package.duration.split(' ')[0]);
+    final duration = (widget.package.duration is int)
+        ? (widget.package.duration as int)
+        : widget.package.duration.toInt();
     final dates = List.generate(duration, (index) => widget.startDate.add(Duration(days: index)));
 
     return Scaffold(
@@ -197,7 +199,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
         Row(
           children: [
             Text(
-              widget.package.itinerary[_selectedDayIndex].title,
+              widget.package.itineraries[_selectedDayIndex].title,
               style: const TextStyle(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(width: 8),
@@ -246,7 +248,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
         isPublic: widget.isPublic,
         day: 'Day ${_selectedDayIndex + 1}',
         date: '${date.day} ${months[date.month - 1]}',
-        location: widget.package.itinerary[_selectedDayIndex].title,
+        location: widget.package.itineraries[_selectedDayIndex].title,
       ),
     );
   }
@@ -476,7 +478,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                   style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
                 ),
                 Text(
-                  widget.isPublic ? widget.package.price : '\$3,450',
+                  widget.isPublic ? '${widget.package.currency} ${widget.package.basePrice}' : '\$3,450',
                   style: const TextStyle(color: AppColors.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 Text(

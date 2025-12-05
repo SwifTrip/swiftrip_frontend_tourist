@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../models/tour_package.dart';
+import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
 
 class ReviewTripScreen extends StatefulWidget {
-  final TourPackage package;
+  final CustomizeItineraryModel package;
   final bool isPublic;
   final DateTime startDate;
 
@@ -141,7 +141,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
           ),
           child: Column(
             children: [
-              _buildPriceRow('Base Tour Price (2 Adults)', widget.package.price),
+              _buildPriceRow('Base Tour Price (2 Adults)', '${widget.package.currency} ${widget.package.basePrice}'),
               const SizedBox(height: 12),
               _buildPriceRow('Accommodation Upgrades', '+\$220'),
               const SizedBox(height: 12),
@@ -202,7 +202,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
               style: TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Text(
-              '${widget.package.itinerary.length} Days Summary',
+              '${widget.package.itineraries.length} Days Summary',
               style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
             ),
           ],
@@ -222,9 +222,9 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: widget.package.itinerary.length,
+      itemCount: widget.package.itineraries.length,
       itemBuilder: (context, index) {
-        final day = widget.package.itinerary[index];
+        final day = widget.package.itineraries[index];
         final date = widget.startDate.add(Duration(days: index));
         final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -295,7 +295,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
   }
 
   Widget _buildTripSummaryCard() {
-    final endDate = widget.startDate.add(Duration(days: int.parse(widget.package.duration.split(' ')[0]) - 1));
+    final endDate = widget.startDate.add(Duration(days: ((widget.package.duration is int) ? (widget.package.duration as int) : widget.package.duration.toInt()) - 1));
     final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     return Container(
@@ -368,8 +368,8 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: AppColors.border),
-                        image: DecorationImage(
-                          image: NetworkImage(widget.package.imageUrl),
+                          image: DecorationImage(
+                          image: NetworkImage(widget.package.media.isNotEmpty ? widget.package.media.first.url : 'https://via.placeholder.com/100x100.png?text=Trip'),
                           fit: BoxFit.cover,
                         ),
                       ),

@@ -1,8 +1,8 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
-import '../models/tour_package.dart';
 import '../models/search_result.dart';
 import '../services/package_service.dart';
 import 'package_details_screen.dart';
@@ -586,6 +586,7 @@ class AgencySelection extends StatelessWidget {
                         fontSize: 13,
                         height: 40,
                         onPressed: () async {
+                          CustomizeItineraryModel? packageDetails;
                           if (!packageIsPublic) {
                             // Private package - fetch detailed itinerary
                             showDialog(
@@ -605,23 +606,8 @@ class AgencySelection extends StatelessWidget {
                               Navigator.pop(context); // Close loading dialog
 
                               if (response != null && response.success) {
-                                // Navigate to customize itinerary screen
-                                // TODO: Navigate to customize itinerary screen with response.data
-                                final details = response.data;
-                                final daysCount = details.itineraries.length;
-                                final itemsCount = details.itineraries
-                                    .fold<int>(0, (sum, d) => sum + d.items.length);
-                                final staysCount = details.stays.length;
-                                final info =
-                                    'Loaded: ${details.title} • Days: ${details.duration} • Itineraries: $daysCount • Items: $itemsCount • Stays: $staysCount';
-
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(info),
-                                    backgroundColor: Colors.green,
-                                    duration: const Duration(seconds: 4),
-                                  ),
-                                );
+                                packageDetails = response.data;
+                                
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
@@ -640,68 +626,13 @@ class AgencySelection extends StatelessWidget {
                                 ),
                               );
                             }
-                          } else {
-                            // Public package - go to package details screen
-                            final package = TourPackage(
-                              title: title,
-                              price: priceText,
-                              duration: duration,
-                              rating: rating.toString(),
-                              reviewsCount: reviews,
-                              imageUrl: imageUrl,
-                              highlights: [
-                                if (packageResult.description.isNotEmpty)
-                                  packageResult.description
-                                else
-                                  'Great for scenic getaways',
-                                'Operated by $agencyName',
-                              ],
-                              included: [
-                                {
-                                  'icon': Icons.directions_bus,
-                                  'text': 'Transport included',
-                                },
-                                {
-                                  'icon': Icons.restaurant,
-                                  'text': 'Meals where listed',
-                                },
-                                {'icon': Icons.person, 'text': 'Local guide'},
-                              ],
-                              perfectFor: ['Friends', 'Families', 'Couples'],
-                              itinerary: [
-                                ItineraryDay(
-                                  day: 'Day 01',
-                                  title: 'Arrival & meet agency',
-                                  subtitle:
-                                      'Check-in and meet your guide from $agencyName.',
-                                  icon: Icons.location_pin,
-                                ),
-                                ItineraryDay(
-                                  day: 'Day 02',
-                                  title: 'Explore highlights',
-                                  subtitle: 'Destinations: $locations.',
-                                  icon: Icons.map,
-                                ),
-                              ],
-                              reviews: [
-                                Review(
-                                  initial: agencyName.isNotEmpty
-                                      ? agencyName[0].toUpperCase()
-                                      : 'A',
-                                  name: agencyName,
-                                  date: 'recent',
-                                  stars: 5,
-                                  comment: 'Contact agency for full details.',
-                                ),
-                              ],
-                            );
 
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => PackageDetailsScreen(
-                                  package: package,
                                   isPublic: packageIsPublic,
+                                  customizeItinerary: packageDetails!,
                                 ),
                               ),
                             );

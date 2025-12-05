@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../models/tour_package.dart';
+import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
 import 'customize_itinerary_screen.dart';
 
 class SelectDepartureScreen extends StatefulWidget {
-  final TourPackage package;
+  final CustomizeItineraryModel package;
 
   const SelectDepartureScreen({super.key, required this.package});
 
@@ -149,7 +149,7 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
                   style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  widget.package.price + ' total',
+                  '${widget.package.currency} ${widget.package.basePrice} total',
                   style: const TextStyle(color: _accentColor, fontSize: 10, fontWeight: FontWeight.bold),
                 ),
               ],
@@ -393,7 +393,7 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: Image.network(
-              widget.package.imageUrl,
+              widget.package.media.isNotEmpty ? widget.package.media.first.url : 'https://via.placeholder.com/300x300.png?text=Trip',
               width: 64,
               height: 64,
               fit: BoxFit.cover,
@@ -418,7 +418,7 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        widget.package.duration,
+                        '${widget.package.duration} days',
                         style: const TextStyle(color: _accentColor, fontSize: 10, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -436,11 +436,7 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '\$550',
-                style: TextStyle(color: AppColors.textSecondary.withOpacity(0.5), fontSize: 12, decoration: TextDecoration.lineThrough),
-              ),
-              Text(
-                widget.package.price,
+                '${widget.package.currency} ${widget.package.basePrice}',
                 style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 18),
               ),
             ],

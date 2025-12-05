@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import '../models/tour_package.dart';
+import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
 import 'select_departure_screen.dart';
 import 'select_start_date_screen.dart';
 
 class PackageDetailsScreen extends StatefulWidget {
-  final TourPackage package;
+  final CustomizeItineraryModel customizeItinerary;
   final bool isPublic;
 
   const PackageDetailsScreen({
-    super.key, 
-    required this.package, 
+    super.key,
+    required this.customizeItinerary,
     this.isPublic = true,
   });
 
@@ -26,7 +26,7 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
   void initState() {
     super.initState();
     // Initialize all days as collapsed except the first one
-    for (int i = 0; i < widget.package.itinerary.length; i++) {
+    for (int i = 0; i < widget.customizeItinerary.itineraries.length; i++) {
       _isDayExpanded.add(i == 0);
     }
   }
@@ -51,8 +51,8 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
             ),
           ),
         ),
-        title: const Text(
-          'Package Details',
+        title: Text(
+          'Package Details ${widget.customizeItinerary.id}',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
         ),
         centerTitle: true,
@@ -130,7 +130,7 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          ...widget.package.included.take(4).map((item) {
+          ..._buildIncludedItems().map((text) {
             return Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: Row(
@@ -146,7 +146,7 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      item['text'] as String,
+                      text,
                       style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
                     ),
                   ),
@@ -157,6 +157,16 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
         ],
       ),
     );
+  }
+
+  List<String> _buildIncludedItems() {
+    final inc = widget.customizeItinerary.includes;
+    final items = <String>[];
+    if ((inc.guide ?? '').isNotEmpty) items.add('Guide: ${inc.guide}');
+    if ((inc.meals ?? '').isNotEmpty) items.add('Meals: ${inc.meals}');
+    if ((inc.transport ?? '').isNotEmpty) items.add('Transport: ${inc.transport}');
+    if (inc.permits) items.add('Permits included');
+    return items.take(4).toList();
   }
 
   Widget _buildCustomizableCard() {
@@ -235,7 +245,7 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
           ],
         ),
         const SizedBox(height: 16),
-        ...widget.package.itinerary.asMap().entries.map((entry) {
+        ...widget.customizeItinerary.itineraries.asMap().entries.map((entry) {
           final index = entry.key;
           final day = entry.value;
           return Padding(
@@ -247,7 +257,7 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
     );
   }
 
-  Widget _buildExpandableDay(int index, ItineraryDay day) {
+  Widget _buildExpandableDay(int index, DayItinerary day) {
     bool isExpanded = _isDayExpanded[index];
     return Container(
       decoration: BoxDecoration(
@@ -265,7 +275,7 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
               backgroundColor: isExpanded ? _accentColor : AppColors.background,
               radius: 14,
               child: Text(
-                (index + 1).toString().padLeft(2, '0'),
+                ((day.dayNumber == 0 ? index + 1 : day.dayNumber)).toString().padLeft(2, '0'),
                 style: TextStyle(
                   color: isExpanded ? Colors.white : AppColors.textSecondary, 
                   fontSize: 10, 
@@ -304,13 +314,15 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                     children: [
                       const Icon(Icons.schedule, color: AppColors.textSecondary, size: 14),
                       const SizedBox(width: 4),
-                      Text(day.subtitle.contains('drive') ? day.subtitle.split(',')[0] : 'Activity Day', 
-                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                      Text(
+                        (day.dayType.toLowerCase().contains('drive') ? 'Drive Day' : 'Activity Day'),
+                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    day.subtitle,
+                    day.description,
                     style: const TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.5),
                   ),
                 ],
@@ -324,18 +336,18 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
   Widget _buildInfoGrid() {
     return Row(
       children: [
-        _buildInfoItem(Icons.calendar_month, 'DURATION', widget.package.duration),
+        _buildInfoItem(Icons.calendar_month, 'DURATION', '${widget.customizeItinerary.duration} days'),
         const SizedBox(width: 12),
         _buildInfoItem(
           widget.isPublic ? Icons.group_add : Icons.person, 
           widget.isPublic ? 'GROUP SIZE' : 'GROUP TYPE', 
-          widget.isPublic ? 'Max 12' : 'Private'
+          widget.isPublic ? 'Max ${widget.customizeItinerary.maxGroupSize}' : 'Private'
         ),
         const SizedBox(width: 12),
         _buildInfoItem(
           widget.isPublic ? Icons.directions_bus : Icons.directions_car, 
           'TRANSPORT', 
-          widget.isPublic ? 'AC Coaster' : 'Luxury SUV'
+          (widget.customizeItinerary.includes.transport ?? (widget.isPublic ? 'AC Coaster' : 'Luxury SUV'))
         ),
       ],
     );
@@ -421,7 +433,7 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                   textBaseline: TextBaseline.alphabetic,
                   children: [
                     Text(
-                      widget.package.price.startsWith('Rs') ? '\$450' : widget.package.price,
+                      '${widget.customizeItinerary.currency} ${widget.customizeItinerary.basePrice}',
                       style: const TextStyle(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                     Text(
@@ -447,8 +459,8 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => widget.isPublic 
-                            ? SelectDepartureScreen(package: widget.package)
-                            : SelectStartDateScreen(package: widget.package),
+                            ? SelectDepartureScreen(package: widget.customizeItinerary)
+                            : SelectStartDateScreen(package: widget.customizeItinerary),
                       ),
                     );
                   },
@@ -467,7 +479,9 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
     return Stack(
       children: [
         Image.network(
-          widget.package.imageUrl,
+          widget.customizeItinerary.media.isNotEmpty
+              ? widget.customizeItinerary.media.first.url
+              : 'https://via.placeholder.com/1200x800.png?text=Trip',
           height: 380,
           width: double.infinity,
           fit: BoxFit.cover,
@@ -507,15 +521,11 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.star, color: Colors.amber, size: 14),
+                        const Icon(Icons.category, color: Colors.amber, size: 14),
                         const SizedBox(width: 4),
                         Text(
-                          widget.package.rating.split(' ')[0],
+                          widget.customizeItinerary.category,
                           style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          ' (${widget.package.reviewsCount})',
-                          style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 10),
                         ),
                       ],
                     ),
@@ -524,7 +534,7 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                widget.package.title,
+                widget.customizeItinerary.title,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 28,
