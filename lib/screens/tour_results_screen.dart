@@ -1,4 +1,3 @@
-
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
@@ -11,6 +10,7 @@ class TourResultsScreen extends StatelessWidget {
   final String dates;
   final int guests;
   final bool isPublic;
+  final List<dynamic> packages;
 
   const TourResultsScreen({
     super.key,
@@ -18,6 +18,7 @@ class TourResultsScreen extends StatelessWidget {
     this.destination = 'Hunza',
     this.dates = 'Sep 15 - Sep 19',
     this.guests = 2,
+    this.packages = const [],
   });
 
   @override
@@ -63,59 +64,137 @@ class TourResultsScreen extends StatelessWidget {
         children: [
           const SizedBox(height: 8),
           _buildFilterBar(),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildTourCard(
-                  context: context,
-                  title: isPublic ? 'Classic Hunza Expedition' : 'Classic Hunza Private Expedition',
-                  locations: 'Karimabad, Altit, Baltit',
-                  price: isPublic ? 450 : 950,
-                  rating: 4.8,
-                  reviews: 128,
-                  duration: '5 Days',
-                  imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCJ63yU4pc9m4bcYiIRArzFDSP_KI3AUe5IOfp2OPRbK0WFJrIq9oZLq2MJlkHnUlKc7_gSDi0ZDtT8Qgjqlt1KdpJ3kT8ZKTdUTV3n86Ao5glkAvkNvpKz5mFdmcdBbu_E5BkzpbU2VWmHO1JDXoYKy8cRSSqiZWTlVFboXax5qolrS3ZhApq-YbGOkgcuV7T-ig44eFIHE3pqCqrzlNWfJBeHAO-Jn8b7jv-I5sPGUZNVxg9F02GWis-boOAMc5Q2rUbJ3D4NdtZU',
-                  tags: isPublic 
-                      ? ['Transportation', 'Hotels', 'Guide'] 
-                      : ['Private Car', 'Luxury Hotels', 'Dedicated Guide'],
+                Text(
+                  '${packages.length} tours found',
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                const SizedBox(height: 20),
-                _buildTourCard(
-                  context: context,
-                  title: isPublic ? 'Attabad & Passu Adventure' : 'Attabad & Passu Luxury Private',
-                  locations: 'Attabad Lake, Passu Cones',
-                  price: isPublic ? 620 : 1200,
-                  rating: 4.9,
-                  reviews: 84,
-                  duration: '7 Days',
-                  imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDeaQ9BAz698k59yniB4d6C2z2ywKuBqhjVSDAcd9Ntj664CjGA1sw1imif_dIw8evhs0E58snAcPnDT_Pr8vYB-Ll9i-OPQ-4aoJVhDCTUYPKQbILC_8OMI2oh9xtaJ_gqGVcEBFcYXFG5r074QxscACVwhT3-MktmsZXjyaULwzgib2iIk3nkaryP0Yw5w9Dy-BwBZpNvnrBM-6GI29CZ9ImF4yYthMR7vEDy-JxUqjSMVlAy_N1DHassPk-OBM7Upk321K2zD7Kg',
-                  tags: isPublic 
-                      ? ['Boating', 'Hiking', 'Breakfast'] 
-                      : ['Private Boat', 'Hiking', 'Breakfast Included'],
-                  isPopular: true,
+                Text(
+                  destination,
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 12,
+                  ),
                 ),
-                const SizedBox(height: 20),
-                _buildTourCard(
-                  context: context,
-                  title: isPublic ? 'Cultural Heritage Tour' : 'Cultural Private Tour',
-                  locations: 'Ganish, Altit Fort',
-                  price: isPublic ? 380 : 780,
-                  rating: 4.6,
-                  reviews: 45,
-                  duration: '3 Days',
-                  imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDJjHyHnTeWrSSeTZaAuHj1nfzxx7r_qWJLl6CWuaUWTu6qmL2_GMiKfWnw1MtVQ_lrYN0EvMbGsn5EBcZwSpGVzHZS66auuUQXGnAGwVHcLLXfkMrTFaUojO46gfjKbosV5KV70XuvWI1q4anY--PUEtSYimyYt8sxD1bLSuXiSaQa9_in5hl9b4sYkHJUZjFZdMBJgg7sRjLvFO8ripDgDOPhjAFPkAeR2_txXtJIgu1n1QzXUBd3q72PS__48YKQxQ9YDrdMh7U1',
-                  tags: isPublic 
-                      ? ['History', 'Museums', 'Local Food'] 
-                      : ['Private Guide', 'Exclusive Access', 'Local Cuisine'],
-                ),
-                const SizedBox(height: 80),
               ],
             ),
+          ),
+          Expanded(
+            child: packages.isEmpty
+                ? _buildEmptyState()
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: packages.length,
+                    itemBuilder: (context, index) {
+                      final pkg = (packages[index] as Map?)
+                              ?.cast<String, dynamic>() ??
+                          <String, dynamic>{};
+                      final agencyName = (pkg['company']?['name'] ?? 'Agency')
+                          .toString();
+                      final packageIsPublic =
+                          pkg['isPublic'] as bool? ?? isPublic;
+                      final price = pkg['basePrice'] as num?;
+                      final currency = (pkg['currency'] ?? 'PKR')
+                          .toString()
+                          .toUpperCase();
+                      final durationValue = pkg['duration'];
+                      final durationLabel =
+                          (durationValue is num && durationValue > 0)
+                          ? '${durationValue.round()} day${durationValue.round() == 1 ? '' : 's'}'
+                          : 'Flexible';
+                      final coverImage =
+                          (pkg['coverImage'] as String?)?.isNotEmpty == true
+                          ? pkg['coverImage'] as String
+                          : 'https://via.placeholder.com/600x400.png?text=Tour+Package';
+                      final from = (pkg['fromLocation'] ?? 'Start').toString();
+                      final to = (pkg['toLocation'] ?? destination).toString();
+                      final locations = '$from → $to';
+                      final category = (pkg['category'] ?? '').toString();
+                      final tags = _buildTags(pkg['includes'], category);
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: _buildTourCard(
+                          context: context,
+                          title: (pkg['title'] ?? 'Tour Package').toString(),
+                          agencyName: agencyName,
+                          locations: locations,
+                          price: price,
+                          currency: currency,
+                          rating: 4.7,
+                          reviews: 12,
+                          duration: durationLabel,
+                          imageUrl: coverImage,
+                          tags: tags,
+                          isPopular: index == 0,
+                          packageIsPublic: packageIsPublic,
+                          rawPackage: pkg,
+                        ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.search_off, color: AppColors.textSecondary, size: 48),
+          SizedBox(height: 12),
+          Text(
+            'No tours found',
+            style: TextStyle(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+          SizedBox(height: 4),
+          Text(
+            'Try adjusting your filters',
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<String> _buildTags(dynamic includes, String category) {
+    if (includes is Map) {
+      final tags = <String>[];
+      if (includes['guide'] != null) {
+        tags.add('Guide');
+      }
+      if (includes['meals'] != null) {
+        tags.add('Meals');
+      }
+      if (includes['permits'] == true) {
+        tags.add('Permits');
+      }
+      if (tags.isNotEmpty) return tags;
+    }
+    if (category.isNotEmpty) return [category];
+    return ['Activities'];
+  }
+
+  String _formatPrice(num? price, String currency) {
+    if (price == null) return '--';
+    if (price % 1 == 0) {
+      return '$currency ${price.toStringAsFixed(0)}';
+    }
+    return '$currency ${price.toStringAsFixed(2)}';
   }
 
   Widget _buildFilterBar() {
@@ -135,7 +214,11 @@ class TourResultsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFilterChip(String label, {bool isActive = false, bool hasDropdown = false}) {
+  Widget _buildFilterChip(
+    String label, {
+    bool isActive = false,
+    bool hasDropdown = false,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
@@ -172,17 +255,22 @@ class TourResultsScreen extends StatelessWidget {
   Widget _buildTourCard({
     required BuildContext context,
     required String title,
+    required String agencyName,
     required String locations,
-    required int price,
+    required num? price,
+    required String currency,
     required double rating,
     required int reviews,
     required String duration,
     required String imageUrl,
     required List<String> tags,
+    required bool packageIsPublic,
+    Map<String, dynamic>? rawPackage,
     bool isPopular = false,
   }) {
-    final buttonText = isPublic ? 'View Details' : 'Choose Start Date';
-    final pricingUnit = isPublic ? '/ person' : '/ group (up to 4)';
+    final buttonText = packageIsPublic ? 'View Details' : 'Choose Start Date';
+    final pricingUnit = packageIsPublic ? '/ person' : '/ group';
+    final priceText = _formatPrice(price, currency);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
@@ -197,7 +285,9 @@ class TourResultsScreen extends StatelessWidget {
           Stack(
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
+                ),
                 child: Image.network(
                   imageUrl,
                   height: 200,
@@ -228,9 +318,14 @@ class TourResultsScreen extends StatelessWidget {
                   child: BackdropFilter(
                     filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
-                        color: isPublic ? AppColors.background.withOpacity(0.6) : Colors.purple.withOpacity(0.3),
+                        color: packageIsPublic
+                            ? AppColors.background.withOpacity(0.6)
+                            : Colors.purple.withOpacity(0.3),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
@@ -240,13 +335,17 @@ class TourResultsScreen extends StatelessWidget {
                             width: 8,
                             height: 8,
                             decoration: BoxDecoration(
-                              color: isPublic ? Colors.green : Colors.purpleAccent,
+                              color: packageIsPublic
+                                  ? Colors.green
+                                  : Colors.purpleAccent,
                               shape: BoxShape.circle,
                             ),
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            isPublic ? 'PUBLIC AVAILABLE' : 'PRIVATE AVAILABLE',
+                            packageIsPublic
+                                ? 'PUBLIC AVAILABLE'
+                                : 'PRIVATE AVAILABLE',
                             style: const TextStyle(
                               color: AppColors.textPrimary,
                               fontSize: 10,
@@ -268,7 +367,10 @@ class TourResultsScreen extends StatelessWidget {
                   child: BackdropFilter(
                     filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.black.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(8),
@@ -276,7 +378,11 @@ class TourResultsScreen extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.schedule, color: Colors.white, size: 14),
+                          const Icon(
+                            Icons.schedule,
+                            color: Colors.white,
+                            size: 14,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             duration,
@@ -317,7 +423,33 @@ class TourResultsScreen extends StatelessWidget {
                           const SizedBox(height: 4),
                           Row(
                             children: [
-                              const Icon(Icons.location_on, color: AppColors.textSecondary, size: 14),
+                              const Icon(
+                                Icons.store,
+                                size: 14,
+                                color: AppColors.textSecondary,
+                              ),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  agencyName,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.location_on,
+                                color: AppColors.textSecondary,
+                                size: 14,
+                              ),
                               const SizedBox(width: 4),
                               Text(
                                 locations,
@@ -335,14 +467,21 @@ class TourResultsScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.yellow.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.star, color: Colors.yellow, size: 14),
+                              const Icon(
+                                Icons.star,
+                                color: Colors.yellow,
+                                size: 14,
+                              ),
                               const SizedBox(width: 2),
                               Text(
                                 rating.toString(),
@@ -370,21 +509,32 @@ class TourResultsScreen extends StatelessWidget {
                 Wrap(
                   spacing: 8,
                   runSpacing: 4,
-                  children: tags.map((tag) => Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: isPublic ? Colors.blue.withOpacity(0.1) : Colors.deepPurple.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      tag,
-                      style: TextStyle(
-                        color: isPublic ? Colors.blue : Colors.purpleAccent,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  )).toList(),
+                  children: tags
+                      .map(
+                        (tag) => Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: packageIsPublic
+                                ? Colors.blue.withOpacity(0.1)
+                                : Colors.deepPurple.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            tag,
+                            style: TextStyle(
+                              color: packageIsPublic
+                                  ? Colors.blue
+                                  : Colors.purpleAccent,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
                 ),
                 const SizedBox(height: 16),
                 const Divider(color: AppColors.border),
@@ -412,7 +562,7 @@ class TourResultsScreen extends StatelessWidget {
                             child: Row(
                               children: [
                                 Text(
-                                  '\$$price',
+                                  priceText,
                                   style: const TextStyle(
                                     color: AppColors.accent,
                                     fontSize: 22,
@@ -440,30 +590,59 @@ class TourResultsScreen extends StatelessWidget {
                         fontSize: 13,
                         height: 40,
                         onPressed: () {
-                          // Create a dummy package object based on the card info for now
-                          // In a real app, this would come from a list of TourPackage objects
                           final package = TourPackage(
                             title: title,
-                            price: '\$$price',
+                            price: priceText,
                             duration: duration,
                             rating: rating.toString(),
                             reviewsCount: reviews,
                             imageUrl: imageUrl,
-                            highlights: ['Ancient Forts', 'Local Culture', 'Scenic Views'],
-                            included: [
-                              {'icon': Icons.directions_bus, 'text': 'Transportation included'},
-                              {'icon': Icons.hotel, 'text': '3-star hotels'},
-                              {'icon': Icons.restaurant, 'text': 'Breakfast & Dinner'},
-                              {'icon': Icons.person, 'text': 'Professional Guide'},
+                            highlights: [
+                              if ((rawPackage?['description'] as String?)
+                                      ?.isNotEmpty ==
+                                  true)
+                                rawPackage!['description'] as String
+                              else
+                                'Great for scenic getaways',
+                              'Operated by $agencyName',
                             ],
-                            perfectFor: ['Families', 'Couples', 'Solo Travelers'],
+                            included: [
+                              {
+                                'icon': Icons.directions_bus,
+                                'text': 'Transport included',
+                              },
+                              {
+                                'icon': Icons.restaurant,
+                                'text': 'Meals where listed',
+                              },
+                              {'icon': Icons.person, 'text': 'Local guide'},
+                            ],
+                            perfectFor: ['Friends', 'Families', 'Couples'],
                             itinerary: [
-                              ItineraryDay(day: 'Day 01', title: 'Arrival in Hunza', subtitle: 'Transfer to Karimabad, check-in to hotel.', icon: Icons.landscape),
-                              ItineraryDay(day: 'Day 02', title: 'Forts Exploration', subtitle: 'Visit Altit and Baltit forts.', icon: Icons.fort),
-                              ItineraryDay(day: 'Day 03', title: 'Local Markets', subtitle: 'Explore Karimabad bazaar and local cuisine.', icon: Icons.shopping_bag),
+                              ItineraryDay(
+                                day: 'Day 01',
+                                title: 'Arrival & meet agency',
+                                subtitle:
+                                    'Check-in and meet your guide from $agencyName.',
+                                icon: Icons.location_pin,
+                              ),
+                              ItineraryDay(
+                                day: 'Day 02',
+                                title: 'Explore highlights',
+                                subtitle: 'Destinations: $locations.',
+                                icon: Icons.map,
+                              ),
                             ],
                             reviews: [
-                              Review(initial: 'A', name: 'Ali Khan', date: '2 weeks ago', stars: 5, comment: 'Amazing experience! The guide was very helpful.'),
+                              Review(
+                                initial: agencyName.isNotEmpty
+                                    ? agencyName[0].toUpperCase()
+                                    : 'A',
+                                name: agencyName,
+                                date: 'recent',
+                                stars: 5,
+                                comment: 'Contact agency for full details.',
+                              ),
                             ],
                           );
 
@@ -472,7 +651,7 @@ class TourResultsScreen extends StatelessWidget {
                             MaterialPageRoute(
                               builder: (context) => PackageDetailsScreen(
                                 package: package,
-                                isPublic: isPublic,
+                                isPublic: packageIsPublic,
                               ),
                             ),
                           );

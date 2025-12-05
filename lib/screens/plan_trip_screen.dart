@@ -1,3 +1,5 @@
+import 'package:swift_trip_app/screens/tour_results_screen.dart';
+
 import '../theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../widgets/common_button.dart';
@@ -113,57 +115,25 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
       });
 
       if (result['success'] == true) {
-        final packages = result['data'] as List;
-        final pagination = result['pagination'] as Map?;
-
-        // Show success snackbar with fetched data info
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '✅ Data Fetched Successfully!',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  const SizedBox(height: 8),
-                  Text('From: $fromLocation'),
-                  Text('To: $toLocation'),
-                  Text('Travelers: $groupSize'),
-                  Text('Category: $selectedStyle'),
-                  Text('Tour Type: ${isPublicTrip ? "Public" : "Private"}'),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Packages Found: ${packages.length}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.greenAccent,
-                    ),
-                  ),
-                  if (pagination != null) ...[
-                    Text('Total: ${pagination['total'] ?? 0}'),
-                    Text('Page: ${pagination['page'] ?? 1}'),
-                  ],
-                ],
-              ),
-              backgroundColor: Colors.green.shade700,
-              duration: const Duration(seconds: 5),
-              behavior: SnackBarBehavior.floating,
+        final packages = (result['data'] as List?) ?? [];
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TourResultsScreen(
+              destination: toLocation,
+              dates: selectedMonth,
+              guests: groupSize,
+              isPublic: isPublicTrip,
+              packages: packages,
             ),
-          );
-        }
+          ),
+        );
       } else {
-        // Show error snackbar
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                '❌ Error: ${result['message'] ?? "Failed to fetch packages"}',
-              ),
+              content: Text(result['message'] ?? 'Failed to fetch tours'),
               backgroundColor: Colors.red,
-              duration: const Duration(seconds: 4),
             ),
           );
         }
@@ -172,16 +142,6 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
       setState(() {
         isLoading = false;
       });
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('❌ Exception: ${e.toString()}'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 4),
-          ),
-        );
-      }
     }
   }
 
