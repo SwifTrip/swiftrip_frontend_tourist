@@ -17,6 +17,38 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
   int adultsCount = 2;
   int childrenCount = 0;
   String selectedStyle = 'Adventure';
+  String fromLocation = '';
+  String toLocation = '';
+  
+  // List of available locations
+  final List<String> locations = [
+    'Karachi',
+    'Lahore',
+    'Islamabad',
+    'Rawalpindi',
+    'Faisalabad',
+    'Multan',
+    'Peshawar',
+    'Quetta',
+    'Sialkot',
+    'Gujranwala',
+    'Hunza Valley',
+    'Skardu',
+    'Gilgit',
+    'Murree',
+    'Naran',
+    'Kaghan',
+    'Swat',
+    'Chitral',
+    'San Francisco',
+    'New York',
+    'Los Angeles',
+    'Chicago',
+    'London',
+    'Paris',
+    'Dubai',
+    'Istanbul',
+  ];
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -45,6 +77,205 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
         selectedMonth = "${picked.day}/${picked.month}/${picked.year}";
       });
     }
+  }
+
+  void _showLocationPicker(BuildContext context, bool isFromLocation) {
+    final TextEditingController searchController = TextEditingController();
+    List<String> filteredLocations = List.from(locations);
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            void filterLocations(String query) {
+              setModalState(() {
+                if (query.isEmpty) {
+                  filteredLocations = List.from(locations);
+                } else {
+                  filteredLocations = locations
+                      .where((location) =>
+                          location.toLowerCase().contains(query.toLowerCase()))
+                      .toList();
+                }
+              });
+            }
+
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.75,
+              decoration: const BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
+              ),
+              child: Column(
+                children: [
+                  // Handle bar
+                  Container(
+                    margin: const EdgeInsets.only(top: 12),
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: AppColors.textSecondary.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  
+                  // Title
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          isFromLocation ? 'Select From Location' : 'Select Destination',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.close, color: AppColors.textSecondary),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Search field
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: TextField(
+                      controller: searchController,
+                      onChanged: filterLocations,
+                      style: const TextStyle(color: AppColors.textPrimary),
+                      decoration: InputDecoration(
+                        hintText: 'Search location...',
+                        hintStyle: TextStyle(
+                          color: AppColors.textSecondary.withOpacity(0.5),
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: AppColors.textSecondary,
+                        ),
+                        filled: true,
+                        fillColor: AppColors.surface,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: AppColors.border),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: AppColors.border),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: AppColors.accent),
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 16),
+                  
+                  // Location list
+                  Expanded(
+                    child: filteredLocations.isEmpty
+                        ? Center(
+                            child: Text(
+                              'No locations found',
+                              style: TextStyle(
+                                color: AppColors.textSecondary.withOpacity(0.5),
+                                fontSize: 16,
+                              ),
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: filteredLocations.length,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            itemBuilder: (context, index) {
+                              final location = filteredLocations[index];
+                              final isSelected = isFromLocation 
+                                  ? location == fromLocation 
+                                  : location == toLocation;
+                              
+                              return InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    if (isFromLocation) {
+                                      fromLocation = location;
+                                    } else {
+                                      toLocation = location;
+                                    }
+                                  });
+                                  Navigator.pop(context);
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                    horizontal: 12,
+                                  ),
+                                  margin: const EdgeInsets.only(bottom: 8),
+                                  decoration: BoxDecoration(
+                                    color: isSelected 
+                                        ? AppColors.accent.withOpacity(0.1)
+                                        : AppColors.surface,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: isSelected 
+                                          ? AppColors.accent 
+                                          : AppColors.border,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.location_on,
+                                        color: isSelected 
+                                            ? AppColors.accent 
+                                            : AppColors.textSecondary,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          location,
+                                          style: TextStyle(
+                                            color: isSelected 
+                                                ? AppColors.accent 
+                                                : AppColors.textPrimary,
+                                            fontSize: 16,
+                                            fontWeight: isSelected 
+                                                ? FontWeight.w600 
+                                                : FontWeight.normal,
+                                          ),
+                                        ),
+                                      ),
+                                      if (isSelected)
+                                        const Icon(
+                                          Icons.check_circle,
+                                          color: AppColors.accent,
+                                          size: 20,
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -506,9 +737,10 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
         children: [
           _buildLocationField(
             label: 'FROM',
-            value: 'San Francisco, CA',
+            value: fromLocation,
             icon: Icons.circle_outlined,
             iconColor: Colors.blue,
+            onTap: () => _showLocationPicker(context, true),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 26),
@@ -526,10 +758,11 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
           ),
           _buildLocationField(
             label: 'TO',
-            value: '',
+            value: toLocation,
             hint: 'Search Destination',
             icon: Icons.location_on,
             iconColor: Colors.red,
+            onTap: () => _showLocationPicker(context, false),
           ),
         ],
       ),
@@ -542,44 +775,49 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
     String? hint,
     required IconData icon,
     required Color iconColor,
+    required VoidCallback onTap,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textSecondary,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Icon(icon, color: iconColor, size: 20),
-            const SizedBox(width: 12),
-            Expanded(
-              child: value.isNotEmpty
-                  ? Text(
-                      value,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    )
-                  : Text(
-                      hint ?? '',
-                      style: TextStyle(
-                        color: AppColors.textSecondary.withOpacity(0.5),
-                        fontSize: 16,
-                      ),
-                    ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textSecondary,
             ),
-          ],
-        ),
-      ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(icon, color: iconColor, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: value.isNotEmpty
+                    ? Text(
+                        value,
+                        style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      )
+                    : Text(
+                        hint ?? '',
+                        style: TextStyle(
+                          color: AppColors.textSecondary.withOpacity(0.5),
+                          fontSize: 16,
+                        ),
+                      ),
+              ),
+              Icon(Icons.arrow_drop_down, color: AppColors.textSecondary, size: 24),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

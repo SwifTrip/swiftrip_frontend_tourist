@@ -14,7 +14,6 @@ class SelectStartDateScreen extends StatefulWidget {
 }
 
 class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
-  DateTime _currentMonth = DateTime(2024, 10);
   DateTime? _selectedDate = DateTime(2024, 10, 14);
   final int _durationDays = 7;
 
