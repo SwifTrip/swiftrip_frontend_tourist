@@ -1,5 +1,4 @@
 import 'package:swift_trip_app/screens/tour_results_screen.dart';
-
 import '../theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../widgets/common_button.dart';
@@ -114,8 +113,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
         isLoading = false;
       });
 
-      if (result['success'] == true) {
-        final packages = (result['data'] as List?) ?? [];
+      if (result != null && result.success) {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -124,15 +122,16 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
               dates: selectedMonth,
               guests: groupSize,
               isPublic: isPublicTrip,
-              packages: packages,
+              packages: result.data,
+              pagination: result.pagination,
             ),
           ),
         );
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(result['message'] ?? 'Failed to fetch tours'),
+            const SnackBar(
+              content: Text('Failed to fetch tours. Please try again.'),
               backgroundColor: Colors.red,
             ),
           );

@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
+import '../models/search_result.dart';
 
 class PackageService {
-  Future<Map<String, dynamic>> searchPackages({
+  Future<agencyResult?> searchPackages({
     String? fromLocation,
     String? toLocation,
     String? category,
@@ -58,45 +59,19 @@ class PackageService {
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        // Success
-        return {
-          'success': true,
-          'data': responseData['data'] ?? [],
-          'pagination': responseData['pagination'] ?? {},
-          'message': 'Packages retrieved successfully',
-        };
+        // Success - parse into agencyResult model
+        return agencyResult.fromJson(responseData);
       } else {
         // Error from server
-        try {
-          final responseData = jsonDecode(response.body);
-          return {
-            'success': false,
-            'message':
-                responseData['message'] ?? 'Failed to search packages',
-            'data': [],
-          };
-        } catch (e) {
-          return {
-            'success': false,
-            'message':
-                'Server error: ${response.statusCode} - ${response.body}',
-            'data': [],
-          };
-        }
+        print('Server error: ${response.statusCode} - ${response.body}');
+        return null;
       }
     } on http.ClientException catch (e) {
-      return {
-        'success': false,
-        'message':
-            'Connection error: ${e.message}. Make sure the backend server is running on http://localhost:3000',
-        'data': [],
-      };
+      print('Connection error: ${e.message}');
+      return null;
     } catch (e) {
-      return {
-        'success': false,
-        'message': 'Network error: ${e.toString()}',
-        'data': [],
-      };
+      print('Network error: ${e.toString()}');
+      return null;
     }
   }
 

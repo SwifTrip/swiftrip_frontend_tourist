@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
 import '../models/tour_package.dart';
+import '../models/search_result.dart';
 import 'package_details_screen.dart';
 
 class TourResultsScreen extends StatelessWidget {
@@ -10,7 +11,8 @@ class TourResultsScreen extends StatelessWidget {
   final String dates;
   final int guests;
   final bool isPublic;
-  final List<dynamic> packages;
+  final List<TourPackageResult> packages;
+  final PaginationInfo? pagination;
 
   const TourResultsScreen({
     super.key,
@@ -19,6 +21,7 @@ class TourResultsScreen extends StatelessWidget {
     this.dates = 'Sep 15 - Sep 19',
     this.guests = 2,
     this.packages = const [],
+    this.pagination,
   });
 
   @override
@@ -93,37 +96,28 @@ class TourResultsScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(16),
                     itemCount: packages.length,
                     itemBuilder: (context, index) {
-                      final pkg = (packages[index] as Map?)
-                              ?.cast<String, dynamic>() ??
-                          <String, dynamic>{};
-                      final agencyName = (pkg['company']?['name'] ?? 'Agency')
-                          .toString();
-                      final packageIsPublic =
-                          pkg['isPublic'] as bool? ?? isPublic;
-                      final price = pkg['basePrice'] as num?;
-                      final currency = (pkg['currency'] ?? 'PKR')
-                          .toString()
-                          .toUpperCase();
-                      final durationValue = pkg['duration'];
-                      final durationLabel =
-                          (durationValue is num && durationValue > 0)
-                          ? '${durationValue.round()} day${durationValue.round() == 1 ? '' : 's'}'
+                      final pkg = packages[index];
+                      final agencyName = pkg.company.name;
+                      final packageIsPublic = pkg.isPublic;
+                      final price = pkg.basePrice;
+                      final currency = pkg.currency.toUpperCase();
+                      final durationLabel = pkg.duration > 0
+                          ? '${pkg.duration.round()} day${pkg.duration.round() == 1 ? '' : 's'}'
                           : 'Flexible';
-                      final coverImage =
-                          (pkg['coverImage'] as String?)?.isNotEmpty == true
-                          ? pkg['coverImage'] as String
+                      final coverImage = pkg.coverImage?.isNotEmpty == true
+                          ? pkg.coverImage!
                           : 'https://via.placeholder.com/600x400.png?text=Tour+Package';
-                      final from = (pkg['fromLocation'] ?? 'Start').toString();
-                      final to = (pkg['toLocation'] ?? destination).toString();
+                      final from = pkg.fromLocation;
+                      final to = pkg.toLocation;
                       final locations = '$from → $to';
-                      final category = (pkg['category'] ?? '').toString();
-                      final tags = _buildTags(pkg['includes'], category);
+                      final category = pkg.category;
+                      final tags = _buildTags(pkg.includes, category);
 
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 20),
                         child: _buildTourCard(
                           context: context,
-                          title: (pkg['title'] ?? 'Tour Package').toString(),
+                          title: pkg.title,
                           agencyName: agencyName,
                           locations: locations,
                           price: price,
@@ -135,7 +129,7 @@ class TourResultsScreen extends StatelessWidget {
                           tags: tags,
                           isPopular: index == 0,
                           packageIsPublic: packageIsPublic,
-                          rawPackage: pkg,
+                          packageResult: pkg,
                         ),
                       );
                     },
@@ -171,20 +165,21 @@ class TourResultsScreen extends StatelessWidget {
     );
   }
 
-  List<String> _buildTags(dynamic includes, String category) {
-    if (includes is Map) {
-      final tags = <String>[];
-      if (includes['guide'] != null) {
-        tags.add('Guide');
-      }
-      if (includes['meals'] != null) {
-        tags.add('Meals');
-      }
-      if (includes['permits'] == true) {
-        tags.add('Permits');
-      }
-      if (tags.isNotEmpty) return tags;
+  List<String> _buildTags(PackageIncludes includes, String category) {
+    final tags = <String>[];
+    if (includes.guide != null) {
+      tags.add('Guide');
     }
+    if (includes.meals != null) {
+      tags.add('Meals');
+    }
+    if (includes.permits) {
+      tags.add('Permits');
+    }
+    if (includes.transport != null) {
+      tags.add('Transport');
+    }
+    if (tags.isNotEmpty) return tags;
     if (category.isNotEmpty) return [category];
     return ['Activities'];
   }
@@ -257,7 +252,7 @@ class TourResultsScreen extends StatelessWidget {
     required String title,
     required String agencyName,
     required String locations,
-    required num? price,
+    required num price,
     required String currency,
     required double rating,
     required int reviews,
@@ -265,7 +260,7 @@ class TourResultsScreen extends StatelessWidget {
     required String imageUrl,
     required List<String> tags,
     required bool packageIsPublic,
-    Map<String, dynamic>? rawPackage,
+    required TourPackageResult packageResult,
     bool isPopular = false,
   }) {
     final buttonText = packageIsPublic ? 'View Details' : 'Choose Start Date';
@@ -598,10 +593,8 @@ class TourResultsScreen extends StatelessWidget {
                             reviewsCount: reviews,
                             imageUrl: imageUrl,
                             highlights: [
-                              if ((rawPackage?['description'] as String?)
-                                      ?.isNotEmpty ==
-                                  true)
-                                rawPackage!['description'] as String
+                              if (packageResult.description.isNotEmpty)
+                                packageResult.description
                               else
                                 'Great for scenic getaways',
                               'Operated by $agencyName',
