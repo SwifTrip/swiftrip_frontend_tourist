@@ -1,17 +1,17 @@
-import 'package:swift_trip_app/screens/tour_results_screen.dart';
+import 'package:swift_trip_app/screens/agencySelection.dart';
 import '../theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../widgets/common_button.dart';
 import '../services/package_service.dart';
 
-class PlanTripScreen extends StatefulWidget {
-  const PlanTripScreen({super.key});
+class SearchTour extends StatefulWidget {
+  const SearchTour({super.key});
 
   @override
-  State<PlanTripScreen> createState() => _PlanTripScreenState();
+  State<SearchTour> createState() => _SearchTourState();
 }
 
-class _PlanTripScreenState extends State<PlanTripScreen> {
+class _SearchTourState extends State<SearchTour> {
   bool isPublicTrip = true;
   String selectedMonth = 'Anytime';
   DateTime? selectedDate;
@@ -117,7 +117,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => TourResultsScreen(
+            builder: (context) => AgencySelection(
               destination: toLocation,
               dates: selectedMonth,
               guests: groupSize,

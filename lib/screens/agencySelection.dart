@@ -6,7 +6,7 @@ import '../models/tour_package.dart';
 import '../models/search_result.dart';
 import 'package_details_screen.dart';
 
-class TourResultsScreen extends StatelessWidget {
+class AgencySelection extends StatelessWidget {
   final String destination;
   final String dates;
   final int guests;
@@ -14,7 +14,7 @@ class TourResultsScreen extends StatelessWidget {
   final List<TourPackageResult> packages;
   final PaginationInfo? pagination;
 
-  const TourResultsScreen({
+  const AgencySelection({
     super.key,
     required this.isPublic,
     this.destination = 'Hunza',
