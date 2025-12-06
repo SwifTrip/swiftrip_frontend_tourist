@@ -9,7 +9,7 @@ class PackageService {
     String? toLocation,
     String? category,
     int? travelers,
-    // String? tourType,
+    String? tourType,
     // double? minBudget,
     // double? maxBudget,
     // String? startDate,
@@ -32,9 +32,9 @@ class PackageService {
       if (travelers != null) {
         queryParams['travelers'] = travelers.toString();
       }
-      // if (tourType != null && tourType.isNotEmpty) {
-      //   queryParams['tourType'] = tourType;
-      // }
+      if (tourType != null && tourType.isNotEmpty) {
+        queryParams['tourType'] = tourType;
+      }
       // if (minBudget != null) {
       //   queryParams['minBudget'] = minBudget.toString();
       // }

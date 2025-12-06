@@ -105,7 +105,7 @@ class _SearchTourState extends State<SearchTour> {
         toLocation: toLocation,
         travelers: groupSize,
         category: selectedStyle.toUpperCase(),
-        // tourType: isPublicTrip ? 'PUBLIC' : 'PRIVATE',
+        tourType: isPublicTrip ? 'PUBLIC' : 'PRIVATE',
         // startDate: selectedDate?.toIso8601String(),
       );
 
