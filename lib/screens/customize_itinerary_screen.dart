@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
-import '../widgets/accommodation_selection_sheet.dart';
 import 'review_trip_screen.dart';
 
 class CustomizeItineraryScreen extends StatefulWidget {
@@ -93,11 +92,15 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                       const SizedBox(height: 24),
                       _buildSectionHeader('ACCOMMODATION', isCustomizable: !widget.isPublic),
                       const SizedBox(height: 12),
-                      _buildHotelCard(),
+                      _buildAccommodationSection(dates[_selectedDayIndex]),
                       const SizedBox(height: 24),
-                      _buildSectionHeader('TRANSPORT', isFixed: true),
+                      _buildSectionHeader('TRANSPORT', isCustomizable: !widget.isPublic),
                       const SizedBox(height: 12),
-                      _buildTransportCard(),
+                      _buildTransportSection(dates[_selectedDayIndex]),
+                      const SizedBox(height: 24),
+                      _buildSectionHeader('MEALS', isCustomizable: !widget.isPublic),
+                      const SizedBox(height: 12),
+                      _buildMealSection(dates[_selectedDayIndex]),
                       const SizedBox(height: 24),
                       if (_getActivityItemsForDay().isNotEmpty) ..._buildActivitySection(),
                       const SizedBox(height: 24),
@@ -226,17 +229,41 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
     );
   }
 
-  List<ItineraryItem> _getActivityItemsForDay() {
+  List<ItineraryItem> _getItemsForSelectedDay() {
     if (_selectedDayIndex >= widget.package.itineraries.length) {
       return [];
     }
     return widget.package.itineraries[_selectedDayIndex].items;
   }
 
+  List<ItineraryItem> _getAccommodationItemsForDay() {
+    return _getItemsForSelectedDay()
+        .where((item) => item.type.toLowerCase() == 'stay')
+        .toList();
+  }
+
+  List<ItineraryItem> _getTransportItemsForDay() {
+    return _getItemsForSelectedDay()
+        .where((item) => item.type.toLowerCase() == 'transport')
+        .toList();
+  }
+
+  List<ItineraryItem> _getMealItemsForDay() {
+    return _getItemsForSelectedDay()
+        .where((item) => item.type.toLowerCase() == 'meal')
+        .toList();
+  }
+
+  List<ItineraryItem> _getActivityItemsForDay() {
+    return _getItemsForSelectedDay()
+        .where((item) => item.type.toLowerCase() == 'activity')
+        .toList();
+  }
+
   List<Widget> _buildActivitySection() {
     final items = _getActivityItemsForDay();
     final widgets = <Widget>[
-      _buildSectionHeader('ACTIVITIES & EXTRAS'),
+      _buildSectionHeader('ACTIVITIES'),
       const SizedBox(height: 12),
     ];
 
@@ -259,56 +286,48 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
 
   num _calculateTotalPrice() {
     num total = widget.package.basePrice;
-    final items = _getActivityItemsForDay();
-    
+    final items = [
+      ..._getActivityItemsForDay(),
+      ..._getAccommodationItemsForDay(),
+      ..._getTransportItemsForDay(),
+      ..._getMealItemsForDay(),
+    ];
+
     for (final item in items) {
-      // Only add price if it's an optional item and it's selected
       if (item.optional && (_selectedOptionalItems[item.id] ?? false)) {
         total += item.price;
       }
     }
-    
+
     return total;
   }
 
   String _buildPriceDescription() {
-    final items = _getActivityItemsForDay();
+    final items = [
+      ..._getActivityItemsForDay(),
+      ..._getAccommodationItemsForDay(),
+      ..._getTransportItemsForDay(),
+      ..._getMealItemsForDay(),
+    ];
     num addOnTotal = 0;
-    
+
     for (final item in items) {
       if (item.optional && (_selectedOptionalItems[item.id] ?? false)) {
         addOnTotal += item.price;
       }
     }
-    
+
     if (addOnTotal > 0) {
-      return 'Base + \$${addOnTotal} add-ons';
+      return 'Base + Rs${addOnTotal} add-ons';
     } else {
       return 'Base price';
     }
   }
 
-  void _showAccommodationPicker(DateTime date) {
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => AccommodationSelectionSheet(
-        isPublic: widget.isPublic,
-        day: 'Day ${_selectedDayIndex + 1}',
-        date: '${date.day} ${months[date.month - 1]}',
-        location: widget.package.itineraries[_selectedDayIndex].title,
-      ),
-    );
-  }
-
-  Widget _buildHotelCard() {
-    final isCustomizable = !widget.isPublic;
-    
-    return GestureDetector(
-      onTap: isCustomizable ? () => _showAccommodationPicker(widget.startDate.add(Duration(days: _selectedDayIndex))) : null,
-      child: Container(
+  Widget _buildAccommodationSection(DateTime date) {
+    final stays = _getAccommodationItemsForDay();
+    if (stays.isEmpty) {
+      return Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: AppColors.surface,
@@ -316,15 +335,66 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
           border: Border.all(color: AppColors.border),
         ),
         child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                'https://lh3.googleusercontent.com/aida-public/AB6AXuCJ63yU4pc9m4bcYiIRArzFDSP_KI3AUe5IOfp2OPRbK0WFJrIq9oZLq2MJlkHnUlKc7_gSDi0ZDtT8Qgjqlt1KdpJ3kT8ZKTdUTV3n86Ao5glkAvkNvpKz5mFdmcdBbu_E5BkzpbU2VWmHO1JDXoYKy8cRSSqiZWTlVFboXax5qolrS3ZhApq-YbGOkgcuV7T-ig44eFIHE3pqCqrzlNWfJBeHAO-Jn8b7jv-I5sPGUZNVxg9F02GWis-boOAMc5Q2rUbJ3D4NdtZU',
-                width: 60,
-                height: 60,
-                fit: BoxFit.cover,
+          children: const [
+            Icon(Icons.hotel_outlined, color: AppColors.textSecondary, size: 18),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'No accommodation scheduled for this day.',
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
               ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        for (int i = 0; i < stays.length; i++) ...[
+          _buildAccommodationCard(
+            item: stays[i],
+            date: date,
+          ),
+          if (i < stays.length - 1) const SizedBox(height: 12),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildAccommodationCard({
+    required ItineraryItem item,
+    required DateTime date,
+  }) {
+    final isCustomizable = !widget.isPublic && item.optional;
+    final isFixed = !item.optional;
+    final isSelected = _selectedOptionalItems[item.id] ?? item.optional == false;
+
+    return GestureDetector(
+      onTap: isCustomizable
+          ? () {
+              setState(() {
+                _selectedOptionalItems[item.id] = !(_selectedOptionalItems[item.id] ?? false);
+              });
+            }
+          : null,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isSelected ? _accentColor.withOpacity(0.04) : AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: isSelected ? _accentColor.withOpacity(0.3) : AppColors.border),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 54,
+              height: 54,
+              decoration: BoxDecoration(
+                color: isSelected ? _accentColor.withOpacity(0.12) : AppColors.background,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(Icons.hotel_outlined, color: isSelected ? _accentColor : AppColors.textSecondary),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -334,37 +404,55 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Luxus Hunza Resort',
-                        style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 14),
-                      ),
-                      if (isCustomizable)
-                        Icon(Icons.chevron_right, color: AppColors.textSecondary.withOpacity(0.5)),
-                    ],
-                  ),
-                  Text(
-                    'Deluxe Lake View Room',
-                    style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 12),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                        decoration: BoxDecoration(color: const Color(0xFFF59E0B), borderRadius: BorderRadius.circular(4)),
-                        child: Row(
-                          children: const [
-                            Icon(Icons.star, color: Colors.white, size: 8),
-                            SizedBox(width: 2),
-                            Text('4.8', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold)),
-                          ],
+                      Expanded(
+                        child: Text(
+                          item.name.isNotEmpty ? item.name : 'Stay',
+                          style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 14),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      if (isFixed)
+                        Row(
+                          children: const [
+                            Icon(Icons.lock_outline, color: AppColors.textSecondary, size: 12),
+                            SizedBox(width: 4),
+                            Text('INCLUDED', style: TextStyle(color: AppColors.textSecondary, fontSize: 9, fontWeight: FontWeight.bold)),
+                          ],
+                        )
+                      else if (isSelected)
+                        const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 18)
+                      else
+                        Icon(Icons.add_circle_outline, color: AppColors.textSecondary.withOpacity(0.6), size: 18),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    item.description.isNotEmpty ? item.description : 'Accommodation for this night.',
+                    style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 12),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Icon(Icons.calendar_today_outlined, size: 12, color: AppColors.textSecondary.withOpacity(0.7)),
+                      const SizedBox(width: 4),
                       Text(
-                        'Current Selection',
-                        style: TextStyle(color: _accentColor, fontSize: 10, fontWeight: FontWeight.bold),
+                        '${date.day}/${date.month}/${date.year}',
+                        style: TextStyle(color: AppColors.textSecondary.withOpacity(0.7), fontSize: 10),
                       ),
+                      const SizedBox(width: 12),
+                      if (item.price > 0)
+                        Text(
+                          item.optional ? '+Rs${item.price}' : 'Rs${item.price}',
+                          style: TextStyle(color: isFixed ? AppColors.textSecondary : _accentColor, fontSize: 11, fontWeight: FontWeight.bold),
+                        )
+                      else
+                        Text(
+                          'Included',
+                          style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 11),
+                        ),
                     ],
                   ),
                 ],
@@ -376,26 +464,276 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
     );
   }
 
-  Widget _buildTransportCard() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        children: [
-          Icon(widget.isPublic ? Icons.directions_bus_outlined : Icons.airport_shuttle_outlined, color: AppColors.textSecondary, size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              widget.isPublic ? 'Shared AC Coaster' : 'Private Airport Transfer',
-              style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w500, fontSize: 13),
+  Widget _buildTransportSection(DateTime date) {
+    final transports = _getTransportItemsForDay();
+    if (transports.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Row(
+          children: const [
+            Icon(Icons.directions_bus_outlined, color: AppColors.textSecondary, size: 18),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'No transport scheduled for this day.',
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+              ),
             ),
-          ),
-          Icon(Icons.lock_outline, color: AppColors.textSecondary.withOpacity(0.5), size: 14),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        for (int i = 0; i < transports.length; i++) ...[
+          _buildTransportItemCard(item: transports[i], date: date),
+          if (i < transports.length - 1) const SizedBox(height: 12),
         ],
+      ],
+    );
+  }
+
+  Widget _buildTransportItemCard({
+    required ItineraryItem item,
+    required DateTime date,
+  }) {
+    final isCustomizable = !widget.isPublic && item.optional;
+    final isFixed = !item.optional;
+    final isSelected = _selectedOptionalItems[item.id] ?? item.optional == false;
+
+    return GestureDetector(
+      onTap: isCustomizable
+          ? () {
+              setState(() {
+                _selectedOptionalItems[item.id] = !(_selectedOptionalItems[item.id] ?? false);
+              });
+            }
+          : null,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isSelected ? _accentColor.withOpacity(0.04) : AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: isSelected ? _accentColor.withOpacity(0.3) : AppColors.border),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 54,
+              height: 54,
+              decoration: BoxDecoration(
+                color: isSelected ? _accentColor.withOpacity(0.12) : AppColors.background,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(Icons.directions_bus_outlined, color: isSelected ? _accentColor : AppColors.textSecondary),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item.name.isNotEmpty ? item.name : 'Transport',
+                          style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 14),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (isFixed)
+                        Row(
+                          children: const [
+                            Icon(Icons.lock_outline, color: AppColors.textSecondary, size: 12),
+                            SizedBox(width: 4),
+                            Text('INCLUDED', style: TextStyle(color: AppColors.textSecondary, fontSize: 9, fontWeight: FontWeight.bold)),
+                          ],
+                        )
+                      else if (isSelected)
+                        const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 18)
+                      else
+                        Icon(Icons.add_circle_outline, color: AppColors.textSecondary.withOpacity(0.6), size: 18),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    item.description.isNotEmpty ? item.description : 'Transport for this day.',
+                    style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 12),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Icon(Icons.calendar_today_outlined, size: 12, color: AppColors.textSecondary.withOpacity(0.7)),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${date.day}/${date.month}/${date.year}',
+                        style: TextStyle(color: AppColors.textSecondary.withOpacity(0.7), fontSize: 10),
+                      ),
+                      const SizedBox(width: 12),
+                      if (item.price > 0)
+                        Text(
+                          item.optional ? '+Rs${item.price}' : 'Rs${item.price}',
+                          style: TextStyle(color: isFixed ? AppColors.textSecondary : _accentColor, fontSize: 11, fontWeight: FontWeight.bold),
+                        )
+                      else
+                        Text(
+                          'Included',
+                          style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 11),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMealSection(DateTime date) {
+    final meals = _getMealItemsForDay();
+    if (meals.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Row(
+          children: const [
+            Icon(Icons.restaurant_menu_outlined, color: AppColors.textSecondary, size: 18),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'No meals scheduled for this day.',
+                style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        for (int i = 0; i < meals.length; i++) ...[
+          _buildMealItemCard(item: meals[i], date: date),
+          if (i < meals.length - 1) const SizedBox(height: 12),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildMealItemCard({
+    required ItineraryItem item,
+    required DateTime date,
+  }) {
+    final isCustomizable = !widget.isPublic && item.optional;
+    final isFixed = !item.optional;
+    final isSelected = _selectedOptionalItems[item.id] ?? item.optional == false;
+
+    return GestureDetector(
+      onTap: isCustomizable
+          ? () {
+              setState(() {
+                _selectedOptionalItems[item.id] = !(_selectedOptionalItems[item.id] ?? false);
+              });
+            }
+          : null,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isSelected ? _accentColor.withOpacity(0.04) : AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: isSelected ? _accentColor.withOpacity(0.3) : AppColors.border),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 54,
+              height: 54,
+              decoration: BoxDecoration(
+                color: isSelected ? _accentColor.withOpacity(0.12) : AppColors.background,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(Icons.restaurant_menu_outlined, color: isSelected ? _accentColor : AppColors.textSecondary),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item.name.isNotEmpty ? item.name : 'Meal',
+                          style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 14),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (isFixed)
+                        Row(
+                          children: const [
+                            Icon(Icons.lock_outline, color: AppColors.textSecondary, size: 12),
+                            SizedBox(width: 4),
+                            Text('INCLUDED', style: TextStyle(color: AppColors.textSecondary, fontSize: 9, fontWeight: FontWeight.bold)),
+                          ],
+                        )
+                      else if (isSelected)
+                        const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 18)
+                      else
+                        Icon(Icons.add_circle_outline, color: AppColors.textSecondary.withOpacity(0.6), size: 18),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    item.description.isNotEmpty ? item.description : 'Meal for this day.',
+                    style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 12),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Icon(Icons.calendar_today_outlined, size: 12, color: AppColors.textSecondary.withOpacity(0.7)),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${date.day}/${date.month}/${date.year}',
+                        style: TextStyle(color: AppColors.textSecondary.withOpacity(0.7), fontSize: 10),
+                      ),
+                      const SizedBox(width: 12),
+                      if (item.price > 0)
+                        Text(
+                          item.optional ? '+Rs${item.price}' : 'Rs${item.price}',
+                          style: TextStyle(color: isFixed ? AppColors.textSecondary : _accentColor, fontSize: 11, fontWeight: FontWeight.bold),
+                        )
+                      else
+                        Text(
+                          'Included',
+                          style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 11),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -477,7 +815,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 4),
                       child: Text(
-                        item.price > 0 ? '+\$${item.price}' : 'Free',
+                        item.price > 0 ? '+Rs${item.price}' : 'Free',
                         style: const TextStyle(color: AppColors.textSecondary, fontSize: 10),
                       ),
                     ),
