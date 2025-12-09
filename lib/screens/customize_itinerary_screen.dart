@@ -8,14 +8,14 @@ class CustomizeItineraryScreen extends StatefulWidget {
   final CustomizeItineraryModel package;
   final bool isPublic;
   final DateTime startDate;
-  final int groupSize;
+  final int travelers;
 
   const CustomizeItineraryScreen({
     super.key, 
     required this.package, 
     required this.isPublic,
     required this.startDate,
-    required this.groupSize,
+    required this.travelers,
   });
 
   @override
@@ -301,7 +301,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
       }
     }
 
-    return total;
+    return total*widget.travelers;
   }
 
   String _buildPriceDescription() {
@@ -928,6 +928,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                           isPublic: widget.isPublic,
                           startDate: widget.startDate,
                           selectedOptionalItems: _selectedOptionalItems,
+                          travelers: widget.travelers,
                         ),
                       ),
                     );

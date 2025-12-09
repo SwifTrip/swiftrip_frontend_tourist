@@ -44,7 +44,7 @@ class TourPackageResult {
   final String fromLocation;
   final String toLocation;
   final bool isPublic;
-  final int maxGroupSize;
+  final int maxtravelers;
   final num duration;
   final PackageIncludes includes;
   final String? coverImage;
@@ -61,7 +61,7 @@ class TourPackageResult {
     required this.fromLocation,
     required this.toLocation,
     required this.isPublic,
-    required this.maxGroupSize,
+    required this.maxtravelers,
     required this.duration,
     required this.includes,
     this.coverImage,
@@ -80,7 +80,7 @@ class TourPackageResult {
       fromLocation: json['fromLocation'] as String? ?? '',
       toLocation: json['toLocation'] as String? ?? '',
       isPublic: json['isPublic'] as bool? ?? true,
-      maxGroupSize: json['maxGroupSize'] as int? ?? 1,
+      maxtravelers: json['maxtravelers'] as int? ?? 1,
       duration: json['duration'] as num? ?? 0,
       includes: PackageIncludes.fromJson(
         (json['includes'] as Map<String, dynamic>?) ?? {},
@@ -104,7 +104,7 @@ class TourPackageResult {
       'fromLocation': fromLocation,
       'toLocation': toLocation,
       'isPublic': isPublic,
-      'maxGroupSize': maxGroupSize,
+      'maxtravelers': maxtravelers,
       'duration': duration,
       'includes': includes.toJson(),
       'coverImage': coverImage,

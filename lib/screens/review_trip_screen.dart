@@ -8,6 +8,7 @@ class ReviewTripScreen extends StatefulWidget {
   final bool isPublic;
   final DateTime startDate;
   final Map<int, bool> selectedOptionalItems;
+  final int travelers;
 
   const ReviewTripScreen({
     super.key,
@@ -15,6 +16,7 @@ class ReviewTripScreen extends StatefulWidget {
     required this.isPublic,
     required this.startDate,
     required this.selectedOptionalItems,
+    required this.travelers,
   });
 
   @override
@@ -150,6 +152,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
 
     num totalAddOns = accommodationTotal + transportTotal + mealTotal + activityTotal;
     num finalTotal = widget.package.basePrice + totalAddOns;
+    finalTotal*=widget.travelers;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -185,6 +188,8 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                 const SizedBox(height: 12),
                 _buildPriceRow('Activities & Extras', '+${widget.package.currency} $activityTotal'),
               ],
+              const SizedBox(height: 12),
+              _buildPriceRow("Group Size", '${widget.travelers}'),
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 16),
                 child: Divider(color: AppColors.border, height: 1),
@@ -526,7 +531,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                       child: _buildInfoItem(
                         Icons.group_outlined,
                         'TRAVELERS',
-                        '2 Adults',
+                         '${widget.travelers} Persons',
                         const Color(0xFFF97316),
                       ),
                     ),

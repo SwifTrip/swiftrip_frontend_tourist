@@ -8,13 +8,13 @@ import 'select_start_date_screen.dart';
 class PackageDetailsScreen extends StatefulWidget {
   final CustomizeItineraryModel customizeItinerary;
   final bool isPublic;
-  final int groupSize;
+  final int travelers;
 
   const PackageDetailsScreen({
     super.key,
     required this.customizeItinerary,
     this.isPublic = true,
-    required this.groupSize,
+    required this.travelers,
   });
 
   @override
@@ -349,7 +349,7 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
         _buildInfoItem(
           Icons.people, 
           'GROUP SIZE', 
-          (widget.groupSize).toString()
+          (widget.travelers).toString()
         ),
       ],
     );
@@ -461,8 +461,8 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => widget.isPublic 
-                            ? SelectDepartureScreen(package: widget.customizeItinerary,groupSize: widget.groupSize,)
-                            : SelectStartDateScreen(package: widget.customizeItinerary, groupSize: widget.groupSize,),
+                            ? SelectDepartureScreen(package: widget.customizeItinerary,travelers: widget.travelers,)
+                            : SelectStartDateScreen(package: widget.customizeItinerary, travelers: widget.travelers,),
                       ),
                     );
                   },

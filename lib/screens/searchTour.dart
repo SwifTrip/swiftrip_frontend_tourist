@@ -15,7 +15,7 @@ class _SearchTourState extends State<SearchTour> {
   bool isPublicTrip = true;
   String selectedMonth = 'Anytime';
   DateTime? selectedDate;
-  int groupSize = 1;
+  int travelers = 1;
   String selectedStyle = 'Adventure';
   String fromLocation = '';
   String toLocation = '';
@@ -103,7 +103,7 @@ class _SearchTourState extends State<SearchTour> {
       final result = await _packageService.searchPackages(
         fromLocation: fromLocation,
         toLocation: toLocation,
-        travelers: groupSize,
+        travelers: travelers,
         category: selectedStyle.toUpperCase(),
         tourType: isPublicTrip ? 'PUBLIC' : 'PRIVATE',
         // startDate: selectedDate?.toIso8601String(),
@@ -120,7 +120,7 @@ class _SearchTourState extends State<SearchTour> {
             builder: (context) => AgencySelection(
               destination: toLocation,
               dates: isPublicTrip ? selectedMonth : '',
-              guests: groupSize,
+              travelers: travelers,
               isPublic: isPublicTrip,
               packages: result.data,
               pagination: result.pagination,
@@ -609,13 +609,13 @@ class _SearchTourState extends State<SearchTour> {
         children: [
           _buildTravelerRow(
             label: 'Group Size',
-            count: groupSize,
+            count: travelers,
             icon: Icons.person,
             iconBg: Colors.blue.withValues(alpha: 0.1),
             iconColor: Colors.blue,
-            onIncrement: () => setState(() => groupSize++),
+            onIncrement: () => setState(() => travelers++),
             onDecrement: () =>
-                setState(() => groupSize > 1 ? groupSize-- : null),
+                setState(() => travelers > 1 ? travelers-- : null),
           ),
         ],
       ),

@@ -10,7 +10,7 @@ import 'package_details_screen.dart';
 class AgencySelection extends StatelessWidget {
   final String destination;
   final String dates;
-  final int guests;
+  final int travelers;
   final bool isPublic;
   final List<TourPackageResult> packages;
   final PaginationInfo? pagination;
@@ -20,7 +20,7 @@ class AgencySelection extends StatelessWidget {
     required this.isPublic,
     required this.destination,
     required this.dates,
-    this.guests = 0,
+    this.travelers = 0,
     this.packages = const [],
     this.pagination,
   });
@@ -47,7 +47,7 @@ class AgencySelection extends StatelessWidget {
               ),
             ),
             Text(
-              '$dates • $guests Guests',
+              '$dates • $travelers travelers',
               style: const TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 12,
@@ -633,7 +633,7 @@ class AgencySelection extends StatelessWidget {
                                 builder: (context) => PackageDetailsScreen(
                                   isPublic: packageIsPublic,
                                   customizeItinerary: packageDetails!,
-                                  groupSize: guests,
+                                  travelers: travelers,
                                 ),
                               ),
                             );

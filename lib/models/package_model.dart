@@ -25,8 +25,8 @@ class CustomizeItineraryModel {
   final String fromLocation;
   final String toLocation;
   final bool isPublic;
-  final int maxGroupSize;
-  final int minGroupSize;
+  final int maxtravelers;
+  final int mintravelers;
   final PackageInclusions includes;
   final Company company;
   final List<Media> media;
@@ -44,8 +44,8 @@ class CustomizeItineraryModel {
     required this.fromLocation,
     required this.toLocation,
     required this.isPublic,
-    required this.maxGroupSize,
-    required this.minGroupSize,
+    required this.maxtravelers,
+    required this.mintravelers,
     required this.includes,
     required this.company,
     required this.media,
@@ -65,8 +65,8 @@ class CustomizeItineraryModel {
       fromLocation: json['fromLocation'] ?? '',
       toLocation: json['toLocation'] ?? '',
       isPublic: json['isPublic'] ?? false,
-      maxGroupSize: json['maxGroupSize'] ?? 0,
-      minGroupSize: json['minGroupSize'] ?? 0,
+      maxtravelers: json['maxtravelers'] ?? 0,
+      mintravelers: json['mintravelers'] ?? 0,
       includes: PackageInclusions.fromJson(json['includes'] ?? {}),
       company: Company.fromJson(json['company'] ?? {}),
       media: (json['media'] as List?)?.map((m) => Media.fromJson(m)).toList() ?? [],
@@ -90,8 +90,8 @@ class CustomizeItineraryModel {
       'fromLocation': fromLocation,
       'toLocation': toLocation,
       'isPublic': isPublic,
-      'maxGroupSize': maxGroupSize,
-      'minGroupSize': minGroupSize,
+      'maxtravelers': maxtravelers,
+      'mintravelers': mintravelers,
       'includes': includes.toJson(),
       'company': company.toJson(),
       'media': media.map((m) => m.toJson()).toList(),

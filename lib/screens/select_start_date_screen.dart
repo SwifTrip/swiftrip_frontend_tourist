@@ -6,9 +6,9 @@ import 'customize_itinerary_screen.dart';
 
 class SelectStartDateScreen extends StatefulWidget {
   final CustomizeItineraryModel package;
-  final int groupSize;
+  final int travelers;
 
-  const SelectStartDateScreen({super.key, required this.package, required this.groupSize});
+  const SelectStartDateScreen({super.key, required this.package, required this.travelers});
 
   @override
   State<SelectStartDateScreen> createState() => _SelectStartDateScreenState();
@@ -152,7 +152,7 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
                           package: widget.package,
                           isPublic: false,
                           startDate: _selectedDate!,
-                          groupSize: widget.groupSize,
+                          travelers: widget.travelers,
                         ),
                       ),
                     );
