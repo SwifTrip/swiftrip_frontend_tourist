@@ -18,9 +18,9 @@ class AgencySelection extends StatelessWidget {
   const AgencySelection({
     super.key,
     required this.isPublic,
-    this.destination = 'Hunza',
-    this.dates = 'Sep 15 - Sep 19',
-    this.guests = 2,
+    required this.destination,
+    required this.dates,
+    this.guests = 0,
     this.packages = const [],
     this.pagination,
   });
@@ -633,6 +633,7 @@ class AgencySelection extends StatelessWidget {
                                 builder: (context) => PackageDetailsScreen(
                                   isPublic: packageIsPublic,
                                   customizeItinerary: packageDetails!,
+                                  groupSize: guests,
                                 ),
                               ),
                             );

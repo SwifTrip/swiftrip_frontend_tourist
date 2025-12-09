@@ -119,7 +119,7 @@ class _SearchTourState extends State<SearchTour> {
           MaterialPageRoute(
             builder: (context) => AgencySelection(
               destination: toLocation,
-              dates: selectedMonth,
+              dates: isPublicTrip ? selectedMonth : '',
               guests: groupSize,
               isPublic: isPublicTrip,
               packages: result.data,
@@ -398,6 +398,7 @@ class _SearchTourState extends State<SearchTour> {
                   const SizedBox(height: 32),
 
                   // When Section
+                  if (isPublicTrip) ...[
                   const Text(
                     'When?',
                     style: TextStyle(
@@ -406,10 +407,11 @@ class _SearchTourState extends State<SearchTour> {
                       color: AppColors.textPrimary,
                     ),
                   ),
+                  
                   const SizedBox(height: 16),
                   _buildMonthSelector(),
                   const SizedBox(height: 32),
-
+                  ],
                   // Travelers Section
                   const Text(
                     'Travelers',

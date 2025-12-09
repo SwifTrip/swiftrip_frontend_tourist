@@ -6,8 +6,9 @@ import 'customize_itinerary_screen.dart';
 
 class SelectDepartureScreen extends StatefulWidget {
   final CustomizeItineraryModel package;
+  final int groupSize;
 
-  const SelectDepartureScreen({super.key, required this.package});
+  const SelectDepartureScreen({super.key, required this.package, required this.groupSize});
 
   @override
   State<SelectDepartureScreen> createState() => _SelectDepartureScreenState();
@@ -169,6 +170,7 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
                           package: widget.package,
                           isPublic: true,
                           startDate: selectedDeparture['date'],
+                          groupSize: widget.groupSize,
                         ),
                       ),
                     );

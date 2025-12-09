@@ -8,12 +8,14 @@ class CustomizeItineraryScreen extends StatefulWidget {
   final CustomizeItineraryModel package;
   final bool isPublic;
   final DateTime startDate;
+  final int groupSize;
 
   const CustomizeItineraryScreen({
     super.key, 
     required this.package, 
     required this.isPublic,
     required this.startDate,
+    required this.groupSize,
   });
 
   @override

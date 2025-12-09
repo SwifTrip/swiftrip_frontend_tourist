@@ -8,11 +8,13 @@ import 'select_start_date_screen.dart';
 class PackageDetailsScreen extends StatefulWidget {
   final CustomizeItineraryModel customizeItinerary;
   final bool isPublic;
+  final int groupSize;
 
   const PackageDetailsScreen({
     super.key,
     required this.customizeItinerary,
     this.isPublic = true,
+    required this.groupSize,
   });
 
   @override
@@ -339,15 +341,15 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
         _buildInfoItem(Icons.calendar_month, 'DURATION', '${widget.customizeItinerary.duration} days'),
         const SizedBox(width: 12),
         _buildInfoItem(
-          widget.isPublic ? Icons.group_add : Icons.person, 
-          widget.isPublic ? 'GROUP SIZE' : 'GROUP TYPE', 
-          widget.isPublic ? 'Max ${widget.customizeItinerary.maxGroupSize}' : 'Private'
+          Icons.group_add,
+          'TOUR TYPE',
+          widget.isPublic ? 'PUBLIC' : 'Private'
         ),
         const SizedBox(width: 12),
         _buildInfoItem(
-          widget.isPublic ? Icons.directions_bus : Icons.directions_car, 
-          'TRANSPORT', 
-          (widget.customizeItinerary.includes.transport ?? (widget.isPublic ? 'AC Coaster' : 'Luxury SUV'))
+          Icons.people, 
+          'GROUP SIZE', 
+          (widget.groupSize).toString()
         ),
       ],
     );
@@ -459,8 +461,8 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => widget.isPublic 
-                            ? SelectDepartureScreen(package: widget.customizeItinerary)
-                            : SelectStartDateScreen(package: widget.customizeItinerary),
+                            ? SelectDepartureScreen(package: widget.customizeItinerary,groupSize: widget.groupSize,)
+                            : SelectStartDateScreen(package: widget.customizeItinerary, groupSize: widget.groupSize,),
                       ),
                     );
                   },
