@@ -259,6 +259,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
 
   Widget _buildItinerarySummary() {
     return ListView.builder(
+      key: ValueKey(_allExpanded),
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: widget.package.itineraries.length,
