@@ -7,12 +7,14 @@ class ReviewTripScreen extends StatefulWidget {
   final CustomizeItineraryModel package;
   final bool isPublic;
   final DateTime startDate;
+  final Map<int, bool> selectedOptionalItems;
 
   const ReviewTripScreen({
     super.key,
     required this.package,
     required this.isPublic,
     required this.startDate,
+    required this.selectedOptionalItems,
   });
 
   @override
@@ -124,6 +126,31 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
   }
 
   Widget _buildPriceBreakdown() {
+    // Calculate breakdowns
+    num accommodationTotal = 0;
+    num transportTotal = 0;
+    num mealTotal = 0;
+    num activityTotal = 0;
+
+    for (final day in widget.package.itineraries) {
+      for (final item in day.items) {
+        if (item.optional && (widget.selectedOptionalItems[item.id] ?? false)) {
+          if (item.type.toLowerCase() == 'stay') {
+            accommodationTotal += item.price;
+          } else if (item.type.toLowerCase() == 'transport') {
+            transportTotal += item.price;
+          } else if (item.type.toLowerCase() == 'meal') {
+            mealTotal += item.price;
+          } else if (item.type.toLowerCase() == 'activity') {
+            activityTotal += item.price;
+          }
+        }
+      }
+    }
+
+    num totalAddOns = accommodationTotal + transportTotal + mealTotal + activityTotal;
+    num finalTotal = widget.package.basePrice + totalAddOns;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -141,16 +168,28 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
           ),
           child: Column(
             children: [
-              _buildPriceRow('Base Tour Price (2 Adults)', '${widget.package.currency} ${widget.package.basePrice}'),
-              const SizedBox(height: 12),
-              _buildPriceRow('Accommodation Upgrades', '+\$220'),
-              const SizedBox(height: 12),
-              _buildPriceRow('Activities & Extras', '+\$35'),
+              _buildPriceRow('Base Tour Price', '${widget.package.currency} ${widget.package.basePrice}'),
+              if (accommodationTotal > 0) ...[
+                const SizedBox(height: 12),
+                _buildPriceRow('Accommodation Add-ons', '+${widget.package.currency} $accommodationTotal'),
+              ],
+              if (transportTotal > 0) ...[
+                const SizedBox(height: 12),
+                _buildPriceRow('Transport Add-ons', '+${widget.package.currency} $transportTotal'),
+              ],
+              if (mealTotal > 0) ...[
+                const SizedBox(height: 12),
+                _buildPriceRow('Meal Add-ons', '+${widget.package.currency} $mealTotal'),
+              ],
+              if (activityTotal > 0) ...[
+                const SizedBox(height: 12),
+                _buildPriceRow('Activities & Extras', '+${widget.package.currency} $activityTotal'),
+              ],
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 16),
                 child: Divider(color: AppColors.border, height: 1),
               ),
-              _buildPriceRow('Total Amount', '\$3,450', isTotal: true),
+              _buildPriceRow('Total Amount', '${widget.package.currency} $finalTotal', isTotal: true),
               const SizedBox(height: 8),
               const Align(
                 alignment: Alignment.centerRight,
@@ -228,6 +267,38 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
         final date = widget.startDate.add(Duration(days: index));
         final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+        // Filter items: show only fixed items OR optional items that are selected
+        final accommodations = day.items
+            .where((item) =>
+                item.type.toLowerCase() == 'stay' &&
+                (!item.optional || (widget.selectedOptionalItems[item.id] ?? false)))
+            .toList();
+        final transports = day.items
+            .where((item) =>
+                item.type.toLowerCase() == 'transport' &&
+                (!item.optional || (widget.selectedOptionalItems[item.id] ?? false)))
+            .toList();
+        final meals = day.items
+            .where((item) =>
+                item.type.toLowerCase() == 'meal' &&
+                (!item.optional || (widget.selectedOptionalItems[item.id] ?? false)))
+            .toList();
+        final activities = day.items
+            .where((item) =>
+                item.type.toLowerCase() == 'activity' &&
+                (!item.optional || (widget.selectedOptionalItems[item.id] ?? false)))
+            .toList();
+
+        // Only show day if it has at least one item
+        final hasItems = accommodations.isNotEmpty ||
+            transports.isNotEmpty ||
+            meals.isNotEmpty ||
+            activities.isNotEmpty;
+
+        if (!hasItems) {
+          return const SizedBox.shrink();
+        }
+
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
@@ -262,12 +333,51 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(68, 0, 16, 16),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildSummaryItem(Icons.hotel_outlined, 'Luxus Hunza Resort'),
-                      const SizedBox(height: 8),
-                      _buildSummaryItem(Icons.directions_bus_outlined, 'Shared AC Coaster'),
-                      const SizedBox(height: 8),
-                      _buildSummaryItem(Icons.task_alt, '2 Activities planned'),
+                      // Accommodations
+                      if (accommodations.isNotEmpty) ...[
+                        const Text(
+                          'ACCOMMODATION',
+                          style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                        ),
+                        const SizedBox(height: 8),
+                        for (final item in accommodations)
+                          _buildReviewItem(Icons.hotel_outlined, item.name, item.optional),
+                        const SizedBox(height: 12),
+                      ],
+                      // Transport
+                      if (transports.isNotEmpty) ...[
+                        const Text(
+                          'TRANSPORT',
+                          style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                        ),
+                        const SizedBox(height: 8),
+                        for (final item in transports)
+                          _buildReviewItem(Icons.directions_bus_outlined, item.name, item.optional),
+                        const SizedBox(height: 12),
+                      ],
+                      // Meals
+                      if (meals.isNotEmpty) ...[
+                        const Text(
+                          'MEALS',
+                          style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                        ),
+                        const SizedBox(height: 8),
+                        for (final item in meals)
+                          _buildReviewItem(Icons.restaurant_menu_outlined, item.name, item.optional),
+                        const SizedBox(height: 12),
+                      ],
+                      // Activities
+                      if (activities.isNotEmpty) ...[
+                        const Text(
+                          'ACTIVITIES',
+                          style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                        ),
+                        const SizedBox(height: 8),
+                        for (final item in activities)
+                          _buildReviewItem(Icons.local_activity_outlined, item.name, item.optional),
+                      ],
                     ],
                   ),
                 ),
@@ -279,18 +389,39 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
     );
   }
 
-  Widget _buildSummaryItem(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, color: AppColors.textSecondary, size: 16),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            text,
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+  Widget _buildReviewItem(IconData icon, String text, bool isOptional) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Icon(icon, color: AppColors.textSecondary, size: 16),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    text,
+                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                  ),
+                ),
+                if (isOptional)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF10B981).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text(
+                      'ADDED',
+                      style: TextStyle(color: Color(0xFF10B981), fontSize: 9, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

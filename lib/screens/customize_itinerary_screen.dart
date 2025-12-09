@@ -925,6 +925,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                           package: widget.package,
                           isPublic: widget.isPublic,
                           startDate: widget.startDate,
+                          selectedOptionalItems: _selectedOptionalItems,
                         ),
                       ),
                     );
