@@ -16,6 +16,7 @@ class ApiConfig {
 
 // Custom Tour Endpoints
   static const String createCustomTour = '$baseUrl/custom-tour/create';
+  static const String touristCustomTours = '$baseUrl/tourist/custom-tours';
 
   // Tourist Package Search Endpoints (Public)
   static const String searchPackages = '$baseUrl/tourist/packages/search';

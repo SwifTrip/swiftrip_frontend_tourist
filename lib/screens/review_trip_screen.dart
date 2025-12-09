@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:swift_trip_app/models/package_model.dart';
+import '../models/custom_tour_model.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
+import '../services/custom_tour_service.dart';
 
 class ReviewTripScreen extends StatefulWidget {
   final CustomizeItineraryModel package;
@@ -26,6 +29,8 @@ class ReviewTripScreen extends StatefulWidget {
 class _ReviewTripScreenState extends State<ReviewTripScreen> {
   late final Color _accentColor;
   bool _allExpanded = true;
+  bool _isSubmitting = false;
+  final CustomTourService _customTourService = CustomTourService();
 
   @override
   void initState() {
@@ -113,13 +118,9 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
           ],
         ),
         child: CommonButton(
-          text: 'Proceed to Payment',
-          onPressed: () {
-            // Future navigation to payment screen
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Payment flow coming in next phase!")),
-            );
-          },
+          text: _isSubmitting ? 'Saving...' : 'Click to save',
+          onPressed: _isSubmitting ? null : _saveCustomTour,
+          isEnabled: !_isSubmitting,
           backgroundColor: _accentColor,
           textColor: Colors.white,
         ),
@@ -628,6 +629,150 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
           ],
         ),
       ],
+    );
+  }
+
+  Future<void> _saveCustomTour() async {
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    try {
+      // Calculate end date based on package duration
+      final durationDays = ((widget.package.duration is int)
+              ? (widget.package.duration as int)
+              : widget.package.duration.toInt()) -
+          1;
+      final endDate = widget.startDate.add(Duration(days: durationDays));
+
+      // Build itineraries list
+      final itineraries = widget.package.itineraries.map((day) {
+        // Include ALL items (both optional and required) with their inclusion status
+        final selectedItems = day.items.map((item) {
+          // If item is optional, check if user selected it
+          // If item is required (not optional), it's always included
+          final included = !item.optional || (widget.selectedOptionalItems[item.id] ?? false);
+          
+          return {
+            'itemId': item.id,
+            'included': included,
+          };
+        }).toList();
+
+        return {
+          'dayNumber': day.id,
+          'selectedItems': selectedItems,
+        };
+      }).toList();
+
+      // Build the request body to show in snackbar
+      final requestBody = {
+        'basePackageId': widget.package.id,
+        'startDate': widget.startDate.toIso8601String(),
+        'endDate': endDate.toIso8601String(),
+        'travelerCount': widget.travelers,
+        'itineraries': itineraries,
+      };
+
+      // Show the JSON body in snackbar
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: SingleChildScrollView(
+            child: Text(
+              'Request Body:\n${jsonEncode(requestBody)}',
+              style: const TextStyle(fontSize: 10),
+            ),
+          ),
+          backgroundColor: Colors.blueGrey[800],
+          duration: const Duration(seconds: 10),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+
+      // Wait a moment so user can see the snackbar
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // Call the API
+      final result = await _customTourService.createCustomTour(
+        basePackageId: widget.package.id,
+        startDate: widget.startDate,
+        endDate: endDate,
+        travelerCount: widget.travelers,
+        itineraries: itineraries,
+      );
+
+      if (!mounted) return;
+
+      if (result != null && result['success'] == true) {
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['message'] ?? 'Custom tour saved successfully!'),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+
+        // Navigate to next screen or back
+        // You can navigate to payment screen or booking confirmation here
+        // Navigator.push(context, MaterialPageRoute(builder: (context) => PaymentScreen(...)));
+      } else {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result?['message'] ?? 'Failed to save custom tour'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
+  }
+
+  ItinerarySelectionRequest _buildSelectionRequest() {
+    final durationDays = ((widget.package.duration is int)
+            ? (widget.package.duration as int)
+            : widget.package.duration.toInt()) -
+        1;
+    final endDate = widget.startDate.add(Duration(days: durationDays));
+
+    final itinerarySelections = widget.package.itineraries.map((day) {
+      // Only include optional items in selectedItems
+      final items = day.items
+          .where((item) => item.optional)
+          .map((item) {
+            final included = widget.selectedOptionalItems[item.id] ?? false;
+            return SelectedItemSelection(itemId: item.id, included: included);
+          })
+          .toList();
+
+      // Use itinerary id (day.id) as dayNumber
+      return ItineraryDaySelection(dayNumber: day.id, selectedItems: items);
+    }).toList();
+
+    return ItinerarySelectionRequest(
+      basePackageId: widget.package.id,
+      startDate: widget.startDate,
+      endDate: endDate,
+      travelerCount: widget.travelers,
+      itineraries: itinerarySelections,
     );
   }
 }
