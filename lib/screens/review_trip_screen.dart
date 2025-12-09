@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:swift_trip_app/models/package_model.dart';
-import '../models/custom_tour_model.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
 import '../services/custom_tour_service.dart';
@@ -35,7 +34,9 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
   @override
   void initState() {
     super.initState();
-    _accentColor = widget.isPublic ? const Color(0xFF137FEC) : const Color(0xFF8B5CF6);
+    _accentColor = widget.isPublic
+        ? const Color(0xFF137FEC)
+        : const Color(0xFF8B5CF6);
   }
 
   @override
@@ -53,11 +54,19 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
           children: const [
             Text(
               'Review Trip',
-              style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
             ),
             Text(
               'Step 3 of 4',
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
@@ -83,13 +92,26 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                     TextSpan(
                       children: [
                         TextSpan(text: 'By proceeding, you agree to our '),
-                        TextSpan(text: 'Terms of Service', style: TextStyle(decoration: TextDecoration.underline)),
+                        TextSpan(
+                          text: 'Terms of Service',
+                          style: TextStyle(
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
                         TextSpan(text: ' and '),
-                        TextSpan(text: 'Cancellation Policy', style: TextStyle(decoration: TextDecoration.underline)),
+                        TextSpan(
+                          text: 'Cancellation Policy',
+                          style: TextStyle(
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
                         TextSpan(text: '.'),
                       ],
                     ),
-                    style: TextStyle(color: AppColors.textSecondary, fontSize: 10),
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 10,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -114,7 +136,11 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
           color: AppColors.surface,
           border: const Border(top: BorderSide(color: AppColors.border)),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 20, offset: const Offset(0, -10))
+            BoxShadow(
+              color: Colors.black.withOpacity(0.4),
+              blurRadius: 20,
+              offset: const Offset(0, -10),
+            ),
           ],
         ),
         child: CommonButton(
@@ -151,16 +177,21 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
       }
     }
 
-    num totalAddOns = accommodationTotal + transportTotal + mealTotal + activityTotal;
+    num totalAddOns =
+        accommodationTotal + transportTotal + mealTotal + activityTotal;
     num finalTotal = widget.package.basePrice + totalAddOns;
-    finalTotal*=widget.travelers;
+    finalTotal *= widget.travelers;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           'Price Breakdown',
-          style: TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 16),
         Container(
@@ -172,22 +203,37 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
           ),
           child: Column(
             children: [
-              _buildPriceRow('Base Tour Price', '${widget.package.currency} ${widget.package.basePrice}'),
+              _buildPriceRow(
+                'Base Tour Price',
+                '${widget.package.currency} ${widget.package.basePrice}',
+              ),
               if (accommodationTotal > 0) ...[
                 const SizedBox(height: 12),
-                _buildPriceRow('Accommodation Add-ons', '+${widget.package.currency} $accommodationTotal'),
+                _buildPriceRow(
+                  'Accommodation Add-ons',
+                  '+${widget.package.currency} $accommodationTotal',
+                ),
               ],
               if (transportTotal > 0) ...[
                 const SizedBox(height: 12),
-                _buildPriceRow('Transport Add-ons', '+${widget.package.currency} $transportTotal'),
+                _buildPriceRow(
+                  'Transport Add-ons',
+                  '+${widget.package.currency} $transportTotal',
+                ),
               ],
               if (mealTotal > 0) ...[
                 const SizedBox(height: 12),
-                _buildPriceRow('Meal Add-ons', '+${widget.package.currency} $mealTotal'),
+                _buildPriceRow(
+                  'Meal Add-ons',
+                  '+${widget.package.currency} $mealTotal',
+                ),
               ],
               if (activityTotal > 0) ...[
                 const SizedBox(height: 12),
-                _buildPriceRow('Activities & Extras', '+${widget.package.currency} $activityTotal'),
+                _buildPriceRow(
+                  'Activities & Extras',
+                  '+${widget.package.currency} $activityTotal',
+                ),
               ],
               const SizedBox(height: 12),
               _buildPriceRow("Group Size", '${widget.travelers}'),
@@ -195,13 +241,21 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                 padding: EdgeInsets.symmetric(vertical: 16),
                 child: Divider(color: AppColors.border, height: 1),
               ),
-              _buildPriceRow('Total Amount', '${widget.package.currency} $finalTotal', isTotal: true),
+              _buildPriceRow(
+                'Total Amount',
+                '${widget.package.currency} $finalTotal',
+                isTotal: true,
+              ),
               const SizedBox(height: 8),
               const Align(
                 alignment: Alignment.centerRight,
                 child: Text(
                   'Including all taxes and fees',
-                  style: TextStyle(color: Color(0xFF10B981), fontSize: 10, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    color: Color(0xFF10B981),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ],
@@ -244,11 +298,18 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
           children: [
             const Text(
               'Trip Itinerary',
-              style: TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             Text(
               '${widget.package.itineraries.length} Days Summary',
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 12,
+              ),
             ),
           ],
         ),
@@ -256,7 +317,11 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
           onPressed: () => setState(() => _allExpanded = !_allExpanded),
           child: Text(
             _allExpanded ? 'Collapse All' : 'Expand All',
-            style: TextStyle(color: _accentColor, fontSize: 12, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: _accentColor,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ],
@@ -272,32 +337,58 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
       itemBuilder: (context, index) {
         final day = widget.package.itineraries[index];
         final date = widget.startDate.add(Duration(days: index));
-        final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        final months = [
+          'Jan',
+          'Feb',
+          'Mar',
+          'Apr',
+          'May',
+          'Jun',
+          'Jul',
+          'Aug',
+          'Sep',
+          'Oct',
+          'Nov',
+          'Dec',
+        ];
 
         // Filter items: show only fixed items OR optional items that are selected
         final accommodations = day.items
-            .where((item) =>
-                item.type.toLowerCase() == 'stay' &&
-                (!item.optional || (widget.selectedOptionalItems[item.id] ?? false)))
+            .where(
+              (item) =>
+                  item.type.toLowerCase() == 'stay' &&
+                  (!item.optional ||
+                      (widget.selectedOptionalItems[item.id] ?? false)),
+            )
             .toList();
         final transports = day.items
-            .where((item) =>
-                item.type.toLowerCase() == 'transport' &&
-                (!item.optional || (widget.selectedOptionalItems[item.id] ?? false)))
+            .where(
+              (item) =>
+                  item.type.toLowerCase() == 'transport' &&
+                  (!item.optional ||
+                      (widget.selectedOptionalItems[item.id] ?? false)),
+            )
             .toList();
         final meals = day.items
-            .where((item) =>
-                item.type.toLowerCase() == 'meal' &&
-                (!item.optional || (widget.selectedOptionalItems[item.id] ?? false)))
+            .where(
+              (item) =>
+                  item.type.toLowerCase() == 'meal' &&
+                  (!item.optional ||
+                      (widget.selectedOptionalItems[item.id] ?? false)),
+            )
             .toList();
         final activities = day.items
-            .where((item) =>
-                item.type.toLowerCase() == 'activity' &&
-                (!item.optional || (widget.selectedOptionalItems[item.id] ?? false)))
+            .where(
+              (item) =>
+                  item.type.toLowerCase() == 'activity' &&
+                  (!item.optional ||
+                      (widget.selectedOptionalItems[item.id] ?? false)),
+            )
             .toList();
 
         // Only show day if it has at least one item
-        final hasItems = accommodations.isNotEmpty ||
+        final hasItems =
+            accommodations.isNotEmpty ||
             transports.isNotEmpty ||
             meals.isNotEmpty ||
             activities.isNotEmpty;
@@ -328,13 +419,22 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                   child: Text(
                     '${date.day}\n${months[date.month - 1]}',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: _accentColor, fontSize: 10, fontWeight: FontWeight.bold, height: 1.1),
+                    style: TextStyle(
+                      color: _accentColor,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      height: 1.1,
+                    ),
                   ),
                 ),
               ),
               title: Text(
                 'Day ${index + 1}: ${day.title}',
-                style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               children: [
                 Padding(
@@ -346,22 +446,40 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                       if (accommodations.isNotEmpty) ...[
                         const Text(
                           'ACCOMMODATION',
-                          style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         for (final item in accommodations)
-                          _buildReviewItem(Icons.hotel_outlined, item.name, item.optional),
+                          _buildReviewItem(
+                            Icons.hotel_outlined,
+                            item.name,
+                            item.optional,
+                          ),
                         const SizedBox(height: 12),
                       ],
                       // Transport
                       if (transports.isNotEmpty) ...[
                         const Text(
                           'TRANSPORT',
-                          style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         for (final item in transports)
-                          _buildReviewItem(Icons.directions_bus_outlined, item.name, item.optional),
+                          _buildReviewItem(
+                            Icons.directions_bus_outlined,
+                            item.name,
+                            item.optional,
+                          ),
                         const SizedBox(height: 12),
                       ],
                       // Meals - grouped by meal type
@@ -373,11 +491,20 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                       if (activities.isNotEmpty) ...[
                         const Text(
                           'ACTIVITIES',
-                          style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         for (final item in activities)
-                          _buildReviewItem(Icons.local_activity_outlined, item.name, item.optional),
+                          _buildReviewItem(
+                            Icons.local_activity_outlined,
+                            item.name,
+                            item.optional,
+                          ),
                       ],
                     ],
                   ),
@@ -415,37 +542,76 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
     final widgets = <Widget>[];
 
     if (breakfastMeals.isNotEmpty) {
-      widgets.add(const Text(
-        'BREAKFAST',
-        style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
-      ));
+      widgets.add(
+        const Text(
+          'BREAKFAST',
+          style: TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+          ),
+        ),
+      );
       widgets.add(const SizedBox(height: 8));
       for (final item in breakfastMeals) {
-        widgets.add(_buildReviewItem(Icons.restaurant_menu_outlined, item.name, item.optional));
+        widgets.add(
+          _buildReviewItem(
+            Icons.restaurant_menu_outlined,
+            item.name,
+            item.optional,
+          ),
+        );
       }
       widgets.add(const SizedBox(height: 12));
     }
 
     if (lunchMeals.isNotEmpty) {
-      widgets.add(const Text(
-        'LUNCH',
-        style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
-      ));
+      widgets.add(
+        const Text(
+          'LUNCH',
+          style: TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+          ),
+        ),
+      );
       widgets.add(const SizedBox(height: 8));
       for (final item in lunchMeals) {
-        widgets.add(_buildReviewItem(Icons.restaurant_menu_outlined, item.name, item.optional));
+        widgets.add(
+          _buildReviewItem(
+            Icons.restaurant_menu_outlined,
+            item.name,
+            item.optional,
+          ),
+        );
       }
       widgets.add(const SizedBox(height: 12));
     }
 
     if (dinnerMeals.isNotEmpty) {
-      widgets.add(const Text(
-        'DINNER',
-        style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
-      ));
+      widgets.add(
+        const Text(
+          'DINNER',
+          style: TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+          ),
+        ),
+      );
       widgets.add(const SizedBox(height: 8));
       for (final item in dinnerMeals) {
-        widgets.add(_buildReviewItem(Icons.restaurant_menu_outlined, item.name, item.optional));
+        widgets.add(
+          _buildReviewItem(
+            Icons.restaurant_menu_outlined,
+            item.name,
+            item.optional,
+          ),
+        );
       }
     }
 
@@ -465,19 +631,29 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                 Expanded(
                   child: Text(
                     text,
-                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
                 if (isOptional)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFF10B981).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: const Text(
                       'ADDED',
-                      style: TextStyle(color: Color(0xFF10B981), fontSize: 9, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Color(0xFF10B981),
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
               ],
@@ -489,8 +665,29 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
   }
 
   Widget _buildTripSummaryCard() {
-    final endDate = widget.startDate.add(Duration(days: ((widget.package.duration is int) ? (widget.package.duration as int) : widget.package.duration.toInt()) - 1));
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final endDate = widget.startDate.add(
+      Duration(
+        days:
+            ((widget.package.duration is int)
+                ? (widget.package.duration as int)
+                : widget.package.duration.toInt()) -
+            1,
+      ),
+    );
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
 
     return Container(
       decoration: BoxDecoration(
@@ -498,7 +695,11 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.border),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Stack(
@@ -527,7 +728,10 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: _accentColor.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(4),
@@ -562,8 +766,12 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: AppColors.border),
-                          image: DecorationImage(
-                          image: NetworkImage(widget.package.media.isNotEmpty ? widget.package.media.first.url : 'https://via.placeholder.com/100x100.png?text=Trip'),
+                        image: DecorationImage(
+                          image: NetworkImage(
+                            widget.package.media.isNotEmpty
+                                ? widget.package.media.first.url
+                                : 'https://via.placeholder.com/100x100.png?text=Trip',
+                          ),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -588,7 +796,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                       child: _buildInfoItem(
                         Icons.group_outlined,
                         'TRAVELERS',
-                         '${widget.travelers} Persons',
+                        '${widget.travelers} Persons',
                         const Color(0xFFF97316),
                       ),
                     ),
@@ -602,7 +810,12 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
     );
   }
 
-  Widget _buildInfoItem(IconData icon, String label, String value, Color iconColor) {
+  Widget _buildInfoItem(
+    IconData icon,
+    String label,
+    String value,
+    Color iconColor,
+  ) {
     return Row(
       children: [
         Container(
@@ -620,11 +833,19 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
           children: [
             Text(
               label,
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 9, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 9,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             Text(
               value,
-              style: const TextStyle(color: AppColors.textPrimary, fontSize: 12, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
@@ -639,7 +860,8 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
 
     try {
       // Calculate end date based on package duration
-      final durationDays = ((widget.package.duration is int)
+      final durationDays =
+          ((widget.package.duration is int)
               ? (widget.package.duration as int)
               : widget.package.duration.toInt()) -
           1;
@@ -651,18 +873,14 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
         final selectedItems = day.items.map((item) {
           // If item is optional, check if user selected it
           // If item is required (not optional), it's always included
-          final included = !item.optional || (widget.selectedOptionalItems[item.id] ?? false);
-          
-          return {
-            'itemId': item.id,
-            'included': included,
-          };
+          final included =
+              !item.optional ||
+              (widget.selectedOptionalItems[item.id] ?? false);
+
+          return {'itemId': item.id, 'included': included};
         }).toList();
 
-        return {
-          'dayNumber': day.id,
-          'selectedItems': selectedItems,
-        };
+        return {'dayNumber': day.dayNumber, 'selectedItems': selectedItems};
       }).toList();
 
       // Build the request body to show in snackbar
@@ -708,7 +926,9 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(result['message'] ?? 'Custom tour saved successfully!'),
+            content: Text(
+              result['message'] ?? 'Custom tour saved successfully!',
+            ),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 3),
           ),
@@ -729,7 +949,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
       }
     } catch (e) {
       if (!mounted) return;
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: ${e.toString()}'),
@@ -744,35 +964,5 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
         });
       }
     }
-  }
-
-  ItinerarySelectionRequest _buildSelectionRequest() {
-    final durationDays = ((widget.package.duration is int)
-            ? (widget.package.duration as int)
-            : widget.package.duration.toInt()) -
-        1;
-    final endDate = widget.startDate.add(Duration(days: durationDays));
-
-    final itinerarySelections = widget.package.itineraries.map((day) {
-      // Only include optional items in selectedItems
-      final items = day.items
-          .where((item) => item.optional)
-          .map((item) {
-            final included = widget.selectedOptionalItems[item.id] ?? false;
-            return SelectedItemSelection(itemId: item.id, included: included);
-          })
-          .toList();
-
-      // Use itinerary id (day.id) as dayNumber
-      return ItineraryDaySelection(dayNumber: day.id, selectedItems: items);
-    }).toList();
-
-    return ItinerarySelectionRequest(
-      basePackageId: widget.package.id,
-      startDate: widget.startDate,
-      endDate: endDate,
-      travelerCount: widget.travelers,
-      itineraries: itinerarySelections,
-    );
   }
 }
