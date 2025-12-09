@@ -52,7 +52,7 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
           ),
         ),
         title: Text(
-          'Package Details ${widget.customizeItinerary.id}',
+          'Package Details',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
         ),
         centerTitle: true,
