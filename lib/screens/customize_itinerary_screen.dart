@@ -27,6 +27,9 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
   // Accents based on tour type
   late final Color _accentColor;
   
+  // Track selected optional items: key is itemId, value is whether selected
+  Map<int, bool> _selectedOptionalItems = {};
+  
   @override
   void initState() {
     super.initState();
@@ -96,22 +99,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                       const SizedBox(height: 12),
                       _buildTransportCard(),
                       const SizedBox(height: 24),
-                      _buildSectionHeader('ACTIVITIES & EXTRAS'),
-                      const SizedBox(height: 12),
-                      _buildActivityCard(
-                        title: 'Baltit Fort Guided Tour',
-                        subtitle: 'Historic Landmark visit',
-                        icon: Icons.fort_outlined,
-                        isInPlan: true,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildActivityCard(
-                        title: 'Traditional Hunza Dinner',
-                        subtitle: 'Live music & local cuisine',
-                        icon: Icons.restaurant_outlined,
-                        isPopular: true,
-                        price: '+\$35',
-                      ),
+                      if (_getActivityItemsForDay().isNotEmpty) ..._buildActivitySection(),
                       const SizedBox(height: 24),
                       _buildDayNote(),
                       const SizedBox(height: 140), // Spacing for footer
@@ -238,6 +226,68 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
     );
   }
 
+  List<ItineraryItem> _getActivityItemsForDay() {
+    if (_selectedDayIndex >= widget.package.itineraries.length) {
+      return [];
+    }
+    return widget.package.itineraries[_selectedDayIndex].items;
+  }
+
+  List<Widget> _buildActivitySection() {
+    final items = _getActivityItemsForDay();
+    final widgets = <Widget>[
+      _buildSectionHeader('ACTIVITIES & EXTRAS'),
+      const SizedBox(height: 12),
+    ];
+
+    for (int i = 0; i < items.length; i++) {
+      final item = items[i];
+      widgets.add(
+        _buildActivityCard(
+          item: item,
+          isFixed: !item.optional,
+          isSelected: _selectedOptionalItems[item.id] ?? false,
+        ),
+      );
+      if (i < items.length - 1) {
+        widgets.add(const SizedBox(height: 12));
+      }
+    }
+
+    return widgets;
+  }
+
+  num _calculateTotalPrice() {
+    num total = widget.package.basePrice;
+    final items = _getActivityItemsForDay();
+    
+    for (final item in items) {
+      // Only add price if it's an optional item and it's selected
+      if (item.optional && (_selectedOptionalItems[item.id] ?? false)) {
+        total += item.price;
+      }
+    }
+    
+    return total;
+  }
+
+  String _buildPriceDescription() {
+    final items = _getActivityItemsForDay();
+    num addOnTotal = 0;
+    
+    for (final item in items) {
+      if (item.optional && (_selectedOptionalItems[item.id] ?? false)) {
+        addOnTotal += item.price;
+      }
+    }
+    
+    if (addOnTotal > 0) {
+      return 'Base + \$${addOnTotal} add-ons';
+    } else {
+      return 'Base price';
+    }
+  }
+
   void _showAccommodationPicker(DateTime date) {
     final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     showModalBottomSheet(
@@ -351,71 +401,107 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
   }
 
   Widget _buildActivityCard({
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    bool isInPlan = false,
-    bool isPopular = false,
-    String? price,
+    required ItineraryItem item,
+    required bool isFixed,
+    required bool isSelected,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isInPlan ? _accentColor.withOpacity(0.05) : AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: isInPlan ? _accentColor.withOpacity(0.3) : AppColors.border),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: isInPlan ? _accentColor.withOpacity(0.1) : AppColors.background,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: isInPlan ? _accentColor : AppColors.textSecondary, size: 20),
+    final isIncluded = isFixed && item.optional == false;
+    
+    return GestureDetector(
+      onTap: isFixed ? null : () {
+        setState(() {
+          _selectedOptionalItems[item.id] = !(_selectedOptionalItems[item.id] ?? false);
+        });
+      },
+      child: Opacity(
+        opacity: isFixed ? 0.7 : 1.0,
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: isSelected ? _accentColor.withOpacity(0.05) : AppColors.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: isSelected ? _accentColor.withOpacity(0.3) : AppColors.border),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 13),
-                    ),
-                    if (isPopular)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                        decoration: BoxDecoration(color: const Color(0xFF10B981).withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
-                        child: const Text('POPULAR', style: TextStyle(color: Color(0xFF10B981), fontSize: 7, fontWeight: FontWeight.bold)),
+          child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: isSelected ? _accentColor.withOpacity(0.1) : AppColors.background,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.local_activity_outlined,
+                color: isSelected ? _accentColor : AppColors.textSecondary,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item.name,
+                          style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 13),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                  ],
-                ),
-                Text(
-                  subtitle,
-                  style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 11),
-                ),
-              ],
+                      if (isIncluded)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF10B981).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text(
+                            'INCLUDED',
+                            style: TextStyle(color: Color(0xFF10B981), fontSize: 7, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                    ],
+                  ),
+                  Text(
+                    item.description,
+                    style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 11),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (!isFixed)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        item.price > 0 ? '+\$${item.price}' : 'Free',
+                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 10),
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(width: 12),
-          if (isInPlan)
-            const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 20)
-          else
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                if (price != null)
-                  Text(price, style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 12)),
-                const Text('ADD', style: TextStyle(color: Color(0xFF10B981), fontSize: 10, fontWeight: FontWeight.bold, decoration: TextDecoration.underline)),
-              ],
-            ),
-        ],
+            const SizedBox(width: 12),
+            if (isFixed)
+              Icon(
+                Icons.lock_outline,
+                color: AppColors.textSecondary.withOpacity(0.5),
+                size: 18,
+              )
+            else if (isSelected)
+              const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 20)
+            else
+              Icon(
+                Icons.add_circle_outline,
+                color: AppColors.textSecondary.withOpacity(0.5),
+                size: 20,
+              ),
+          ],
+        ),
+      ),
       ),
     );
   }
@@ -478,11 +564,11 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                   style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
                 ),
                 Text(
-                  widget.isPublic ? '${widget.package.currency} ${widget.package.basePrice}' : '\$3,450',
+                  '${widget.package.currency} ${_calculateTotalPrice()}',
                   style: const TextStyle(color: AppColors.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  widget.isPublic ? 'Fixed Price' : 'Includes + \$220 upgrades',
+                  widget.isPublic ? 'Fixed Price' : _buildPriceDescription(),
                   style: TextStyle(color: widget.isPublic ? AppColors.textSecondary : const Color(0xFF10B981), fontSize: 9, fontWeight: FontWeight.bold),
                 ),
               ],
