@@ -92,18 +92,24 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                       const SizedBox(height: 24),
                       _buildDayHeader(dates[_selectedDayIndex]),
                       const SizedBox(height: 24),
-                      _buildSectionHeader('ACCOMMODATION', isCustomizable: !widget.isPublic),
-                      const SizedBox(height: 12),
-                      _buildAccommodationSection(dates[_selectedDayIndex]),
-                      const SizedBox(height: 24),
-                      _buildSectionHeader('TRANSPORT', isCustomizable: !widget.isPublic),
-                      const SizedBox(height: 12),
-                      _buildTransportSection(dates[_selectedDayIndex]),
-                      const SizedBox(height: 24),
-                      _buildSectionHeader('MEALS', isCustomizable: !widget.isPublic),
-                      const SizedBox(height: 12),
-                      _buildMealSection(dates[_selectedDayIndex]),
-                      const SizedBox(height: 24),
+                      if (_getAccommodationItemsForDay().isNotEmpty) ...[
+                        _buildSectionHeader('ACCOMMODATION', isCustomizable: !widget.isPublic),
+                        const SizedBox(height: 12),
+                        _buildAccommodationSection(dates[_selectedDayIndex]),
+                        const SizedBox(height: 24),
+                      ],
+                      if (_getTransportItemsForDay().isNotEmpty) ...[
+                        _buildSectionHeader('TRANSPORT', isCustomizable: !widget.isPublic),
+                        const SizedBox(height: 12),
+                        _buildTransportSection(dates[_selectedDayIndex]),
+                        const SizedBox(height: 24),
+                      ],
+                      if (_getMealItemsForDay().isNotEmpty) ...[
+                        _buildSectionHeader('MEALS', isCustomizable: !widget.isPublic),
+                        const SizedBox(height: 12),
+                        _buildMealSection(dates[_selectedDayIndex]),
+                        const SizedBox(height: 24),
+                      ],
                       if (_getActivityItemsForDay().isNotEmpty) ..._buildActivitySection(),
                       const SizedBox(height: 24),
                       _buildDayNote(),
@@ -628,11 +634,64 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
       );
     }
 
+    // Group meals by meal type from mealDetails
+    final breakfastMeals = <ItineraryItem>[];
+    final lunchMeals = <ItineraryItem>[];
+    final dinnerMeals = <ItineraryItem>[];
+
+    for (final meal in meals) {
+      for (final detail in meal.mealDetails) {
+        final mealType = detail.mealType.toLowerCase();
+        if (mealType == 'breakfast') {
+          breakfastMeals.add(meal);
+          break;
+        } else if (mealType == 'lunch') {
+          lunchMeals.add(meal);
+          break;
+        } else if (mealType == 'dinner') {
+          dinnerMeals.add(meal);
+          break;
+        }
+      }
+    }
+
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (int i = 0; i < meals.length; i++) ...[
-          _buildMealItemCard(item: meals[i], date: date),
-          if (i < meals.length - 1) const SizedBox(height: 12),
+        if (breakfastMeals.isNotEmpty) ...[
+          const Text(
+            'BREAKFAST',
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+          ),
+          const SizedBox(height: 8),
+          for (int i = 0; i < breakfastMeals.length; i++) ...[
+            _buildMealItemCard(item: breakfastMeals[i], date: date),
+            if (i < breakfastMeals.length - 1) const SizedBox(height: 8),
+          ],
+          const SizedBox(height: 16),
+        ],
+        if (lunchMeals.isNotEmpty) ...[
+          const Text(
+            'LUNCH',
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+          ),
+          const SizedBox(height: 8),
+          for (int i = 0; i < lunchMeals.length; i++) ...[
+            _buildMealItemCard(item: lunchMeals[i], date: date),
+            if (i < lunchMeals.length - 1) const SizedBox(height: 8),
+          ],
+          const SizedBox(height: 16),
+        ],
+        if (dinnerMeals.isNotEmpty) ...[
+          const Text(
+            'DINNER',
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+          ),
+          const SizedBox(height: 8),
+          for (int i = 0; i < dinnerMeals.length; i++) ...[
+            _buildMealItemCard(item: dinnerMeals[i], date: date),
+            if (i < dinnerMeals.length - 1) const SizedBox(height: 8),
+          ],
         ],
       ],
     );

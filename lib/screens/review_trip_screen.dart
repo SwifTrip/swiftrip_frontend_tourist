@@ -363,15 +363,9 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                           _buildReviewItem(Icons.directions_bus_outlined, item.name, item.optional),
                         const SizedBox(height: 12),
                       ],
-                      // Meals
+                      // Meals - grouped by meal type
                       if (meals.isNotEmpty) ...[
-                        const Text(
-                          'MEALS',
-                          style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
-                        ),
-                        const SizedBox(height: 8),
-                        for (final item in meals)
-                          _buildReviewItem(Icons.restaurant_menu_outlined, item.name, item.optional),
+                        ..._buildMealsGroupedSection(meals),
                         const SizedBox(height: 12),
                       ],
                       // Activities
@@ -393,6 +387,68 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
         );
       },
     );
+  }
+
+  List<Widget> _buildMealsGroupedSection(List<ItineraryItem> meals) {
+    // Group meals by meal type from mealDetails
+    final breakfastMeals = <ItineraryItem>[];
+    final lunchMeals = <ItineraryItem>[];
+    final dinnerMeals = <ItineraryItem>[];
+
+    for (final meal in meals) {
+      for (final detail in meal.mealDetails) {
+        final mealType = detail.mealType.toLowerCase();
+        if (mealType == 'breakfast') {
+          breakfastMeals.add(meal);
+          break;
+        } else if (mealType == 'lunch') {
+          lunchMeals.add(meal);
+          break;
+        } else if (mealType == 'dinner') {
+          dinnerMeals.add(meal);
+          break;
+        }
+      }
+    }
+
+    final widgets = <Widget>[];
+
+    if (breakfastMeals.isNotEmpty) {
+      widgets.add(const Text(
+        'BREAKFAST',
+        style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+      ));
+      widgets.add(const SizedBox(height: 8));
+      for (final item in breakfastMeals) {
+        widgets.add(_buildReviewItem(Icons.restaurant_menu_outlined, item.name, item.optional));
+      }
+      widgets.add(const SizedBox(height: 12));
+    }
+
+    if (lunchMeals.isNotEmpty) {
+      widgets.add(const Text(
+        'LUNCH',
+        style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+      ));
+      widgets.add(const SizedBox(height: 8));
+      for (final item in lunchMeals) {
+        widgets.add(_buildReviewItem(Icons.restaurant_menu_outlined, item.name, item.optional));
+      }
+      widgets.add(const SizedBox(height: 12));
+    }
+
+    if (dinnerMeals.isNotEmpty) {
+      widgets.add(const Text(
+        'DINNER',
+        style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+      ));
+      widgets.add(const SizedBox(height: 8));
+      for (final item in dinnerMeals) {
+        widgets.add(_buildReviewItem(Icons.restaurant_menu_outlined, item.name, item.optional));
+      }
+    }
+
+    return widgets;
   }
 
   Widget _buildReviewItem(IconData icon, String text, bool isOptional) {
