@@ -25,10 +25,8 @@ class CustomizeItineraryScreen extends StatefulWidget {
 class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
   int _selectedDayIndex = 0;
   
-  // Accents based on tour type
   late final Color _accentColor;
   
-  // Track selected optional items: key is itemId, value is whether selected
   Map<int, bool> _selectedOptionalItems = {};
   
   @override
@@ -39,7 +37,6 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Generate dates based on start date and duration
     final duration = (widget.package.duration is int)
         ? (widget.package.duration as int)
         : widget.package.duration.toInt();
