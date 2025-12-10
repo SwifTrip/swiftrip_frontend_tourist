@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
@@ -883,35 +882,6 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
         return {'dayNumber': day.dayNumber, 'selectedItems': selectedItems};
       }).toList();
 
-      // Build the request body to show in snackbar
-      final requestBody = {
-        'basePackageId': widget.package.id,
-        'startDate': widget.startDate.toIso8601String(),
-        'endDate': endDate.toIso8601String(),
-        'travelerCount': widget.travelers,
-        'itineraries': itineraries,
-      };
-
-      // Show the JSON body in snackbar
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: SingleChildScrollView(
-            child: Text(
-              'Request Body:\n${jsonEncode(requestBody)}',
-              style: const TextStyle(fontSize: 10),
-            ),
-          ),
-          backgroundColor: Colors.blueGrey[800],
-          duration: const Duration(seconds: 10),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-
-      // Wait a moment so user can see the snackbar
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      // Call the API
       final result = await _customTourService.createCustomTour(
         basePackageId: widget.package.id,
         startDate: widget.startDate,
@@ -923,7 +893,6 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
       if (!mounted) return;
 
       if (result != null && result['success'] == true) {
-        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
