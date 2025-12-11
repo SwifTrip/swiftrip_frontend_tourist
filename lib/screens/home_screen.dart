@@ -6,6 +6,7 @@ import '../widgets/custom_bottom_nav.dart';
 import 'searchTour.dart';
 import 'fixed_packages_screen.dart';
 import 'guide_list_screen.dart';
+import 'Signin.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,6 +17,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  bool _isProfileOverlayVisible = false;
 
   void _onBottomNavTapped(int index) {
     setState(() {
@@ -53,13 +55,34 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                           ),
-                          Container(
-                            width: 48,
-                            alignment: Alignment.centerRight,
-                            child: IconButton(
-                              icon: const Icon(Icons.notifications_outlined, size: 28),
-                              color: AppColors.textPrimary,
-                              onPressed: () {},
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _isProfileOverlayVisible = !_isProfileOverlayVisible;
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: [Colors.blue, Colors.tealAccent],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                              ),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: AppColors.background, width: 2),
+                                ),
+                                child: const CircleAvatar(
+                                  radius: 18,
+                                  backgroundImage: NetworkImage(
+                                    'https://lh3.googleusercontent.com/aida-public/AB6AXuCzKIJritHt8R1Ry9INksc5nKG9a6qEWeLEHUV8L022NPnTwNpdhB6pxn8q3F_EWRswUVFyGeODfMqoty990Vs0sKlmbyPUgD4FjoETAl4KFRhH57jwlu8VIcQEmg3DV9ZpUFLAv3oKs03QhINDVBHCm63GS1XjHtfUy_sP8rXQlNaONgvqTBqszhO3Zbg9ytU9DmcPQuF5mkeitYRiWAkdJ7abAkozEnYXxF3sMmbmi1W_7kcTPmgfMTvkyxgFFBe1kM0MCMiygCwq',
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -272,6 +295,127 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
             ),
 
+            ),
+
+            // Profile Overlay Backdrop
+            if (_isProfileOverlayVisible)
+              Positioned.fill(
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isProfileOverlayVisible = false;
+                    });
+                  },
+                  child: Container(
+                    color: Colors.black.withOpacity(0.3),
+                  ),
+                ),
+              ),
+
+            // Profile Overlay Card
+            if (_isProfileOverlayVisible)
+              Positioned(
+                top: 60,
+                right: 16,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    // Triangle
+                    Padding(
+                      padding: const EdgeInsets.only(right: 12.0),
+                      child: CustomPaint(
+                        size: const Size(20, 10),
+                        painter: TrianglePainter(color: AppColors.surface),
+                      ),
+                    ),
+                    Container(
+                      width: 220,
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Signed in as',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 12,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'bilal@swifttrip.com',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Divider(height: 1, color: AppColors.border),
+                          ListTile(
+                            dense: true,
+                            title: Text(
+                              'Profile',
+                              style: GoogleFonts.plusJakartaSans(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            onTap: () {
+                              setState(() {
+                                _isProfileOverlayVisible = false;
+                              });
+                            },
+                          ),
+                          const Divider(height: 1, color: AppColors.border),
+                          ListTile(
+                            dense: true,
+                            title: Text(
+                              'Logout',
+                              style: GoogleFonts.plusJakartaSans(
+                                color: Colors.redAccent,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onTap: () {
+                              setState(() {
+                                _isProfileOverlayVisible = false;
+                              });
+                              // Implement actual logout logic
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                  builder: (context) => const Signin(),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
             // Custom Bottom Navigation
             Positioned(
               left: 0,
@@ -451,4 +595,23 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
+
+class TrianglePainter extends CustomPainter {
+  final Color color;
+  TrianglePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = color;
+    final path = Path();
+    path.moveTo(size.width / 2, 0);
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
+    path.close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
