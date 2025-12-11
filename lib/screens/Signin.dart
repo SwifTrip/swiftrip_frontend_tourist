@@ -5,6 +5,7 @@ import 'home_screen.dart';
 import '../services/auth_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
+import 'forgot_password_screen.dart';
 
 class Signin extends StatefulWidget {
   const Signin({super.key});
@@ -222,11 +223,16 @@ class SigninState extends State<Signin> {
                 ),
                 const SizedBox(height: 20),
 
-                // Forgot password
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const ForgotPasswordScreen(),
+                        ),
+                      );
+                    },
                     child: const Text(
                       'Forgot Password?',
                       style: TextStyle(color: AppColors.accent),
