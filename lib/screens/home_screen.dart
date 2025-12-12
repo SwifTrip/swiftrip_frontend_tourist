@@ -786,13 +786,33 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
 
-        // Trips List Placeholder
+        // Trips List
         Expanded(
           child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             children: [
               const SizedBox(height: 8),
-              // Trip cards will go here
+              _buildTripCard(
+                title: 'Hunza Extended Stay',
+                provider: 'Hunza Adventures Inc.',
+                date: 'Nov 10 - 20',
+                countdown: '25 Days',
+                status: 'Confirmed',
+                statusColor: Colors.greenAccent,
+                imageUrl:
+                    'https://lh3.googleusercontent.com/aida-public/AB6AXuDALXJq-LgX4lkbQjymS6iWY6ljyvjQWOPsTnBr5zFO8MDxFhhB4U7lz_PGzosY_cnYg8cQj_rN9BZRqK5Lhlke0DvFF9B_WvfvCkotL0iixrSgjr9IwJlYUPth6u9fDXumvA7Wh_BA0mEGhPQJLOkhNIpLAHrG-AiCOIF9iZCFiadJZl9sBXFzywVjocQ8LzBIT6M6u3iQ_7_y1qU0PJ05A1sH1ijexz52YB0U_AnYIIBP4PfcouhLoXOzNOaL6gsXTOfr8xEcEHFG',
+              ),
+              const SizedBox(height: 16),
+              _buildTripCard(
+                title: 'Skardu Expedition',
+                provider: 'Northern Treks Ltd.',
+                date: 'Dec 05 - 12',
+                countdown: '50 Days',
+                status: 'Pending',
+                statusColor: Colors.amberAccent,
+                imageUrl: '', // Show placeholder icon
+              ),
+              const SizedBox(height: 24),
             ],
           ),
         ),
@@ -800,7 +820,148 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildTripTabItem(String label, int index) {
+  Widget _buildTripCard({
+    required String title,
+    required String provider,
+    required String date,
+    required String countdown,
+    required String status,
+    required Color statusColor,
+    required String imageUrl,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Trip Image
+          Container(
+            width: 100,
+            height: 110,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: AppColors.background,
+              image: imageUrl.isNotEmpty
+                  ? DecorationImage(
+                      image: NetworkImage(imageUrl),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
+            ),
+            child: imageUrl.isEmpty
+                ? const Icon(Icons.landscape,
+                    color: AppColors.textSecondary, size: 40)
+                : null,
+          ),
+          const SizedBox(width: 16),
+          // Trip Details
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Status Badge
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: statusColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: statusColor.withOpacity(0.5)),
+                  ),
+                  child: Text(
+                    status.toUpperCase(),
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: statusColor,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  title,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                Text(
+                  provider,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Divider(height: 1, color: AppColors.border),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'DATE',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 10,
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          date,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          'STARTS IN',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 10,
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          countdown,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.accent,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
     final bool isActive = _selectedTripTab == index;
     return Expanded(
       child: GestureDetector(
