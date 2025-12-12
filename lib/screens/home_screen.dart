@@ -17,6 +17,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  int _selectedTripTab = 0; // 0: Upcoming, 1: Current, 2: Previous
   bool _isProfileOverlayVisible = false;
 
   void _onBottomNavTapped(int index) {
@@ -714,10 +715,125 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildTripsContent() {
-    return const Center(
-      child: Text(
-        'Trips Screen Placeholder',
-        style: TextStyle(color: Colors.white, fontSize: 18),
+    return Column(
+      children: [
+        // Sticky Header
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: AppColors.background.withOpacity(0.9),
+            border: Border(
+              bottom: BorderSide(
+                color: AppColors.border.withOpacity(0.5),
+                width: 1,
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _currentIndex = 0;
+                  });
+                },
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.surface,
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back,
+                    color: AppColors.textPrimary,
+                    size: 20,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  'My Trips',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 40), // Balance the back button
+            ],
+          ),
+        ),
+
+        // Tab Selector
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                _buildTripTabItem('Upcoming', 0),
+                _buildTripTabItem('Current', 1),
+                _buildTripTabItem('Previous', 2),
+              ],
+            ),
+          ),
+        ),
+
+        // Trips List Placeholder
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            children: [
+              const SizedBox(height: 8),
+              // Trip cards will go here
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTripTabItem(String label, int index) {
+    final bool isActive = _selectedTripTab == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _selectedTripTab = index;
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: isActive ? AppColors.background : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: isActive
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 14,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+              color: isActive ? AppColors.accent : AppColors.textSecondary,
+            ),
+          ),
+        ),
       ),
     );
   }
