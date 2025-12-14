@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:swift_trip_app/screens/Agency.dart';
-import 'package:swift_trip_app/screens/customBar.dart';
-import 'package:swift_trip_app/screens/summary_screen.dart';
+import 'package:swift_trip_app/models/agency_response_model.dart';
 import 'package:swift_trip_app/widgets/custom_app_bar.dart';
-import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
-
+import 'package:intl/intl.dart';
+import 'package:swift_trip_app/widgets/itineraryItems.dart';
 
 class PlanningScreen extends StatefulWidget {
+  final TourResponse tourResponse;
+  PlanningScreen({required this.tourResponse});
   @override
   _PlanningScreenState createState() => _PlanningScreenState();
 }
 
 class _PlanningScreenState extends State<PlanningScreen> {
-  int selectedIndex = 0;
+  List<int> selectedMeals = [];
+  List<int> selectedActivities = [];
+  List<int> selectedAccommodations = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,340 +29,373 @@ class _PlanningScreenState extends State<PlanningScreen> {
             ),
             Column(
               children: [
-                Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Arrival Day: ",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            "Arrival 6pm",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      child: Card(
-                        color: Color.fromARGB(255, 234, 193, 193),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "10hrs drive from Lhr to Arival",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.red,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      child: Card(
-                        color: Color.fromARGB(255, 248, 243, 214),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Meals dinner",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: const Color.fromARGB(
-                                    255,
-                                    104,
-                                    100,
-                                    66,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                buildHeader(
+                  widget.tourResponse.basePackage.title,
+                  widget.tourResponse.basePackage.description,
+                  widget.tourResponse.basePackage.category,
+                  widget.tourResponse.basePackage.basePrice.toDouble(),
+                  widget.tourResponse.basePackage.toLocation,
+                  widget.tourResponse.basePackage.fromLocation,
+                  widget.tourResponse.basePackage.maxGroupSize ?? 0,
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                        "Accommodation",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    builAccomodationCard(1),
-                    builAccomodationCard(2),
-                    builAccomodationCard(3),
-                    buildDay(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AgencyScreen(),
-                          ),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 25,
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.arrow_back, color: Colors.black),
-                            Text("Back", style: TextStyle(color: Colors.black)),
-                          ],
-                        ),
-                      ),
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => SummaryScreen()),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 25,
-                        ),
-                        child: Row(
-                          children: [
-                            Text(
-                              "Continue",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            Icon(Icons.arrow_forward, color: Colors.white),
-                          ],
-                        ),
-                      ),
-                    ),
-                  
-                      ],
-                    )
-                  ],
-                ),
+                buildDay(widget.tourResponse.basePackage),
               ],
             ),
           ],
         ),
       ),
-      bottomNavigationBar: CustomBottomBar(currentIndex: 1),
     );
   }
 
-  Widget builAccomodationCard(int index) {
-    bool selected = selectedIndex == index;
-    return Container(
-      height: 100,
-      margin: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-      child: Card(
-        color: selected ? const Color(0xffEFF6FF) : Colors.white,
-        shape: RoundedRectangleBorder(
-          side: BorderSide(
-            color: selected ? Colors.blueAccent : Colors.grey.shade300,
-            width: 2,
-          ),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: InkWell(
-          onTap: () {
-            setState(() {
-              selectedIndex = index;
-            });
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(15),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Hotel Stay Resort \n ⭐4.5(150 reviews)"),
-                    Text("Rs 8000/Night"),
-                  ],
-                ),
-              ],
+  Widget buildDay(BasePackage basePackage) {
+    final dateFormat = DateFormat('dd MMM, hh:mm a');
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: basePackage.itineraries.length,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Card(
+            color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    basePackage.itineraries[index].title,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 15),
+
+                  Text(
+                    "Start time  ${basePackage.itineraries[index].startTime != null ? dateFormat.format(basePackage.itineraries[index].startTime!) : ''} - End time"
+                    " ${basePackage.itineraries[index].endTime != null ? dateFormat.format(basePackage.itineraries[index].endTime!) : ''}",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+
+                  const SizedBox(height: 15),
+                  buildItinerartyItem(
+                    basePackage.itineraries[index].itineraryItems,
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget buildDay() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Card(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Day 1",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFF3E0),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.close, color: Colors.orange, size: 18),
-                    SizedBox(width: 6),
-                    Text(
-                      "Meals: Breakfast",
-                      style: TextStyle(color: Colors.orange),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 15),
-
-              const Text(
-                "Activities",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              buildActivity("Shangrila Lake Visit", "3 hours", "Rs. 5,000"),
-              buildActivity("Mountain Hiking", "5 hours", "Rs. 6,000"),
-              const SizedBox(height: 10),
-              Text("Add Activities",style: TextStyle(fontWeight: FontWeight.bold),),
-              const SizedBox(height: 15),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade400),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.add, color: Colors.blue),
-                    SizedBox(width: 8),
-                    Text("Cultural Village Visit"),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 15),
-
-              const Text(
-                "Accommodation",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              buildAccommodation(
-                "Mountain View Resort",
-                "4.5",
-                "Rs. 15,000/night",
-                selected: true,
-              ),
-              buildAccommodation("Comfort Inn", "4.2", "Rs. 8,000/night"),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  static Widget buildActivity(String title, String duration, String price) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE8F5E9),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: ListTile(
-        leading: const Icon(Icons.check_circle, color: Colors.green),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-        subtitle: Text(duration),
-        trailing: Text(
-          price,
-          style: const TextStyle(
-            color: Colors.green,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-
-  static Widget buildAccommodation(
-    String name,
-    String rating,
-    String price, {
-    bool selected = false,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade300, width: 2),
-      ),
-      child: ListTile(
-        title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Row(
+  Widget buildHeader(
+    String title,
+    String description,
+    String category,
+    double price,
+    String to,
+    String from,
+    int groupSize,
+  ) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.star, color: Colors.amber, size: 16),
-            Text(" $rating"),
+            // Title
+            Text(
+              title,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+
+            const SizedBox(height: 8),
+
+            // Description
+            Text(
+              description,
+              style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Category
+            Row(
+              children: [
+                const Icon(Icons.category, size: 18, color: Colors.blue),
+                const SizedBox(width: 6),
+                Text(category, style: const TextStyle(fontSize: 14)),
+              ],
+            ),
+
+            const SizedBox(height: 8),
+
+            // Group Size
+            Row(
+              children: [
+                const Icon(Icons.group, size: 18, color: Colors.purple),
+                const SizedBox(width: 6),
+                Text(
+                  "Group Size: $groupSize",
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 8),
+
+            // Price
+            Row(
+              children: [
+                const Icon(Icons.attach_money, size: 18, color: Colors.green),
+                const SizedBox(width: 6),
+                Text("PKR $price", style: const TextStyle(fontSize: 14)),
+              ],
+            ),
+
+            const SizedBox(height: 8),
+
+            // Route
+            Row(
+              children: [
+                const Icon(Icons.location_on, size: 18, color: Colors.red),
+                const SizedBox(width: 6),
+                Text("$from  →  $to", style: const TextStyle(fontSize: 14)),
+              ],
+            ),
           ],
-        ),
-        trailing: Text(
-          price,
-          style: TextStyle(
-            color: Colors.grey.shade600,
-            fontWeight: FontWeight.bold,
-          ),
         ),
       ),
     );
   }
+
+  Widget buildItinerartyItem(List<ItineraryItem> item) {
+  final meals =
+      item.where((element) => element.type == 'MEAL').toList();
+  final activities =
+      item.where((element) => element.type == 'ACTIVITY').toList();
+  final accommodations =
+      item.where((element) => element.type == 'STAY').toList();
+
+  final breakfastDetails =
+      meals.where((meal) => meal.mealDetails[0].mealType.toLowerCase() == "breakfast").toList();
+  final lunchDetails =
+      meals.where((meal) => meal.mealDetails[0].mealType.toLowerCase() == "lunch").toList();
+  final dinnerDetails =
+      meals.where((meal) => meal.mealDetails[0].mealType.toLowerCase() == "dinner").toList();
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // MEALS
+      const Text(
+        "Meals",
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+      ),
+
+      if (breakfastDetails.isNotEmpty) ...[
+        const SizedBox(height: 8),
+        const Text(
+          "Breakfast",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+        ),
+        const SizedBox(height: 8),
+        ListView.builder(
+          itemCount: breakfastDetails.length,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) => MealItem(
+            meal: breakfastDetails[index],
+            isSelected: selectedMeals.contains(breakfastDetails[index].id),
+            onTap: () {
+              setState(() {
+                final id = breakfastDetails[index].id;
+                if (selectedMeals.contains(id)) {
+                  selectedMeals.remove(id);
+                } else {
+                  selectedMeals.add(id);
+                }
+              });
+            },
+          ),
+        ),
+      ],
+
+      if (lunchDetails.isNotEmpty) ...[
+        const SizedBox(height: 8),
+        const Text(
+          "Lunch",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+        ),
+        const SizedBox(height: 8),
+        ListView.builder(
+          itemCount: lunchDetails.length,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) => MealItem(
+            meal: lunchDetails[index],
+            isSelected: selectedMeals.contains(lunchDetails[index].id),
+            onTap: () {
+              setState(() {
+                final id = lunchDetails[index].id;
+                if (selectedMeals.contains(id)) {
+                  selectedMeals.remove(id);
+                } else {
+                  selectedMeals.add(id);
+                }
+              });
+            },
+          ),
+        ),
+      ],
+
+      if (dinnerDetails.isNotEmpty) ...[
+        const SizedBox(height: 8),
+        const Text(
+          "Dinner",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+        ),
+        const SizedBox(height: 8),
+        ListView.builder(
+          itemCount: dinnerDetails.length,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) => MealItem(
+            meal: dinnerDetails[index],
+            isSelected: selectedMeals.contains(dinnerDetails[index].id),
+            onTap: () {
+              setState(() {
+                final id = dinnerDetails[index].id;
+                if (selectedMeals.contains(id)) {
+                  selectedMeals.remove(id);
+                } else {
+                  selectedMeals.add(id);
+                }
+              });
+            },
+          ),
+        ),
+      ],
+
+      const SizedBox(height: 15),
+
+      // ACTIVITIES
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: const [
+          Text(
+            "Activities",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ],
+      ),
+      const SizedBox(height: 8),
+
+      Builder(
+        builder: (context) {
+          // fixed or already added => TOP
+          final mainActivities = activities
+              .where((e) =>
+                  e.optional == false ||
+                  selectedActivities.contains(e.id))
+              .toList();
+
+          // optional and not selected => BELOW as plus cards
+          final addActivities = activities
+              .where((e) =>
+                  e.optional == true &&
+                  !selectedActivities.contains(e.id))
+              .toList();
+
+          return Column(
+            children: [
+              // TOP: fixed + selected optionals (green)
+              ListView.builder(
+                itemCount: mainActivities.length,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  final act = mainActivities[index];
+                  return ActivityItem(
+                    activity: act,
+                    isSelected: selectedActivities.contains(act.id),
+                    onTap: () {
+                      setState(() {
+                        if (act.optional) {
+                          if (selectedActivities.contains(act.id)) {
+                            selectedActivities.remove(act.id);
+                          } else {
+                            selectedActivities.add(act.id);
+                          }
+                        }
+                      });
+                    },
+                  );
+                },
+              ),
+
+              // BELOW: optional not selected (plus cards)
+              if (addActivities.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                ListView.builder(
+                  itemCount: addActivities.length,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    final act = addActivities[index];
+                    return ActivityItem(
+                      activity: act,
+                      isSelected: false, // force plus UI
+                      onTap: () {
+                        setState(() {
+                          selectedActivities.add(act.id);
+                        });
+                      },
+                    );
+                  },
+                ),
+              ],
+            ],
+          );
+        },
+      ),
+
+      // ACCOMMODATIONS
+      const SizedBox(height: 15),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: const [
+          Text(
+            "Accommodations",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ],
+      ),
+      const SizedBox(height: 8),
+      ListView.builder(
+        itemCount: accommodations.length,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemBuilder: (context, index) {
+          final stay = accommodations[index];
+          return AccommodationItem(
+            accommodation: stay,
+            isSelected: selectedAccommodations.contains(stay.id),
+            onTap: () {
+              setState(() {
+                if (selectedAccommodations.contains(stay.id)) {
+                  selectedAccommodations.remove(stay.id);
+                } else {
+                  selectedAccommodations.add(stay.id);
+                }
+              });
+            },
+          );
+        },
+      ),
+    ],
+  );
+}
+
 }

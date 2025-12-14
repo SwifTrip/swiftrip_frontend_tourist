@@ -1,22 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:swift_trip_app/screens/Destination.dart';
+import 'package:swift_trip_app/models/Agency.dart';
 import 'package:swift_trip_app/screens/Plannig.dart';
-import 'package:swift_trip_app/screens/customBar.dart';
+import 'package:swift_trip_app/services/get_packages.dart';
 import 'package:swift_trip_app/widgets/custom_app_bar.dart';
 import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
 
 class AgencyScreen extends StatefulWidget {
+  final int budget;
+  final String destination;
+
+  final List<Agency> agencies;
+  const AgencyScreen({
+    super.key,
+    required this.agencies,
+    required this.budget,
+    required this.destination,
+  });
   @override
   _AgencyScreenState createState() => _AgencyScreenState();
 }
 
 class _AgencyScreenState extends State<AgencyScreen> {
+  late int agencyId = 0;
+  late String category = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(currentStep: 1),
       body: SingleChildScrollView(
-        child: Container(
+        child: SizedBox(
           width: double.infinity,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -33,8 +45,18 @@ class _AgencyScreenState extends State<AgencyScreen> {
                     style: TextStyle(fontSize: 15),
                   ),
                 ),
-                buildAgencyCard("Mountain Adventures", 8500),
-                buildAgencyCard("City Explorers", 9500),
+                ListView.builder(
+                  itemCount: widget.agencies.length,
+                  itemBuilder: (context, index) {
+                    final agency = widget.agencies[index];
+                    return buildAgencyCard(
+                      agency.companyId,
+                      agency.companyName,
+                    );
+                  },
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -46,12 +68,7 @@ class _AgencyScreenState extends State<AgencyScreen> {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DestinationScreen(),
-                          ),
-                        );
+                        Navigator.pop(context);
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
@@ -73,11 +90,28 @@ class _AgencyScreenState extends State<AgencyScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => PlanningScreen()),
-                        );
+                      onPressed: () async {
+                        try {
+                          final service = PackageService();
+                          final result = await service.getPackages(
+                            agencyId: agencyId,
+                            toCity: widget.destination,
+                            minBudget: widget.budget,
+                          );
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return PlanningScreen(tourResponse: result);
+                              },
+                            ),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Search failed: $e")),
+                          );
+                        }
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
@@ -106,43 +140,60 @@ class _AgencyScreenState extends State<AgencyScreen> {
     );
   }
 
-  Widget buildAgencyCard(String agencyName, int price) {
+  Widget buildAgencyCard(int agencyId, String agencyName) {
+    bool selected = this.agencyId == agencyId;
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(15),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Icon(Icons.add_a_photo, size: 50, color: Colors.brown),
-                  Text(agencyName),
-                  Text("Rs\n$price"),
-                ],
-              ),
-              Text("⭐ 4.8 (200 reviews)"),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SizedBox(
-                  width: 300,
-                  child: GridView(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 5,
+        color: selected ? const Color(0xffEFF6FF) : Colors.white,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(
+            color: selected ? Colors.blueAccent : Colors.grey.shade300,
+            width: 2,
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: InkWell(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.add_a_photo, size: 50, color: Colors.brown),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15),
+                      child: Text(agencyName),
                     ),
-                    shrinkWrap: true,
-                    children: [
-                      Card(child: Center(child: Text("Mountain Tours"))),
-                      Card(child: Center(child: Text("Adventure Travels"))),
-                      Card(child: Center(child: Text("Photography"))),
-                    ],
+                  ],
+                ),
+                Text("⭐ 4.8 (200 reviews)"),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: 300,
+                    child: GridView(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 5,
+                      ),
+                      shrinkWrap: true,
+                      children: [
+                        Card(child: Center(child: Text("Mountain Tours"))),
+                        Card(child: Center(child: Text("Adventure Travels"))),
+                        Card(child: Center(child: Text("Photography"))),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+          onTap: () {
+            setState(() {
+              this.agencyId = agencyId;
+            });
+          },
         ),
       ),
     );

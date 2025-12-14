@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 import '../models/user_model.dart';
+import 'token_service.dart';
 
 class AuthService {
   // Register new user
@@ -55,10 +56,7 @@ class AuthService {
       }
     } catch (e) {
       // Network or other errors
-      return {
-        'success': false,
-        'message': 'Network error: ${e.toString()}',
-      };
+      return {'success': false, 'message': 'Network error: ${e.toString()}'};
     }
   }
 
@@ -72,16 +70,18 @@ class AuthService {
           .post(
             Uri.parse(ApiConfig.login),
             headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({
-              'email': email,
-              'password': password,
-            }),
+            body: jsonEncode({'email': email, 'password': password}),
           )
           .timeout(ApiConfig.timeout);
 
       final responseData = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
+        // Save token to local storage
+        if (responseData['token'] != null) {
+          await TokenService.saveToken(responseData['token']);
+        }
+
         // Success
         return {
           'success': true,
@@ -97,10 +97,7 @@ class AuthService {
       }
     } catch (e) {
       // Network or other errors
-      return {
-        'success': false,
-        'message': 'Network error: ${e.toString()}',
-      };
+      return {'success': false, 'message': 'Network error: ${e.toString()}'};
     }
   }
 
@@ -114,10 +111,10 @@ class AuthService {
       final responseData = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        return {
-          'success': true,
-          'message': responseData['message'],
-        };
+        // Remove token from local storage
+        await TokenService.removeToken();
+
+        return {'success': true, 'message': responseData['message']};
       } else {
         return {
           'success': false,
@@ -125,10 +122,7 @@ class AuthService {
         };
       }
     } catch (e) {
-      return {
-        'success': false,
-        'message': 'Network error: ${e.toString()}',
-      };
+      return {'success': false, 'message': 'Network error: ${e.toString()}'};
     }
   }
 }

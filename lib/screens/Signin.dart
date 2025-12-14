@@ -108,7 +108,7 @@ class SigninState extends State<Signin> {
               const SizedBox(height: 48),
 
               // Logo
-              Image.asset('assets/logo.png', height: 80),
+              Image.asset('lib/assets/logo.png', height: 80),
               const SizedBox(height: 16),
 
               // App name

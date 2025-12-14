@@ -1,74 +1,348 @@
 import 'package:flutter/material.dart';
-import 'package:swift_trip_app/widgets/custom_app_bar.dart';
 import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
 import 'package:swift_trip_app/screens/app-theme.dart';
-import 'package:swift_trip_app/screens/payment_screen.dart';
+import 'package:swift_trip_app/models/agency_response_model.dart';
+import 'package:swift_trip_app/models/custom_tour_request.dart';
+import 'package:swift_trip_app/services/custom_tour_service.dart';
 
 class SummaryScreen extends StatelessWidget {
-  const SummaryScreen({super.key});
+  final TourResponse tourResponse;
+  final int travelerCount;
+  final DateTime startDate;
+  final DateTime endDate;
+  final Map<int, List<int>> selectedOptionalItems;
+
+  const SummaryScreen({
+    super.key,
+    required this.tourResponse,
+    required this.travelerCount,
+    required this.startDate,
+    required this.endDate,
+    required this.selectedOptionalItems,
+  });
+
+  double computeBaseTotal() =>
+      tourResponse.basePackage.basePrice.toDouble() * travelerCount;
+
+  double computeAddOnTotal() {
+    double sum = 0.0;
+    for (var day in tourResponse.basePackage.itineraries) {
+      final ids = selectedOptionalItems[day.dayNumber] ?? [];
+      for (var item in day.itineraryItems) {
+        if (ids.contains(item.id)) {
+          sum += item.price.toDouble();
+        }
+      }
+    }
+    return sum;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final base = tourResponse.basePackage;
+    final baseTotal = computeBaseTotal();
+    final addOnTotal = computeAddOnTotal();
+
     return Scaffold(
-      appBar: CustomAppBar(currentStep: 3),
+      appBar: AppBar(title: const Text('Booking Summary'), elevation: 2),
+      backgroundColor: Colors.grey.shade100,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Center(
-              child: Text(
-                'Tour Summary',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textColor,
-                ),
+            /// Package Info Card
+            Card(
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
               ),
-            ),
-            const SizedBox(height: 8),
-            const Center(
-              child: Text(
-                'Review your customized tour package',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: AppTheme.secondaryTextColor,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            _buildItinerary(),
-            const SizedBox(height: 20),
-            _buildCostBreakdown(),
-
-            Center(
               child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: ElevatedButton(
-                  onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => PaymentScreen()),
-                      );
-                    },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.blueAccent,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 120,
-                      vertical: 15,
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      base.title,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    child: const Text("Continue"),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Agency: ${tourResponse.agency.name}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.location_on,
+                          size: 16,
+                          color: Colors.grey.shade600,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${base.fromLocation} → ${base.toLocation}',
+                          style: TextStyle(color: Colors.grey.shade600),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Divider(color: Colors.grey.shade300),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Travelers',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Text(
+                              '$travelerCount',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Dates',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Text(
+                              '${startDate.toLocal().toString().split(' ')[0]} - ${endDate.toLocal().toString().split(' ')[0]}',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            /// Price Breakdown Card
+            Card(
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Price Breakdown',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _buildPriceRow('Base Package (x$travelerCount)', baseTotal),
+                    if (addOnTotal > 0) ...[
+                      const SizedBox(height: 8),
+                      _buildPriceRow('Optional Add-ons', addOnTotal),
+                    ],
+                    const SizedBox(height: 8),
+                    Divider(color: Colors.grey.shade300),
+                    const SizedBox(height: 8),
+                    _buildPriceRow(
+                      'Subtotal',
+                      baseTotal + addOnTotal,
+                      isBold: true,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildPriceRow(
+                      'Tax (10%)',
+                      (baseTotal + addOnTotal) * 0.10,
+                    ),
+                    const SizedBox(height: 12),
+                    Divider(color: Colors.grey.shade300, thickness: 2),
+                    const SizedBox(height: 12),
+                    _buildPriceRow(
+                      'Total',
+                      (baseTotal + addOnTotal) * 1.10,
+                      isTotal: true,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            /// Confirm Button
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  backgroundColor: Colors.blue,
+                ),
+                onPressed: () => _handleConfirmBooking(context),
+                child: const Text(
+                  'Confirm & Book',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
               ),
             ),
+
+            const SizedBox(height: 16),
           ],
         ),
       ),
       bottomNavigationBar: CustomBottomBar(currentIndex: 1),
     );
+  }
+
+  Widget _buildPriceRow(
+    String label,
+    double amount, {
+    bool isBold = false,
+    bool isTotal = false,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: isTotal ? 18 : 14,
+            fontWeight: isTotal || isBold ? FontWeight.bold : FontWeight.normal,
+            color: isTotal ? Colors.black : Colors.grey.shade700,
+          ),
+        ),
+        Text(
+          '\$${amount.toStringAsFixed(2)}',
+          style: TextStyle(
+            fontSize: isTotal ? 20 : 14,
+            fontWeight: isTotal || isBold ? FontWeight.bold : FontWeight.w600,
+            color: isTotal ? Colors.blue : Colors.black87,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _handleConfirmBooking(BuildContext context) async {
+    // Show loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      // Build request
+      final request = CustomTourRequest(
+        companyId: tourResponse.agency.id,
+        basePackageId: tourResponse.basePackage.id,
+        startDate: startDate.toIso8601String(),
+        endDate: endDate.toIso8601String(),
+        travelerCount: travelerCount,
+        itineraries: tourResponse.basePackage.itineraries.map((day) {
+          return ItineraryDay(
+            dayNumber: day.dayNumber,
+            selectedOptionalItems: selectedOptionalItems[day.dayNumber] ?? [],
+          );
+        }).toList(),
+      );
+
+      // Call backend
+      final service = CustomTourService();
+      final result = await service.createCustomTour(
+        companyId: request.companyId,
+        basePackageId: request.basePackageId,
+        startDate: request.startDate,
+        endDate: request.endDate,
+        travelerCount: request.travelerCount,
+        itineraries: request.itineraries,
+      );
+
+      // Close loading
+      if (context.mounted) Navigator.pop(context);
+
+      // Handle response
+      if (result['success'] == true) {
+        if (context.mounted) {
+          showDialog(
+            context: context,
+            builder: (_) => AlertDialog(
+              title: const Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.green, size: 32),
+                  SizedBox(width: 12),
+                  Text('Booking Confirmed!'),
+                ],
+              ),
+              content: Text(
+                result['message'] ??
+                    'Your custom tour has been created successfully.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.popUntil(context, (route) => route.isFirst);
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+        }
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result['message'] ?? 'Failed to create booking'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) Navigator.pop(context);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }
 
