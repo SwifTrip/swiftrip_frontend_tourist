@@ -7,6 +7,7 @@ import 'searchTour.dart';
 import 'fixed_packages_screen.dart';
 import 'guide_list_screen.dart';
 import 'Signin.dart';
+import 'profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -134,6 +135,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               setState(() {
                                 _isProfileOverlayVisible = false;
                               });
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const ProfileScreen(),
+                                ),
+                              );
                             },
                           ),
                           const Divider(height: 1, color: AppColors.border),
