@@ -25,6 +25,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     _buildProfileHeader(),
                     const SizedBox(height: 32),
+                    _buildStatsGrid(),
+                    const SizedBox(height: 32),
                   ],
                 ),
               ),
@@ -151,6 +153,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildStatsGrid() {
+    return Row(
+      children: [
+        Expanded(child: _buildStatCard('12', 'Trips')),
+        const SizedBox(width: 12),
+        Expanded(child: _buildStatCard('45', 'Reviews')),
+        const SizedBox(width: 12),
+        Expanded(child: _buildStatCard('3', 'Upcoming')),
+      ],
+    );
+  }
+
+  Widget _buildStatCard(String value, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label.toUpperCase(),
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textSecondary,
+              letterSpacing: 1,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
