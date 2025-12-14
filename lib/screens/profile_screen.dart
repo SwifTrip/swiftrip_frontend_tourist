@@ -257,10 +257,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-      ],
-    );
-  }
-
   Widget _buildSettingsSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
