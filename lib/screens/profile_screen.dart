@@ -29,6 +29,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 32),
                     _buildInformationSection(),
                     const SizedBox(height: 24),
+                    _buildSettingsSection(),
+                    const SizedBox(height: 40),
                   ],
                 ),
               ),
@@ -247,6 +249,68 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 title: 'Preferences',
                 subtitle: 'Dietary, currency, language',
                 isLast: true,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+      ],
+    );
+  }
+
+  Widget _buildSettingsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
+          child: Text(
+            'SETTINGS',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textSecondary,
+              letterSpacing: 1,
+            ),
+          ),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Column(
+            children: [
+              _buildListTile(
+                icon: Icons.settings_outlined,
+                iconColor: Colors.grey,
+                title: 'App Settings',
+                subtitle: 'Notifications, Security',
+              ),
+              const Divider(height: 1, color: AppColors.border),
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.logout, color: Colors.redAccent, size: 20),
+                ),
+                title: Text(
+                  'Log Out',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.redAccent,
+                  ),
+                ),
+                onTap: () {},
               ),
             ],
           ),
