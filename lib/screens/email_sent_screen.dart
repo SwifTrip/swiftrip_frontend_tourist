@@ -21,17 +21,7 @@ class _EmailSentScreenState extends State<EmailSentScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
-              // Title
-              Text(
-                'Check Your Email!',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: -0.5,
-                ),
-              ),
+              // Title will go here
               const Spacer(),
             ],
           ),
