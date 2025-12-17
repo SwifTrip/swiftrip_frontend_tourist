@@ -9,7 +9,32 @@ class EmailSentScreen extends StatefulWidget {
   State<EmailSentScreen> createState() => _EmailSentScreenState();
 }
 
-class _EmailSentScreenState extends State<EmailSentScreen> {
+class _EmailSentScreenState extends State<EmailSentScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _bounceAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 3),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _bounceAnimation = Tween<double>(begin: 0, end: -15).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,6 +92,72 @@ class _EmailSentScreenState extends State<EmailSentScreen> {
                     color: Colors.grey[400],
                     height: 1.5,
                   ),
+                ),
+              ),
+              const SizedBox(height: 60),
+              // Central Animated Icon
+              Center(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Outer glow
+                    Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.accent.withOpacity(0.15),
+                      ),
+                    ),
+                    // Glass background
+                    Container(
+                      width: 96,
+                      height: 96,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white.withOpacity(0.1)),
+                        color: Colors.white.withOpacity(0.05),
+                      ),
+                      child: AnimatedBuilder(
+                        animation: _bounceAnimation,
+                        builder: (context, child) {
+                          return Transform.translate(
+                            offset: Offset(0, _bounceAnimation.value),
+                            child: const Icon(
+                              Icons.mark_email_read,
+                              size: 48,
+                              color: AppColors.accent,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    // Small decorative circles
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: Container(
+                        width: 16,
+                        height: 16,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: AppColors.accent.withOpacity(0.5),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      child: Container(
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.1),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const Spacer(),
