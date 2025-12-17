@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_colors.dart';
+import 'reset_password_screen.dart';
 
 class EmailSentScreen extends StatefulWidget {
   const EmailSentScreen({super.key});
@@ -201,7 +202,12 @@ class _EmailSentScreenState extends State<EmailSentScreen> with SingleTickerProv
                   ),
                   GestureDetector(
                     onTap: () {
-                      // Logic for resend email
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ResetPasswordScreen(),
+                        ),
+                      );
                     },
                     child: Text(
                       'Resend',
