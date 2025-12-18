@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_colors.dart';
+import 'password_updated_screen.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -139,8 +140,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 height: 56,
                 child: ElevatedButton(
                   onPressed: () {
-                    // Navigate to signin or show success
-                    Navigator.pushNamedAndRemoveUntil(context, '/signin', (route) => false);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const PasswordUpdatedScreen(),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.accent,
