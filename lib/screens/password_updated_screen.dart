@@ -100,7 +100,56 @@ class _PasswordUpdatedScreenState extends State<PasswordUpdatedScreen> with Sing
                   );
                 },
               ),
+              const SizedBox(height: 48),
+              // Header
+              Text(
+                'Password Updated!',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'You can now log in with your new password.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  color: Colors.grey[400],
+                  height: 1.5,
+                ),
+              ),
               const Spacer(),
+              // Back to Login Button
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(context, '/signin', (route) => false);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.accent,
+                    foregroundColor: const Color(0xFF1a1a1a),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 8,
+                    shadowColor: AppColors.accent.withOpacity(0.5),
+                  ),
+                  child: Text(
+                    'Back to Login',
+                    style: GoogleFonts.inter(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
