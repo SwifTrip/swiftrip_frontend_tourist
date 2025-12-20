@@ -36,6 +36,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
     }
 
     try {
+      // Small delay for better UX/realism
+      await Future.delayed(const Duration(seconds: 2));
+      
       final result = await _authService.verifyEmail(widget.token!);
       
       if (!mounted) return;
