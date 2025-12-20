@@ -215,7 +215,7 @@ class _EmailSentScreenState extends State<EmailSentScreen> with SingleTickerProv
                 height: 56,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamedAndRemoveUntil(context, '/signin', (route) => false);
+                    Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.accent,
