@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_colors.dart';
 import 'reset_password_screen.dart';
+import '../services/auth_service.dart';
 
 class EmailSentScreen extends StatefulWidget {
   final String email;
@@ -20,6 +21,8 @@ class EmailSentScreen extends StatefulWidget {
 class _EmailSentScreenState extends State<EmailSentScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _bounceAnimation;
+  bool _isResending = false;
+  final AuthService _authService = AuthService();
 
   @override
   void initState() {
@@ -41,6 +44,41 @@ class _EmailSentScreenState extends State<EmailSentScreen> with SingleTickerProv
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  void _handleResend() async {
+    if (_isResending) return;
+
+    setState(() {
+      _isResending = true;
+    });
+
+    try {
+      final result = await _authService.resendVerification(widget.email);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message'] ?? 'Verification email resent'),
+          backgroundColor: result['success'] ? Colors.green : Colors.red,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to resend email'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isResending = false;
+        });
+      }
+    }
   }
 
   @override
@@ -210,22 +248,24 @@ class _EmailSentScreenState extends State<EmailSentScreen> with SingleTickerProv
                     ),
                   ),
                   GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ResetPasswordScreen(),
-                        ),
-                      );
-                    },
-                    child: Text(
-                      'Resend',
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.accent,
-                      ),
-                    ),
+                    onTap: _isResending ? null : _handleResend,
+                    child: _isResending
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
+                            ),
+                          )
+                        : Text(
+                            'Resend',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.accent,
+                            ),
+                          ),
                   ),
                 ],
               ),
