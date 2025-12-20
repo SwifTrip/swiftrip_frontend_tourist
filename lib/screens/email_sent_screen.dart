@@ -4,7 +4,14 @@ import '../theme/app_colors.dart';
 import 'reset_password_screen.dart';
 
 class EmailSentScreen extends StatefulWidget {
-  const EmailSentScreen({super.key});
+  final String email;
+  final bool isPasswordReset;
+
+  const EmailSentScreen({
+    super.key,
+    required this.email,
+    this.isPasswordReset = false,
+  });
 
   @override
   State<EmailSentScreen> createState() => _EmailSentScreenState();
@@ -86,7 +93,9 @@ class _EmailSentScreenState extends State<EmailSentScreen> with SingleTickerProv
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  "We've sent password reset instructions to your email address.",
+                  widget.isPasswordReset
+                      ? "We've sent password reset instructions to ${widget.email}."
+                      : "We've sent a verification link to ${widget.email}. Please verify your account to continue.",
                   textAlign: TextAlign.center,
                   style: GoogleFonts.inter(
                     fontSize: 16,
