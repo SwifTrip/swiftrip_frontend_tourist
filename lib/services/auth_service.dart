@@ -125,4 +125,51 @@ class AuthService {
       return {'success': false, 'message': 'Network error: ${e.toString()}'};
     }
   }
+
+  // Verify email with token
+  Future<Map<String, dynamic>> verifyEmail(String token) async {
+    try {
+      final response = await http
+          .get(Uri.parse('${ApiConfig.verifyEmail}?token=$token'))
+          .timeout(ApiConfig.timeout);
+
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': responseData['message'] ?? 'Email verified successfully',
+        };
+      } else {
+        return {
+          'success': false,
+          'message': responseData['message'] ?? 'Verification failed',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Network error: ${e.toString()}'};
+    }
+  }
+
+  // Resend verification email
+  Future<Map<String, dynamic>> resendVerification(String email) async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse(ApiConfig.resendVerification),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'email': email}),
+          )
+          .timeout(ApiConfig.timeout);
+
+      final responseData = jsonDecode(response.body);
+
+      return {
+        'success': response.statusCode == 200,
+        'message': responseData['message'] ?? 'Request processed',
+      };
+    } catch (e) {
+      return {'success': false, 'message': 'Network error: ${e.toString()}'};
+    }
+  }
 }
