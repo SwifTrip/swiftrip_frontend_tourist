@@ -8,6 +8,8 @@ class ApiConfig {
   static const String register = '$baseUrl/register';
   static const String login = '$baseUrl/login';
   static const String logout = '$baseUrl/logout';
+  static const String verifyEmail = '$baseUrl/verify-email';
+  static const String resendVerification = '$baseUrl/resend-verification';
 
   // Agency search in custom tour Endpoint
   static const String tourSearch = '$baseUrl/custom-tour/search';
