@@ -4,8 +4,21 @@ import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
 import 'email_sent_screen.dart';
 
-class ForgotPasswordScreen extends StatelessWidget {
+class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
+
+  @override
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+}
+
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  final TextEditingController _emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +75,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                 const SizedBox(height: 32),
                 // Email input field
                 TextFormField(
+                  controller: _emailController,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     prefixIcon: const Icon(
@@ -104,10 +118,19 @@ class ForgotPasswordScreen extends StatelessWidget {
                   height: 56,
                   child: ElevatedButton(
                     onPressed: () {
+                      if (_emailController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Please enter your email')),
+                        );
+                        return;
+                      }
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const EmailSentScreen(),
+                          builder: (context) => EmailSentScreen(
+                            email: _emailController.text.trim(),
+                            isPasswordReset: true,
+                          ),
                         ),
                       );
                     },
