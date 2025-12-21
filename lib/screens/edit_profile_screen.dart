@@ -35,6 +35,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
+  // Logic to handle profile update
   Future<void> _handleUpdate() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
