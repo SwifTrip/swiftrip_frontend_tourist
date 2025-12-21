@@ -77,9 +77,11 @@ class AuthService {
       final responseData = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        // Save token to local storage
+        // Save token and user to local storage
         if (responseData['token'] != null) {
           await TokenService.saveToken(responseData['token']);
+          final user = UserModel.fromJson(responseData['data']);
+          await TokenService.saveUser(user);
         }
 
         // Success
