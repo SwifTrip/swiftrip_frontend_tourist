@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_colors.dart';
+import '../models/user_model.dart';
+import '../services/token_service.dart';
+import '../services/user_service.dart';
+import 'Signin.dart';
+import 'edit_profile_screen.dart';
+import '../services/auth_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -10,33 +16,80 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  UserModel? _user;
+  bool _isLoading = true;
+  final UserService _userService = UserService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileData();
+  }
+
+  Future<void> _loadProfileData() async {
+    setState(() => _isLoading = true);
+    
+    // Load local user data first
+    final localUser = await TokenService.getUser();
+    if (localUser != null) {
+      setState(() {
+        _user = localUser;
+        _isLoading = false;
+      });
+    }
+
+    // Refresh from backend to get most recent info
+    if (localUser != null) {
+      try {
+        final result = await _userService.getUserProfile(localUser.id);
+        if (result['success'] == true) {
+          final updatedUser = result['user'] as UserModel;
+          await TokenService.saveUser(updatedUser);
+          if (mounted) {
+            setState(() {
+              _user = updatedUser;
+            });
+          }
+        }
+      } catch (e) {
+        debugPrint('Failed to refresh profile: $e');
+      } finally {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(context),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-                child: Column(
-                  children: [
-                    _buildProfileHeader(),
-                    const SizedBox(height: 32),
-                    _buildStatsGrid(),
-                    const SizedBox(height: 32),
-                    _buildInformationSection(),
-                    const SizedBox(height: 24),
-                    _buildSettingsSection(),
-                    const SizedBox(height: 40),
-                  ],
-                ),
+        child: _isLoading && _user == null
+            ? const Center(child: CircularProgressIndicator(color: AppColors.accent))
+            : Column(
+                children: [
+                  _buildHeader(context),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                      child: Column(
+                        children: [
+                          _buildProfileHeader(),
+                          const SizedBox(height: 32),
+                          _buildStatsGrid(),
+                          const SizedBox(height: 32),
+                          _buildInformationSection(),
+                          const SizedBox(height: 24),
+                          _buildSettingsSection(),
+                          const SizedBox(height: 40),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -67,7 +120,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.edit_outlined, color: AppColors.textPrimary),
-            onPressed: () {},
+            onPressed: () async {
+              if (_user == null) return;
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditProfileScreen(user: _user!),
+                ),
+              );
+              if (result == true) {
+                _loadProfileData();
+              }
+            },
           ),
         ],
       ),
@@ -117,7 +181,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const SizedBox(height: 16),
         Text(
-          'Ali Khan',
+          _user?.fullName ?? 'Loading...',
           style: GoogleFonts.plusJakartaSans(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -126,7 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const SizedBox(height: 4),
         Text(
-          'ali.khan@example.com',
+          _user?.email ?? '',
           style: GoogleFonts.plusJakartaSans(
             fontSize: 14,
             color: AppColors.textSecondary,
