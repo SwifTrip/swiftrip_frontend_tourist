@@ -8,6 +8,8 @@ import 'fixed_packages_screen.dart';
 import 'guide_list_screen.dart';
 import 'Signin.dart';
 import 'profile_screen.dart';
+import '../models/user_model.dart';
+import '../services/token_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,6 +22,22 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   int _selectedTripTab = 0; // 0: Upcoming, 1: Current, 2: Previous
   bool _isProfileOverlayVisible = false;
+  UserModel? _user;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final user = await TokenService.getUser();
+    if (mounted) {
+      setState(() {
+        _user = user;
+      });
+    }
+  }
 
   void _onBottomNavTapped(int index) {
     setState(() {
@@ -110,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  'bilal@swifttrip.com',
+                                  _user?.email ?? 'Loading...',
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
@@ -153,15 +171,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            onTap: () {
+                            onTap: () async {
                               setState(() {
                                 _isProfileOverlayVisible = false;
                               });
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                  builder: (context) => const Signin(),
-                                ),
-                              );
+                              // Call logout service
+                              final authService = AuthService();
+                              await authService.logout();
+                              if (context.mounted) {
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                    builder: (context) => const Signin(),
+                                  ),
+                                );
+                              }
                             },
                           ),
                         ],
@@ -250,7 +273,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
             child: Text(
-              'Good morning, Alex!',
+              'Good morning, ${_user?.firstName ?? 'Traveler'}!',
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
