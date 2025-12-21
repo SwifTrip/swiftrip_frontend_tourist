@@ -10,6 +10,8 @@ import 'Signin.dart';
 import 'profile_screen.dart';
 import '../models/user_model.dart';
 import '../services/token_service.dart';
+import '../services/auth_service.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -149,16 +151,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                            onTap: () {
+                            onTap: () async {
                               setState(() {
                                 _isProfileOverlayVisible = false;
                               });
-                              Navigator.push(
+                              await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => const ProfileScreen(),
                                 ),
                               );
+                              _loadUserData();
                             },
                           ),
                           const Divider(height: 1, color: AppColors.border),
