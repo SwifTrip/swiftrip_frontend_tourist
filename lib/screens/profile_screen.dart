@@ -370,7 +370,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     color: Colors.redAccent,
                   ),
                 ),
-                onTap: () {},
+                onTap: () async {
+                  final authService = AuthService();
+                  await authService.logout();
+                  if (context.mounted) {
+                    Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+                  }
+                },
               ),
             ],
           ),
