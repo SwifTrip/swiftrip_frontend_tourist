@@ -16,7 +16,7 @@ class SwifTripTouristApp extends StatelessWidget {
       title: 'SwifTrip Tourist',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(scaffoldBackgroundColor: const Color(0xFFDFF2FE)),
-      initialRoute: '/',
+      initialRoute: '/signin',
       onGenerateRoute: (settings) {
         if (settings.name == null) return null;
         
