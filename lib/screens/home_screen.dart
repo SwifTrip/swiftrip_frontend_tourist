@@ -298,7 +298,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () {
                     setState(() {
                       _isProfileOverlayVisible =
-                          !(_isProfileOverlayVisible ?? false);
+                          !(_isProfileOverlayVisible);
                     });
                   },
                   child: Container(

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_colors.dart';
-import 'reset_password_screen.dart';
 import '../services/auth_service.dart';
 
 class EmailSentScreen extends StatefulWidget {

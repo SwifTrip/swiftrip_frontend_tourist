@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_colors.dart';
-import '../widgets/common_button.dart';
 import 'email_sent_screen.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
