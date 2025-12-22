@@ -112,86 +112,144 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                         border: Border.all(color: AppColors.border),
                       ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
+                      child: _user != null
+                          ? Column(
+                              mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Signed in as',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 12,
-                                    color: AppColors.textSecondary,
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Signed in as',
+                                        style: GoogleFonts.plusJakartaSans(
+                                          fontSize: 12,
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        _user?.email ?? 'Loading...',
+                                        style: GoogleFonts.plusJakartaSans(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  _user?.email ?? 'Loading...',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.textPrimary,
+                                const Divider(height: 1, color: AppColors.border),
+                                ListTile(
+                                  dense: true,
+                                  title: Text(
+                                    'Profile',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      color: AppColors.textPrimary,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
-                                  overflow: TextOverflow.ellipsis,
+                                  onTap: () async {
+                                    setState(() {
+                                      _isProfileOverlayVisible = false;
+                                    });
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const ProfileScreen(),
+                                      ),
+                                    );
+                                    _loadUserData();
+                                  },
+                                ),
+                                const Divider(height: 1, color: AppColors.border),
+                                ListTile(
+                                  dense: true,
+                                  title: Text(
+                                    'Logout',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      color: Colors.redAccent,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    setState(() {
+                                      _isProfileOverlayVisible = false;
+                                    });
+                                    
+                                    // Clear token and user data
+                                    await TokenService.removeToken();
+                                    await TokenService.removeUser();
+                                    
+                                    // Call backend logout endpoint
+                                    final authService = AuthService();
+                                    await authService.logout();
+                                    
+                                    if (context.mounted) {
+                                      Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(
+                                          builder: (context) => const Signin(),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ],
+                            )
+                          : Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Not signed in',
+                                        style: GoogleFonts.plusJakartaSans(
+                                          fontSize: 12,
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Login to continue',
+                                        style: GoogleFonts.plusJakartaSans(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const Divider(height: 1, color: AppColors.border),
+                                ListTile(
+                                  dense: true,
+                                  title: Text(
+                                    'Login',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      color: AppColors.accent,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onTap: () {
+                                    setState(() {
+                                      _isProfileOverlayVisible = false;
+                                    });
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) => const Signin(),
+                                      ),
+                                    );
+                                  },
                                 ),
                               ],
                             ),
-                          ),
-                          const Divider(height: 1, color: AppColors.border),
-                          ListTile(
-                            dense: true,
-                            title: Text(
-                              'Profile',
-                              style: GoogleFonts.plusJakartaSans(
-                                color: AppColors.textPrimary,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            onTap: () async {
-                              setState(() {
-                                _isProfileOverlayVisible = false;
-                              });
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const ProfileScreen(),
-                                ),
-                              );
-                              _loadUserData();
-                            },
-                          ),
-                          const Divider(height: 1, color: AppColors.border),
-                          ListTile(
-                            dense: true,
-                            title: Text(
-                              'Logout',
-                              style: GoogleFonts.plusJakartaSans(
-                                color: Colors.redAccent,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            onTap: () async {
-                              setState(() {
-                                _isProfileOverlayVisible = false;
-                              });
-                              // Call logout service
-                              final authService = AuthService();
-                              await authService.logout();
-                              if (context.mounted) {
-                                Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                    builder: (context) => const Signin(),
-                                  ),
-                                );
-                              }
-                            },
-                          ),
-                        ],
-                      ),
                     ),
                   ],
                 ),

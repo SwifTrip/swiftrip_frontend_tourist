@@ -24,6 +24,9 @@ class ApiConfig {
   static const String searchPackages = '$baseUrl/tourist/packages/search';
   static const String touristPackages = '$baseUrl/tourist/packages';
 
+  // Tourist Bookings Endpoints
+  static const String myBookings = '$baseUrl/tourist/bookings/my';
+
   // Request timeout duration
   static const Duration timeout = Duration(seconds: 30);
 }

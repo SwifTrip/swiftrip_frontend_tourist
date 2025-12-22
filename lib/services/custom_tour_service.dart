@@ -15,10 +15,9 @@ class CustomTourService {
       // Get auth token
       final token = await TokenService.getToken();
       
-      // if (token == null) {
-      //   print('No authentication token found');
-      //   return {'success': false, 'message': 'Authentication required'};
-      // }
+      if (token == null) {
+        return {'success': false, 'message': 'Authentication required'};
+      }
       final Map<String, dynamic> requestBody = {
         'basePackageId': basePackageId,
         'startDate': startDate.toIso8601String(),
