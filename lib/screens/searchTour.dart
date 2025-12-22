@@ -3,6 +3,8 @@ import '../theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../widgets/common_button.dart';
 import '../services/package_service.dart';
+import 'package:flutter/services.dart';
+import 'dart:convert';
 
 class SearchTour extends StatefulWidget {
   const SearchTour({super.key});
@@ -20,38 +22,29 @@ class _SearchTourState extends State<SearchTour> {
   String fromLocation = '';
   String toLocation = '';
   bool isLoading = false;
+  List<String> locations = [];
 
   final PackageService _packageService = PackageService();
 
-  // List of available locations
-  final List<String> locations = [
-    'Karachi',
-    'Lahore',
-    'Islamabad',
-    'Rawalpindi',
-    'Faisalabad',
-    'Multan',
-    'Peshawar',
-    'Quetta',
-    'Sialkot',
-    'Gujranwala',
-    'Hunza',
-    'Skardu',
-    'Gilgit',
-    'Murree',
-    'Naran',
-    'Kaghan',
-    'Swat',
-    'Chitral',
-    'San Francisco',
-    'New York',
-    'Los Angeles',
-    'Chicago',
-    'London',
-    'Paris',
-    'Dubai',
-    'Istanbul',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadCities();
+  }
+
+  Future<void> _loadCities() async {
+    try {
+      final String jsonString = await rootBundle.loadString('lib/cities.json');
+      final List<dynamic> jsonData = jsonDecode(jsonString);
+      setState(() {
+        locations = List<String>.from(jsonData);
+      });
+    } catch (e) {
+      setState(() {
+        locations = [];
+      });
+    }
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
