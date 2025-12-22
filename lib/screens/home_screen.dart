@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_colors.dart';
@@ -9,9 +8,10 @@ import 'guide_list_screen.dart';
 import 'Signin.dart';
 import 'profile_screen.dart';
 import '../models/user_model.dart';
+import '../models/booking_model.dart';
 import '../services/token_service.dart';
 import '../services/auth_service.dart';
-
+import '../services/booking_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,6 +25,9 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedTripTab = 0; // 0: Upcoming, 1: Current, 2: Previous
   bool _isProfileOverlayVisible = false;
   UserModel? _user;
+  BookingsData? _bookingsData;
+  bool _isLoadingBookings = false;
+  String? _bookingsError;
 
   @override
   void initState() {
@@ -45,6 +48,43 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _currentIndex = index;
     });
+
+    // Load bookings when user navigates to trips tab
+    if (index == 4 && _bookingsData == null && !_isLoadingBookings) {
+      _fetchBookings();
+    }
+  }
+
+  Future<void> _fetchBookings() async {
+    if (_isLoadingBookings) return;
+
+    setState(() {
+      _isLoadingBookings = true;
+      _bookingsError = null;
+    });
+
+    try {
+      final bookingService = BookingService();
+      final response = await bookingService.getUserBookings();
+
+      if (mounted) {
+        setState(() {
+          _isLoadingBookings = false;
+          if (response != null && response.success) {
+            _bookingsData = response.data;
+          } else {
+            _bookingsError = 'Failed to load bookings';
+          }
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingBookings = false;
+          _bookingsError = 'Error: ${e.toString()}';
+        });
+      }
+    }
   }
 
   @override
@@ -76,9 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       _isProfileOverlayVisible = false;
                     });
                   },
-                  child: Container(
-                    color: Colors.black.withOpacity(0.3),
-                  ),
+                  child: Container(color: Colors.black.withOpacity(0.3)),
                 ),
               ),
 
@@ -120,7 +158,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Padding(
                                   padding: const EdgeInsets.all(16.0),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Signed in as',
@@ -142,7 +181,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ],
                                   ),
                                 ),
-                                const Divider(height: 1, color: AppColors.border),
+                                const Divider(
+                                  height: 1,
+                                  color: AppColors.border,
+                                ),
                                 ListTile(
                                   dense: true,
                                   title: Text(
@@ -159,13 +201,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                     await Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => const ProfileScreen(),
+                                        builder: (context) =>
+                                            const ProfileScreen(),
                                       ),
                                     );
                                     _loadUserData();
                                   },
                                 ),
-                                const Divider(height: 1, color: AppColors.border),
+                                const Divider(
+                                  height: 1,
+                                  color: AppColors.border,
+                                ),
                                 ListTile(
                                   dense: true,
                                   title: Text(
@@ -179,15 +225,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                     setState(() {
                                       _isProfileOverlayVisible = false;
                                     });
-                                    
+
                                     // Clear token and user data
                                     await TokenService.removeToken();
                                     await TokenService.removeUser();
-                                    
+
                                     // Call backend logout endpoint
                                     final authService = AuthService();
                                     await authService.logout();
-                                    
+
                                     if (context.mounted) {
                                       Navigator.of(context).pushReplacement(
                                         MaterialPageRoute(
@@ -206,7 +252,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Padding(
                                   padding: const EdgeInsets.all(16.0),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Not signed in',
@@ -227,7 +274,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ],
                                   ),
                                 ),
-                                const Divider(height: 1, color: AppColors.border),
+                                const Divider(
+                                  height: 1,
+                                  color: AppColors.border,
+                                ),
                                 ListTile(
                                   dense: true,
                                   title: Text(
@@ -297,8 +347,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 GestureDetector(
                   onTap: () {
                     setState(() {
-                      _isProfileOverlayVisible =
-                          !(_isProfileOverlayVisible);
+                      _isProfileOverlayVisible = !(_isProfileOverlayVisible);
                     });
                   },
                   child: Container(
@@ -314,8 +363,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border:
-                            Border.all(color: AppColors.background, width: 2),
+                        border: Border.all(
+                          color: AppColors.background,
+                          width: 2,
+                        ),
                       ),
                       child: const CircleAvatar(
                         radius: 18,
@@ -364,13 +415,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: TextField(
                       decoration: const InputDecoration(
                         hintText: 'Where to?',
-                        hintStyle:
-                            TextStyle(color: AppColors.textSecondary, fontSize: 16),
+                        hintStyle: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 16,
+                        ),
                         border: InputBorder.none,
                         isDense: true,
                       ),
                       style: const TextStyle(
-                          color: AppColors.textPrimary, fontSize: 16),
+                        color: AppColors.textPrimary,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -609,35 +664,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
 
         // Trips List
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            children: [
-              const SizedBox(height: 8),
-              _buildTripCard(
-                title: 'Hunza Extended Stay',
-                provider: 'Hunza Adventures Inc.',
-                date: 'Nov 10 - 20',
-                countdown: '25 Days',
-                status: 'Confirmed',
-                statusColor: Colors.greenAccent,
-                imageUrl:
-                    'https://lh3.googleusercontent.com/aida-public/AB6AXuDALXJq-LgX4lkbQjymS6iWY6ljyvjQWOPsTnBr5zFO8MDxFhhB4U7lz_PGzosY_cnYg8cQj_rN9BZRqK5Lhlke0DvFF9B_WvfvCkotL0iixrSgjr9IwJlYUPth6u9fDXumvA7Wh_BA0mEGhPQJLOkhNIpLAHrG-AiCOIF9iZCFiadJZl9sBXFzywVjocQ8LzBIT6M6u3iQ_7_y1qU0PJ05A1sH1ijexz52YB0U_AnYIIBP4PfcouhLoXOzNOaL6gsXTOfr8xEcEHFG',
-              ),
-              const SizedBox(height: 16),
-              _buildTripCard(
-                title: 'Skardu Expedition',
-                provider: 'Northern Treks Ltd.',
-                date: 'Dec 05 - 12',
-                countdown: '50 Days',
-                status: 'Pending',
-                statusColor: Colors.amberAccent,
-                imageUrl: '', // Show placeholder icon
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
-        ),
+        Expanded(child: _buildTripsListContent()),
       ],
     );
   }
@@ -650,6 +677,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required String status,
     required Color statusColor,
     required String imageUrl,
+    String? additionalInfo,
   }) {
     return Container(
       padding: const EdgeInsets.all(12),
@@ -682,8 +710,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   : null,
             ),
             child: imageUrl.isEmpty
-                ? const Icon(Icons.landscape,
-                    color: AppColors.textSecondary, size: 40)
+                ? const Icon(
+                    Icons.landscape,
+                    color: AppColors.textSecondary,
+                    size: 40,
+                  )
                 : null,
           ),
           const SizedBox(width: 16),
@@ -694,8 +725,10 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 // Status Badge
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: statusColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -727,6 +760,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: AppColors.textSecondary,
                   ),
                 ),
+                if (additionalInfo != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    additionalInfo,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 11,
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 12),
                 const Divider(height: 1, color: AppColors.border),
                 const SizedBox(height: 12),
@@ -785,6 +829,274 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildTripsListContent() {
+    // Show loading indicator
+    if (_isLoadingBookings) {
+      return const Center(
+        child: CircularProgressIndicator(color: AppColors.accent),
+      );
+    }
+
+    // Show error message
+    if (_bookingsError != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              size: 64,
+              color: AppColors.textSecondary,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _bookingsError!,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 16,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _fetchBookings,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.accent,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+              ),
+              child: Text(
+                'Retry',
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // No bookings data
+    if (_bookingsData == null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.luggage_outlined,
+              size: 64,
+              color: AppColors.textSecondary,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No bookings yet',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Start exploring and book your first trip!',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Filter bookings based on selected tab
+    final filteredBookings = _getFilteredBookings();
+
+    if (filteredBookings.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.search_off,
+              size: 64,
+              color: AppColors.textSecondary,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No ${_getTabLabel()} trips',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: _fetchBookings,
+      color: AppColors.accent,
+      child: ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: filteredBookings.length,
+        itemBuilder: (context, index) {
+          final booking = filteredBookings[index];
+          return Padding(
+            padding: EdgeInsets.only(top: index == 0 ? 8 : 0, bottom: 16),
+            child: _buildBookingCard(booking),
+          );
+        },
+      ),
+    );
+  }
+
+  String _getTabLabel() {
+    switch (_selectedTripTab) {
+      case 0:
+        return 'upcoming';
+      case 1:
+        return 'current';
+      case 2:
+        return 'previous';
+      default:
+        return '';
+    }
+  }
+
+  List<dynamic> _getFilteredBookings() {
+    if (_bookingsData == null) return [];
+
+    final now = DateTime.now();
+    final allBookings = _bookingsData!.getAllBookings();
+
+    return allBookings.where((booking) {
+      DateTime? startDate;
+      DateTime? endDate;
+
+      if (booking is PublicTourBooking) {
+        startDate = booking.departureDate;
+        endDate = booking.arrivalDate;
+      } else if (booking is PrivateTourBooking) {
+        startDate = booking.startDate;
+        endDate = booking.endDate;
+      }
+
+      if (startDate == null || endDate == null) return false;
+
+      // Filter by tab
+      switch (_selectedTripTab) {
+        case 0: // Upcoming
+          return startDate.isAfter(now);
+        case 1: // Current
+          return startDate.isBefore(now) && endDate.isAfter(now);
+        case 2: // Previous
+          return endDate.isBefore(now);
+        default:
+          return false;
+      }
+    }).toList();
+  }
+
+  Widget _buildBookingCard(dynamic booking) {
+    if (booking is PublicTourBooking) {
+      return _buildPublicTourCard(booking);
+    } else if (booking is PrivateTourBooking) {
+      return _buildPrivateTourCard(booking);
+    }
+    return const SizedBox.shrink();
+  }
+
+  Widget _buildPublicTourCard(PublicTourBooking booking) {
+    final daysUntil = booking.departureDate.difference(DateTime.now()).inDays;
+    final countdown = daysUntil > 0 ? '$daysUntil Days' : 'Today';
+
+    Color statusColor;
+    switch (booking.status.toUpperCase()) {
+      case 'CONFIRMED':
+        statusColor = Colors.greenAccent;
+        break;
+      case 'PENDING':
+        statusColor = Colors.amberAccent;
+        break;
+      case 'CANCELLED':
+        statusColor = Colors.redAccent;
+        break;
+      default:
+        statusColor = Colors.blueAccent;
+    }
+
+    return _buildTripCard(
+      title: booking.package.title,
+      provider: booking.company.name,
+      date:
+          '${_formatDate(booking.departureDate)} - ${_formatDate(booking.arrivalDate)}',
+      countdown: countdown,
+      status: booking.status,
+      statusColor: statusColor,
+      imageUrl: booking.package.coverImage ?? '',
+      additionalInfo: '${booking.seats} seat(s) • PKR ${booking.totalAmount}',
+    );
+  }
+
+  Widget _buildPrivateTourCard(PrivateTourBooking booking) {
+    final daysUntil = booking.startDate.difference(DateTime.now()).inDays;
+    final countdown = daysUntil > 0 ? '$daysUntil Days' : 'Today';
+
+    Color statusColor;
+    switch (booking.status.toUpperCase()) {
+      case 'CONFIRMED':
+      case 'ACCEPTED':
+        statusColor = Colors.greenAccent;
+        break;
+      case 'PENDING':
+        statusColor = Colors.amberAccent;
+        break;
+      case 'CANCELLED':
+      case 'REJECTED':
+        statusColor = Colors.redAccent;
+        break;
+      default:
+        statusColor = Colors.blueAccent;
+    }
+
+    return _buildTripCard(
+      title: 'Custom Tour (${booking.duration} days)',
+      provider: booking.company.name,
+      date:
+          '${_formatDate(booking.startDate)} - ${_formatDate(booking.endDate)}',
+      countdown: countdown,
+      status: booking.status,
+      statusColor: statusColor,
+      imageUrl: '',
+      additionalInfo:
+          '${booking.travelerCount} traveler(s)${booking.totalPrice != null ? ' • PKR ${booking.totalPrice}' : ''}',
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return '${months[date.month - 1]} ${date.day}';
+  }
+
   Widget _buildTripTabItem(String label, int index) {
     final bool isActive = _selectedTripTab == index;
     return Expanded(
@@ -823,11 +1135,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCategoryItem(
-      {required IconData icon,
-      required String label,
-      required bool isActive,
-      VoidCallback? onTap}) {
+  Widget _buildCategoryItem({
+    required IconData icon,
+    required String label,
+    required bool isActive,
+    VoidCallback? onTap,
+  }) {
     return Expanded(
       child: AspectRatio(
         aspectRatio: 1,
@@ -872,10 +1185,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildTrendingCard(
-      {required String title,
-      required String subtitle,
-      required String imageUrl}) {
+  Widget _buildTrendingCard({
+    required String title,
+    required String subtitle,
+    required String imageUrl,
+  }) {
     return Container(
       width: 160, // w-40
       decoration: BoxDecoration(
@@ -891,10 +1205,7 @@ class _HomeScreenState extends State<HomeScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.transparent,
-              Colors.black.withOpacity(0.6),
-            ],
+            colors: [Colors.transparent, Colors.black.withOpacity(0.6)],
             stops: const [0.6, 1.0],
           ),
         ),
@@ -926,8 +1237,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildUpcomingTripCard(
-      {required String title, required String date, required String imageUrl}) {
+  Widget _buildUpcomingTripCard({
+    required String title,
+    required String date,
+    required String imageUrl,
+  }) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -978,10 +1292,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          const Icon(
-            Icons.chevron_right,
-            color: AppColors.textSecondary,
-          ),
+          const Icon(Icons.chevron_right, color: AppColors.textSecondary),
         ],
       ),
     );
