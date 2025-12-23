@@ -108,8 +108,6 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                         const SizedBox(height: 24),
                       ],
                       if (_getActivityItemsForDay().isNotEmpty) ..._buildActivitySection(),
-                      const SizedBox(height: 24),
-                      _buildDayNote(),
                       const SizedBox(height: 140), // Spacing for footer
                     ],
                   ),
@@ -198,9 +196,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
               widget.package.itineraries[_selectedDayIndex].title,
               style: const TextStyle(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(width: 8),
-            Icon(Icons.location_on_outlined, color: _accentColor, size: 20),
-          ],
+            const SizedBox(width: 8), ],
         ),
       ],
     );
@@ -379,6 +375,19 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
       onTap: isCustomizable
           ? () {
               setState(() {
+                // Get all optional accommodation items for this day
+                final optionalAccommodations = _getAccommodationItemsForDay()
+                    .where((acc) => acc.optional)
+                    .toList();
+                
+                // Deselect all other optional accommodations for this day
+                for (final acc in optionalAccommodations) {
+                  if (acc.id != item.id) {
+                    _selectedOptionalItems[acc.id] = false;
+                  }
+                }
+                
+                // Toggle the selected item
                 _selectedOptionalItems[item.id] = !(_selectedOptionalItems[item.id] ?? false);
               });
             }
@@ -706,6 +715,31 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
       onTap: isCustomizable
           ? () {
               setState(() {
+                // Get the meal type of the current item
+                String? currentMealType;
+                for (final detail in item.mealDetails) {
+                  currentMealType = detail.mealType.toLowerCase();
+                  break;
+                }
+                
+                if (currentMealType != null) {
+                  // Get all meals for this day
+                  final allMeals = _getMealItemsForDay();
+                  
+                  // Deselect all other optional meals of the same type
+                  for (final meal in allMeals) {
+                    if (meal.optional && meal.id != item.id) {
+                      for (final detail in meal.mealDetails) {
+                        if (detail.mealType.toLowerCase() == currentMealType) {
+                          _selectedOptionalItems[meal.id] = false;
+                          break;
+                        }
+                      }
+                    }
+                  }
+                }
+                
+                // Toggle the selected item
                 _selectedOptionalItems[item.id] = !(_selectedOptionalItems[item.id] ?? false);
               });
             }
@@ -901,40 +935,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
       ),
     );
   }
-
-  Widget _buildDayNote() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'DAY NOTE',
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
-        ),
-        const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.border),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.edit_note_outlined, color: AppColors.textSecondary.withOpacity(0.5), size: 20),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Text(
-                  'Add a special request or note for this day...',
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
+  
   Widget _buildStickyFooter() {
     return Positioned(
       bottom: 0,
