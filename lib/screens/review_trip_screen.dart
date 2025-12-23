@@ -60,14 +60,6 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                 fontSize: 16,
               ),
             ),
-            Text(
-              'Step 3 of 4',
-              style: TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
           ],
         ),
         centerTitle: true,

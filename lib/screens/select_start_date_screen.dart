@@ -8,7 +8,11 @@ class SelectStartDateScreen extends StatefulWidget {
   final CustomizeItineraryModel package;
   final int travelers;
 
-  const SelectStartDateScreen({super.key, required this.package, required this.travelers});
+  const SelectStartDateScreen({
+    super.key,
+    required this.package,
+    required this.travelers,
+  });
 
   @override
   State<SelectStartDateScreen> createState() => _SelectStartDateScreenState();
@@ -37,7 +41,11 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
         ),
         title: const Text(
           'Select Start Date',
-          style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 18),
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
         centerTitle: true,
         actions: [
@@ -62,8 +70,6 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
                 _buildCalendarView(),
                 const SizedBox(height: 24),
                 _buildLegend(),
-                const SizedBox(height: 24),
-                _buildInfoBox(),
                 const SizedBox(height: 140), // Spacing for footer
               ],
             ),
@@ -76,7 +82,7 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
 
   Widget _buildStickyFooter() {
     final rangeEnd = _selectedDate?.add(Duration(days: _durationDays - 1));
-    
+
     return Positioned(
       bottom: 0,
       left: 0,
@@ -87,7 +93,11 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
           color: AppColors.surface,
           border: const Border(top: BorderSide(color: AppColors.border)),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 20, offset: const Offset(0, -10))
+            BoxShadow(
+              color: Colors.black.withOpacity(0.4),
+              blurRadius: 20,
+              offset: const Offset(0, -10),
+            ),
           ],
         ),
         child: Column(
@@ -101,21 +111,38 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
                   children: [
                     const Text(
                       'SELECTED DATES',
-                      style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Row(
                       children: [
                         Text(
                           _formatDate(_selectedDate),
-                          style: const TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(width: 8),
-                        const Icon(Icons.arrow_forward, color: AppColors.textSecondary, size: 14),
+                        const Icon(
+                          Icons.arrow_forward,
+                          color: AppColors.textSecondary,
+                          size: 14,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           _formatDate(rangeEnd),
-                          style: const TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
@@ -126,12 +153,21 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
                   children: [
                     const Text(
                       'DURATION',
-                      style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '$_durationDays Days / ${_durationDays - 1} Nights',
-                      style: const TextStyle(color: _privateAccent, fontSize: 12, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        color: _privateAccent,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
@@ -174,7 +210,11 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
       children: [
         _buildLegendItem(_privateAccent, 'Start Date'),
         const SizedBox(width: 24),
-        _buildLegendItem(_privateAccent.withOpacity(0.15), 'Trip Duration', isRange: true),
+        _buildLegendItem(
+          _privateAccent.withOpacity(0.15),
+          'Trip Duration',
+          isRange: true,
+        ),
       ],
     );
   }
@@ -185,45 +225,21 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
         Container(
           width: isRange ? 32 : 12,
           height: 12,
-          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(isRange ? 4 : 999)),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(isRange ? 4 : 999),
+          ),
         ),
         const SizedBox(width: 8),
-        Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w500)),
-      ],
-    );
-  }
-
-  Widget _buildInfoBox() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.blue.withOpacity(0.1)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(Icons.info_outline, color: Colors.blue, size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  'Flexible Start Dates',
-                  style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 12),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Since this is a private tour, you can start on any date that suits you. The 7-day itinerary will automatically adjust.',
-                  style: TextStyle(color: Colors.white54, fontSize: 11, height: 1.5),
-                ),
-              ],
-            ),
+        Text(
+          label,
+          style: const TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -236,10 +252,18 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: weekdays.map((day) => Text(
-            day,
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.bold),
-          )).toList(),
+          children: weekdays
+              .map(
+                (day) => Text(
+                  day,
+                  style: const TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
+              .toList(),
         ),
         const SizedBox(height: 16),
         GridView.builder(
@@ -253,18 +277,22 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
           itemCount: daysInMonth + firstDayOffset,
           itemBuilder: (context, index) {
             if (index < firstDayOffset) return const SizedBox.shrink();
-            
+
             final day = index - firstDayOffset + 1;
             final date = DateTime(2024, 10, day);
             final isPast = day < 12;
-            final isSelected = _selectedDate != null && date.isAtSameMomentAs(_selectedDate!);
-            
+            final isSelected =
+                _selectedDate != null && date.isAtSameMomentAs(_selectedDate!);
+
             // Range logic
             bool isInRange = false;
             bool isRangeEnd = false;
             if (_selectedDate != null) {
-              final rangeEnd = _selectedDate!.add(Duration(days: _durationDays - 1));
-              isInRange = date.isAfter(_selectedDate!) && date.isBefore(rangeEnd);
+              final rangeEnd = _selectedDate!.add(
+                Duration(days: _durationDays - 1),
+              );
+              isInRange =
+                  date.isAfter(_selectedDate!) && date.isBefore(rangeEnd);
               isRangeEnd = date.isAtSameMomentAs(rangeEnd);
             }
 
@@ -281,7 +309,7 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
                         color: _privateAccent.withOpacity(0.15),
                       ),
                     ),
-                  
+
                   // Start date background extention
                   if (isSelected)
                     Positioned(
@@ -314,19 +342,33 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: isSelected ? _privateAccent : Colors.transparent,
-                      boxShadow: isSelected ? [
-                        BoxShadow(color: _privateAccent.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4))
-                      ] : null,
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: _privateAccent.withOpacity(0.3),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ]
+                          : null,
                     ),
                     child: Center(
                       child: Text(
                         day.toString(),
                         style: TextStyle(
-                          color: isPast 
+                          color: isPast
                               ? AppColors.textSecondary.withOpacity(0.3)
-                              : (isSelected ? Colors.white : (isInRange || isRangeEnd ? _privateAccent : AppColors.textPrimary)),
-                          fontWeight: isSelected || isInRange || isRangeEnd ? FontWeight.bold : FontWeight.normal,
-                          decoration: isPast ? TextDecoration.lineThrough : null,
+                              : (isSelected
+                                    ? Colors.white
+                                    : (isInRange || isRangeEnd
+                                          ? _privateAccent
+                                          : AppColors.textPrimary)),
+                          fontWeight: isSelected || isInRange || isRangeEnd
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                          decoration: isPast
+                              ? TextDecoration.lineThrough
+                              : null,
                         ),
                       ),
                     ),
@@ -336,7 +378,10 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
                     Positioned(
                       top: -30,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(4),
@@ -346,7 +391,11 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
                           children: [
                             const Text(
                               'Start',
-                              style: TextStyle(color: Color(0xFF101922), fontSize: 10, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                color: Color(0xFF101922),
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             Positioned(
                               bottom: -8,
@@ -355,7 +404,11 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
                               child: Center(
                                 child: Transform.rotate(
                                   angle: 0.785, // 45 degrees
-                                  child: Container(width: 8, height: 8, color: Colors.white),
+                                  child: Container(
+                                    width: 8,
+                                    height: 8,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
@@ -370,7 +423,10 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
                       child: Container(
                         width: 4,
                         height: 4,
-                        decoration: const BoxDecoration(color: _privateAccent, shape: BoxShape.circle),
+                        decoration: const BoxDecoration(
+                          color: _privateAccent,
+                          shape: BoxShape.circle,
+                        ),
                       ),
                     ),
                 ],
@@ -395,7 +451,9 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: Image.network(
-              widget.package.media.isNotEmpty ? widget.package.media.first.url : 'https://via.placeholder.com/300x300.png?text=Trip',
+              widget.package.media.isNotEmpty
+                  ? "https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                  : 'https://via.placeholder.com/300x300.png?text=Trip',
               width: 64,
               height: 64,
               fit: BoxFit.cover,
@@ -417,23 +475,37 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
                 ),
                 Text(
                   widget.package.title,
-                  style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 14),
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.calendar_today, color: AppColors.textSecondary, size: 12),
+                    const Icon(
+                      Icons.calendar_today,
+                      color: AppColors.textSecondary,
+                      size: 12,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       '${widget.package.duration} days',
-                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 12,
+                      ),
                     ),
                     const SizedBox(width: 8),
                     const Text('•', style: TextStyle(color: Colors.white24)),
                     const SizedBox(width: 8),
                     const Text(
                       'Fixed Duration',
-                      style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),
@@ -456,7 +528,11 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
         const Spacer(),
         const Text(
           'October 2024',
-          style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 18),
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
         const Spacer(),
         IconButton(
@@ -469,7 +545,20 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
 
   String _formatDate(DateTime? date) {
     if (date == null) return '--';
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${months[date.month - 1]} ${date.day}';
   }
 }

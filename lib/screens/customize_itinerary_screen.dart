@@ -64,12 +64,6 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
           ],
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.save_outlined, color: _accentColor),
-            onPressed: () {},
-          ),
-        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
           child: Divider(color: AppColors.border, height: 1),
@@ -209,13 +203,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
         Text(
           title,
           style: const TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
-        ),
-        if (isCustomizable)
-          const Text(
-            'CHANGE',
-            style: TextStyle(color: Color(0xFF10B981), fontSize: 10, fontWeight: FontWeight.bold, decoration: TextDecoration.underline),
-          )
-        else if (isFixed)
+        ),if (isFixed)
           Row(
             children: [
               Icon(Icons.lock_outline, color: AppColors.textSecondary.withOpacity(0.5), size: 10),

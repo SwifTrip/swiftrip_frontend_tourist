@@ -254,7 +254,8 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                   ),
                 ],
               ),
-            ),],
+            ),
+          ],
         ),
       ),
     );
@@ -577,7 +578,7 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
       children: [
         Image.network(
           widget.customizeItinerary.media.isNotEmpty
-              ? widget.customizeItinerary.media.first.url
+              ? "https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               : 'https://via.placeholder.com/1200x800.png?text=Trip',
           height: 380,
           width: double.infinity,
@@ -656,7 +657,8 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                   Icon(Icons.location_on, color: Colors.white70, size: 16),
                   SizedBox(width: 4),
                   Text(
-                    widget.customizeItinerary.fromLocation + " to " +
+                    widget.customizeItinerary.fromLocation +
+                        " to " +
                         widget.customizeItinerary.toLocation,
                     style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
