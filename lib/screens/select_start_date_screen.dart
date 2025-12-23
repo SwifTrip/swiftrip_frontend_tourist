@@ -19,11 +19,23 @@ class SelectStartDateScreen extends StatefulWidget {
 }
 
 class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
-  DateTime? _selectedDate = DateTime(2024, 10, 14);
+  late DateTime _selectedDate;
   late int _durationDays;
+  late DateTime _currentDate;
+  late DateTime _displayedMonth; // Track which month to display
 
   // Private tour accent color (Purple as per mockup)
   static const Color _privateAccent = Color(0xFF8B5CF6);
+
+  @override
+  void initState() {
+    super.initState();
+    _currentDate = DateTime.now();
+    // Set selected date to tomorrow
+    _selectedDate = DateTime(_currentDate.year, _currentDate.month, _currentDate.day + 1);
+    // Set displayed month to current month
+    _displayedMonth = DateTime(_currentDate.year, _currentDate.month, 1);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -244,8 +256,16 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
   }
 
   Widget _buildCalendarView() {
-    final daysInMonth = 31;
-    final firstDayOffset = 2; // Oct 1, 2024 starts on Tuesday
+    final year = _displayedMonth.year;
+    final month = _displayedMonth.month;
+    
+    // Get number of days in the displayed month
+    final daysInMonth = DateTime(year, month + 1, 0).day;
+    
+    // Get the first day of the month and its weekday offset
+    final firstDay = DateTime(year, month, 1);
+    final firstDayOffset = firstDay.weekday; // 0 = Sunday, 1 = Monday, etc.
+    
     final weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
     return Column(
@@ -279,22 +299,27 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
             if (index < firstDayOffset) return const SizedBox.shrink();
 
             final day = index - firstDayOffset + 1;
-            final date = DateTime(2024, 10, day);
-            final isPast = day < 12;
-            final isSelected =
-                _selectedDate != null && date.isAtSameMomentAs(_selectedDate!);
+            final date = DateTime(year, month, day);
+            
+            // Only allow dates greater than today
+            final today = DateTime.now();
+            final todayWithoutTime = DateTime(today.year, today.month, today.day);
+            final isPast = date.isBefore(todayWithoutTime) || date.isAtSameMomentAs(todayWithoutTime);
+            
+            final isSelected = date.year == _selectedDate.year &&
+                date.month == _selectedDate.month &&
+                date.day == _selectedDate.day;
 
             // Range logic
             bool isInRange = false;
             bool isRangeEnd = false;
-            if (_selectedDate != null) {
-              final rangeEnd = _selectedDate!.add(
-                Duration(days: _durationDays - 1),
-              );
-              isInRange =
-                  date.isAfter(_selectedDate!) && date.isBefore(rangeEnd);
-              isRangeEnd = date.isAtSameMomentAs(rangeEnd);
-            }
+            final rangeEnd = _selectedDate.add(
+              Duration(days: _durationDays - 1),
+            );
+            isInRange = date.isAfter(_selectedDate) && date.isBefore(rangeEnd);
+            isRangeEnd = date.year == rangeEnd.year &&
+                date.month == rangeEnd.month &&
+                date.day == rangeEnd.day;
 
             return GestureDetector(
               onTap: isPast ? null : () => setState(() => _selectedDate = date),
@@ -518,17 +543,25 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
   }
 
   Widget _buildCalendarHeader() {
+    final months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    final monthName = months[_displayedMonth.month - 1];
+    final year = _displayedMonth.year;
+    
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         IconButton(
           icon: const Icon(Icons.chevron_left, color: AppColors.textSecondary),
-          onPressed: () {},
+          onPressed: () {
+            setState(() {
+              _displayedMonth = DateTime(_displayedMonth.year, _displayedMonth.month - 1, 1);
+            });
+          },
         ),
         const Spacer(),
-        const Text(
-          'October 2024',
-          style: TextStyle(
+        Text(
+          '$monthName $year',
+          style: const TextStyle(
             color: AppColors.textPrimary,
             fontWeight: FontWeight.bold,
             fontSize: 18,
@@ -537,7 +570,11 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
         const Spacer(),
         IconButton(
           icon: const Icon(Icons.chevron_right, color: AppColors.textPrimary),
-          onPressed: () {},
+          onPressed: () {
+            setState(() {
+              _displayedMonth = DateTime(_displayedMonth.year, _displayedMonth.month + 1, 1);
+            });
+          },
         ),
       ],
     );
