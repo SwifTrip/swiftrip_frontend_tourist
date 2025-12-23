@@ -3,6 +3,7 @@ import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
 import '../services/custom_tour_service.dart';
+import 'home_screen.dart';
 
 class ReviewTripScreen extends StatefulWidget {
   final CustomizeItineraryModel package;
@@ -902,10 +903,12 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
             duration: const Duration(seconds: 3),
           ),
         );
-
-        // Navigate to next screen or back
-        // You can navigate to payment screen or booking confirmation here
-        // Navigator.push(context, MaterialPageRoute(builder: (context) => PaymentScreen(...)));
+        // Return to home after successful save
+        if (!mounted) return;
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          (route) => false,
+        );
       } else {
         // Show error message
         ScaffoldMessenger.of(context).showSnackBar(

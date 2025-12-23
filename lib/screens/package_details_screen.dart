@@ -34,7 +34,7 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
   }
 
   Color get _accentColor =>
-      widget.isPublic ? const Color(0xFF137FEC) : Colors.purpleAccent;
+      widget.isPublic ? Color(0xFF137FEC) : Colors.purpleAccent;
 
   @override
   Widget build(BuildContext context) {
@@ -246,7 +246,7 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                   Text(
                     widget.isPublic
                         ? 'Add airport transfers or single supplements.'
-                        : 'Dates, routes, and hotels are all flexible.',
+                        : 'Dates, activities, and hotels are all flexible.',
                     style: const TextStyle(
                       color: AppColors.textSecondary,
                       fontSize: 12,
@@ -254,9 +254,7 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                   ),
                 ],
               ),
-            ),
-            Icon(Icons.chevron_right, color: _accentColor.withOpacity(0.5)),
-          ],
+            ),],
         ),
       ),
     );
@@ -537,16 +535,6 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                     ),
                   ],
                 ),
-                Text(
-                  widget.isPublic
-                      ? 'Deposit: \$100 today'
-                      : 'Deposit: \$250 today',
-                  style: const TextStyle(
-                    color: Color(0xFF10B981),
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
               ],
             ),
             const SizedBox(width: 16),
@@ -663,12 +651,13 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              const Row(
+              Row(
                 children: [
                   Icon(Icons.location_on, color: Colors.white70, size: 16),
                   SizedBox(width: 4),
                   Text(
-                    'Karimabad, Altit, Baltit',
+                    widget.customizeItinerary.fromLocation + " to " +
+                        widget.customizeItinerary.toLocation,
                     style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                 ],

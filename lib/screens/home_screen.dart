@@ -22,7 +22,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-  int _selectedTripTab = 0; // 0: Upcoming, 1: Current, 2: Previous
   bool _isProfileOverlayVisible = false;
   UserModel? _user;
   BookingsData? _bookingsData;
@@ -49,18 +48,21 @@ class _HomeScreenState extends State<HomeScreen> {
       _currentIndex = index;
     });
 
-    // Load bookings when user navigates to trips tab
-    if (index == 4 && _bookingsData == null && !_isLoadingBookings) {
-      _fetchBookings();
+    // Always refresh bookings when user navigates to trips tab
+    if (index == 4 && !_isLoadingBookings) {
+      _fetchBookings(forceRefresh: true);
     }
   }
 
-  Future<void> _fetchBookings() async {
+  Future<void> _fetchBookings({bool forceRefresh = false}) async {
     if (_isLoadingBookings) return;
 
     setState(() {
       _isLoadingBookings = true;
       _bookingsError = null;
+      if (forceRefresh) {
+        _bookingsData = null;
+      }
     });
 
     try {
@@ -644,25 +646,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
 
-        // Tab Selector
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                _buildTripTabItem('Upcoming', 0),
-                _buildTripTabItem('Current', 1),
-                _buildTripTabItem('Previous', 2),
-              ],
-            ),
-          ),
-        ),
-
         // Trips List
         Expanded(child: _buildTripsListContent()),
       ],
@@ -912,10 +895,10 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    // Filter bookings based on selected tab
-    final filteredBookings = _getFilteredBookings();
+    // Use all bookings
+    final allBookings = _bookingsData!.getAllBookings();
 
-    if (filteredBookings.isEmpty) {
+    if (allBookings.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -927,7 +910,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'No ${_getTabLabel()} trips',
+              'No trips found',
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -944,9 +927,9 @@ class _HomeScreenState extends State<HomeScreen> {
       color: AppColors.accent,
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: filteredBookings.length,
+        itemCount: allBookings.length,
         itemBuilder: (context, index) {
-          final booking = filteredBookings[index];
+          final booking = allBookings[index];
           return Padding(
             padding: EdgeInsets.only(top: index == 0 ? 8 : 0, bottom: 16),
             child: _buildBookingCard(booking),
@@ -954,53 +937,6 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
     );
-  }
-
-  String _getTabLabel() {
-    switch (_selectedTripTab) {
-      case 0:
-        return 'upcoming';
-      case 1:
-        return 'current';
-      case 2:
-        return 'previous';
-      default:
-        return '';
-    }
-  }
-
-  List<dynamic> _getFilteredBookings() {
-    if (_bookingsData == null) return [];
-
-    final now = DateTime.now();
-    final allBookings = _bookingsData!.getAllBookings();
-
-    return allBookings.where((booking) {
-      DateTime? startDate;
-      DateTime? endDate;
-
-      if (booking is PublicTourBooking) {
-        startDate = booking.departureDate;
-        endDate = booking.arrivalDate;
-      } else if (booking is PrivateTourBooking) {
-        startDate = booking.startDate;
-        endDate = booking.endDate;
-      }
-
-      if (startDate == null || endDate == null) return false;
-
-      // Filter by tab
-      switch (_selectedTripTab) {
-        case 0: // Upcoming
-          return startDate.isAfter(now);
-        case 1: // Current
-          return startDate.isBefore(now) && endDate.isAfter(now);
-        case 2: // Previous
-          return endDate.isBefore(now);
-        default:
-          return false;
-      }
-    }).toList();
   }
 
   Widget _buildBookingCard(dynamic booking) {
@@ -1095,44 +1031,6 @@ class _HomeScreenState extends State<HomeScreen> {
       'Dec',
     ];
     return '${months[date.month - 1]} ${date.day}';
-  }
-
-  Widget _buildTripTabItem(String label, int index) {
-    final bool isActive = _selectedTripTab == index;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            _selectedTripTab = index;
-          });
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            color: isActive ? AppColors.background : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: isActive
-                ? [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                : null,
-          ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 14,
-              fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-              color: isActive ? AppColors.accent : AppColors.textSecondary,
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   Widget _buildCategoryItem({

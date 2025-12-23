@@ -5,7 +5,6 @@ import '../models/user_model.dart';
 import '../services/token_service.dart';
 import '../services/user_service.dart';
 import 'edit_profile_screen.dart';
-import '../services/auth_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -349,33 +348,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 iconColor: Colors.grey,
                 title: 'App Settings',
                 subtitle: 'Notifications, Security',
-              ),
-              const Divider(height: 1, color: AppColors.border),
-              ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                leading: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.logout, color: Colors.redAccent, size: 20),
-                ),
-                title: Text(
-                  'Log Out',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.redAccent,
-                  ),
-                ),
-                onTap: () async {
-                  final authService = AuthService();
-                  await authService.logout();
-                  if (context.mounted) {
-                    Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
-                  }
-                },
               ),
             ],
           ),

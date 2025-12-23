@@ -430,17 +430,6 @@ class _SearchTourState extends State<SearchTour> {
                           color: AppColors.textPrimary,
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {},
-                        child: const Text(
-                          'COMPARE',
-                          style: TextStyle(
-                            color: AppColors.accent,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 12),

@@ -12,7 +12,6 @@ class BookingService {
       final token = await TokenService.getToken();
 
       if (token == null) {
-        print('No auth token found');
         return null;
       }
 
@@ -21,7 +20,8 @@ class BookingService {
             Uri.parse(ApiConfig.myBookings),
             headers: {
               'Content-Type': 'application/json',
-              'Cookie': 'token=$token',
+              // Send bearer token per API requirement
+              'Authorization': 'Bearer $token',
             },
           )
           .timeout(ApiConfig.timeout);

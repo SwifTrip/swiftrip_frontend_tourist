@@ -14,6 +14,12 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  // Validation patterns
+  static final RegExp _nameRegExp = RegExp(r'^[A-Za-z]+$');
+  static final RegExp _digitsOnlyRegExp = RegExp(r'^\d+$');
+  static final RegExp _strongPasswordRegExp =
+    RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$');
+
   // Form key and controllers
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late final TextEditingController _firstNameController;
@@ -159,7 +165,13 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: _firstNameController,
                   hintText: 'First Name',
                   icon: Icons.person_outline,
-                  validator: (value) => value!.isEmpty ? 'Required' : null,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) return 'Required';
+                    if (!_nameRegExp.hasMatch(value.trim())) {
+                      return 'Letters only';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 16),
                 
@@ -168,7 +180,13 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: _lastNameController,
                   hintText: 'Last Name',
                   icon: Icons.person_outline,
-                  validator: (value) => value!.isEmpty ? 'Required' : null,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) return 'Required';
+                    if (!_nameRegExp.hasMatch(value.trim())) {
+                      return 'Letters only';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 16),
 
@@ -192,8 +210,8 @@ class _SignupScreenState extends State<SignupScreen> {
                    icon: Icons.phone_outlined,
                    inputType: TextInputType.phone,
                    validator: (value) {
-                     if (value == null || value.trim().isEmpty) return 'Phone number is required';
-                     if (!RegExp(r'^\+?[0-9]{7,15}$').hasMatch(value)) return 'Invalid phone number';
+                       if (value == null || value.trim().isEmpty) return 'Phone number is required';
+                       if (!_digitsOnlyRegExp.hasMatch(value.trim())) return 'Digits only';
                      return null;
                    },
                  ),
@@ -205,7 +223,13 @@ class _SignupScreenState extends State<SignupScreen> {
                   hintText: 'Password',
                   icon: Icons.lock_outline,
                   obscureText: true,
-                  validator: (value) => value!.length < 6 ? 'Min 6 chars' : null,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return 'Password is required';
+                    if (!_strongPasswordRegExp.hasMatch(value)) {
+                      return 'Min 8, 1 upper, 1 lower, 1 digit, 1 special';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 16),
 
@@ -216,6 +240,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   icon: Icons.lock_outline,
                   obscureText: true,
                   validator: (value) {
+                    if (value == null || value.isEmpty) return 'Confirm your password';
                     if (value != _passwordController.text) return 'Mismatch';
                     return null;
                   },
