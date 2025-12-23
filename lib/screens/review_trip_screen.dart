@@ -459,6 +459,8 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                             Icons.hotel_outlined,
                             item.name,
                             item.optional,
+                            price: item.price,
+                            currency: widget.package.currency,
                           ),
                         const SizedBox(height: 12),
                       ],
@@ -479,6 +481,8 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                             Icons.directions_bus_outlined,
                             item.name,
                             item.optional,
+                            price: item.price,
+                            currency: widget.package.currency,
                           ),
                         const SizedBox(height: 12),
                       ],
@@ -504,6 +508,8 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                             Icons.local_activity_outlined,
                             item.name,
                             item.optional,
+                            price: item.price,
+                            currency: widget.package.currency,
                           ),
                       ],
                     ],
@@ -560,6 +566,8 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
             Icons.restaurant_menu_outlined,
             item.name,
             item.optional,
+            price: item.price,
+            currency: widget.package.currency,
           ),
         );
       }
@@ -585,6 +593,8 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
             Icons.restaurant_menu_outlined,
             item.name,
             item.optional,
+            price: item.price,
+            currency: widget.package.currency,
           ),
         );
       }
@@ -610,6 +620,8 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
             Icons.restaurant_menu_outlined,
             item.name,
             item.optional,
+            price: item.price,
+            currency: widget.package.currency,
           ),
         );
       }
@@ -618,7 +630,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
     return widgets;
   }
 
-  Widget _buildReviewItem(IconData icon, String text, bool isOptional) {
+  Widget _buildReviewItem(IconData icon, String text, bool isOptional, {num price = 0, String currency = 'Rs'}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -637,7 +649,17 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                     ),
                   ),
                 ),
-                if (isOptional)
+                if (isOptional && price > 0)
+                  Text(
+                    '+$currency $price',
+                    style: TextStyle(
+                      color: _accentColor,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                if (isOptional) ...[
+                  const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 6,
@@ -656,6 +678,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                       ),
                     ),
                   ),
+                ],
               ],
             ),
           ),
