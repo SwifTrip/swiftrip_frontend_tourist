@@ -36,7 +36,15 @@ class _SwifTripTouristAppState extends State<SwifTripTouristApp> {
     return MaterialApp(
       title: 'SwifTrip Tourist',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(scaffoldBackgroundColor: const Color(0xFFDFF2FE)),
+      theme: ThemeData(
+        scaffoldBackgroundColor: AppColors.background,
+        primaryColor: AppColors.primaryOrange,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.primaryOrange,
+          surface: AppColors.surface,
+        ),
+        useMaterial3: true,
+      ),
       home: FutureBuilder<bool>(
         future: _isLoggedIn,
         builder: (context, snapshot) {
