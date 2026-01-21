@@ -4,52 +4,70 @@ import 'package:flutter/material.dart';
 class CommonButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
+  final List<Color>? gradient;
   final Color? backgroundColor;
   final Color? textColor;
   final bool isEnabled;
   final double? fontSize;
   final double? height;
+  final double? borderRadius;
 
   const CommonButton({
     super.key,
     required this.text,
     this.onPressed,
     this.isEnabled = true,
+    this.gradient,
     this.backgroundColor,
     this.textColor,
     this.fontSize,
     this.height,
+    this.borderRadius,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
       width: double.infinity,
       height: height ?? 56,
-      child: ElevatedButton(
-        onPressed: isEnabled ? onPressed : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isEnabled 
-              ? (backgroundColor ?? AppColors.accent) 
-              : AppColors.surface,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          // Note: The design uses a specific gray for disabled state
-          disabledBackgroundColor: AppColors.surface,
-          disabledForegroundColor: const Color(0xFF9CA3AF), // Text color when disabled
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          elevation: 0,
-        ),
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            text,
-            style: TextStyle(
-              fontFamily: 'Plus Jakarta Sans',
-              fontSize: fontSize ?? 18,
-              fontWeight: FontWeight.bold,
-              color: isEnabled ? (textColor ?? AppColors.background) : AppColors.textSecondary,
+      decoration: BoxDecoration(
+        gradient: isEnabled && backgroundColor == null
+            ? LinearGradient(
+                colors: gradient ?? AppColors.brandGradient,
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              )
+            : null,
+        color: !isEnabled 
+            ? AppColors.border 
+            : (backgroundColor ?? (isEnabled && gradient == null ? null : (isEnabled ? null : AppColors.border))),
+        borderRadius: BorderRadius.circular(borderRadius ?? 16),
+        boxShadow: isEnabled
+            ? [
+                BoxShadow(
+                  color: (backgroundColor ?? AppColors.primaryOrange).withOpacity(0.2),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                )
+              ]
+            : null,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isEnabled ? onPressed : null,
+          borderRadius: BorderRadius.circular(borderRadius ?? 16),
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: fontSize ?? 16,
+                  fontWeight: FontWeight.bold,
+                  color: isEnabled ? (textColor ?? Colors.white) : AppColors.textSecondary,
+                ),
+              ),
             ),
           ),
         ),
