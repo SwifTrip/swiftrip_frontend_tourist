@@ -5,7 +5,7 @@ import '../widgets/custom_bottom_nav.dart';
 import 'searchTour.dart';
 import 'fixed_packages_screen.dart';
 import 'guide_list_screen.dart';
-import 'Signin.dart';
+import 'signin.dart';
 import 'profile_screen.dart';
 import '../models/user_model.dart';
 import '../models/booking_model.dart';

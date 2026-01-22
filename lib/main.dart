@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
-import 'screens/Signin.dart';
-import 'screens/Signup.dart';
+import 'screens/signin.dart';
+import 'screens/signup.dart';
 import 'screens/verification_screen.dart';
 import 'services/token_service.dart';
 
