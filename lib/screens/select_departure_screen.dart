@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
@@ -18,13 +19,13 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
   int _selectedMonthIndex = 0;
   int _selectedDepartureIndex = 1;
 
-  final List<String> _months = ["June '24", "July '24", "August '24", "September '24"];
+  final List<String> _months = ["June '26", "July '26", "August '26", "September '26"];
 
   final List<Map<String, dynamic>> _departures = [
     {
       'month': 'JUN',
       'day': '10',
-      'date': DateTime(2024, 6, 10),
+      'date': DateTime(2026, 6, 10),
       'range': 'Mon - Fri',
       'fullRange': 'Jun 10 - Jun 14',
       'seats': 0,
@@ -33,7 +34,7 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
     {
       'month': 'JUN',
       'day': '24',
-      'date': DateTime(2024, 6, 24),
+      'date': DateTime(2026, 6, 24),
       'range': 'Mon - Sat',
       'fullRange': 'Jun 24 - Jun 29',
       'seats': 4,
@@ -42,7 +43,7 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
     {
       'month': 'JUL',
       'day': '08',
-      'date': DateTime(2024, 7, 8),
+      'date': DateTime(2026, 7, 8),
       'range': 'Mon - Sat',
       'fullRange': 'Jul 08 - Jul 13',
       'seats': 10,
@@ -51,7 +52,7 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
     {
       'month': 'JUL',
       'day': '22',
-      'date': DateTime(2024, 7, 22),
+      'date': DateTime(2026, 7, 22),
       'range': 'Mon - Sat',
       'fullRange': 'Jul 22 - Jul 27',
       'seats': 8,
@@ -60,7 +61,7 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
     {
       'month': 'AUG',
       'day': '05',
-      'date': DateTime(2024, 8, 5),
+      'date': DateTime(2026, 8, 5),
       'range': 'Mon - Sat',
       'fullRange': 'Aug 05 - Aug 10',
       'seats': 12,
@@ -68,7 +69,7 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
     },
   ];
 
-  static const Color _accentColor = Color(0xFF137FEC);
+  Color get _accentColor => AppColors.primaryOrange;
 
   @override
   Widget build(BuildContext context) {
@@ -81,9 +82,9 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Select Departure',
-          style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 18),
+          style: GoogleFonts.plusJakartaSans(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 18),
         ),
         centerTitle: true,
       ),
@@ -96,10 +97,10 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
               children: [
                 const SizedBox(height: 8),
                 _buildTripSummaryCard(),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
                 _buildMonthSelector(),
-                const SizedBox(height: 24),
-                _buildSectionLabel('AVAILABLE DATES'),
+                const SizedBox(height: 32),
+                _buildSectionLabel('AVAILABLE DEPARTURES'),
                 const SizedBox(height: 16),
                 ..._departures.asMap().entries.map((entry) {
                   return Padding(
@@ -127,57 +128,53 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
       left: 0,
       right: 0,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+        padding: const EdgeInsets.fromLTRB(24, 20, 24, 34),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          border: const Border(top: BorderSide(color: AppColors.border)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 20, offset: const Offset(0, -10))
+            BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 30, offset: const Offset(0, -10))
           ],
+          border: Border.all(color: AppColors.border.withOpacity(0.5)),
         ),
         child: Row(
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'SELECTED DATE',
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
-                ),
-                Text(
-                  selectedDeparture['fullRange'],
-                  style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  '${widget.package.currency} ${widget.package.basePrice} total',
-                  style: const TextStyle(color: _accentColor, fontSize: 10, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(width: 24),
             Expanded(
-              child: SizedBox(
-                height: 56,
-                child: CommonButton(
-                  text: 'Continue',
-                  onPressed: () {
-                    final selectedDeparture = _departures[_selectedDepartureIndex];
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CustomizeItineraryScreen(
-                          package: widget.package,
-                          isPublic: true,
-                          startDate: selectedDeparture['date'],
-                          travelers: widget.travelers,
-                        ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'SELECTED DEPARTURE',
+                    style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    selectedDeparture['fullRange'],
+                    style: GoogleFonts.plusJakartaSans(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: CommonButton(
+                text: 'Continue',
+                onPressed: () {
+                  final selectedDeparture = _departures[_selectedDepartureIndex];
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CustomizeItineraryScreen(
+                        package: widget.package,
+                        isPublic: true,
+                        startDate: selectedDeparture['date'],
+                        travelers: widget.travelers,
                       ),
-                    );
-                  },
-                  backgroundColor: _accentColor,
-                  textColor: Colors.white,
-                ),
+                    ),
+                  );
+                },
+                borderRadius: 20,
               ),
             ),
           ],
@@ -189,26 +186,34 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
   Widget _buildSectionLabel(String label) {
     return Row(
       children: [
-        const Icon(Icons.calendar_month, color: AppColors.textSecondary, size: 16),
+        const Icon(Icons.event_note, color: AppColors.primaryOrange, size: 18),
         const SizedBox(width: 8),
         Text(
           label,
-          style: const TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+          style: GoogleFonts.plusJakartaSans(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.2),
         ),
       ],
     );
   }
 
   Widget _buildLegend() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _buildLegendItem(const Color(0xFF10B981), 'Available'),
-        const SizedBox(width: 16),
-        _buildLegendItem(const Color(0xFFF59E0B), 'Selling Fast'),
-        const SizedBox(width: 16),
-        _buildLegendItem(AppColors.textSecondary.withOpacity(0.5), 'Sold Out'),
-      ],
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border.withOpacity(0.5)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _buildLegendItem(AppColors.primaryEmerald, 'Available'),
+          const SizedBox(width: 24),
+          _buildLegendItem(Colors.amber, 'Selling Fast'),
+          const SizedBox(width: 24),
+          _buildLegendItem(AppColors.textSecondary.withOpacity(0.4), 'Fully Booked'),
+        ],
+      ),
     );
   }
 
@@ -216,8 +221,8 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
     return Row(
       children: [
         Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-        const SizedBox(width: 6),
-        Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.w500)),
+        const SizedBox(width: 8),
+        Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.w600)),
       ],
     );
   }
@@ -231,21 +236,21 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
           return GestureDetector(
             onTap: () => setState(() => _selectedMonthIndex = entry.key),
             child: Container(
-              margin: const EdgeInsets.only(right: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              margin: const EdgeInsets.only(right: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
                 color: isSelected ? AppColors.textPrimary : AppColors.surface,
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: isSelected ? Colors.transparent : AppColors.border),
                 boxShadow: isSelected ? [
-                  BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4))
+                  BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 10, offset: const Offset(0, 4))
                 ] : null,
               ),
               child: Text(
                 entry.value,
-                style: TextStyle(
-                  color: isSelected ? AppColors.background : AppColors.textSecondary,
-                  fontSize: 12,
+                style: GoogleFonts.plusJakartaSans(
+                  color: isSelected ? Colors.white : AppColors.textSecondary,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -262,56 +267,65 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
     
     return GestureDetector(
       onTap: isFull ? null : () => setState(() => _selectedDepartureIndex = index),
-      child: Opacity(
-        opacity: isFull ? 0.4 : 1.0,
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isSelected ? _accentColor.withOpacity(0.05) : AppColors.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isSelected ? _accentColor : AppColors.border,
-              width: isSelected ? 2 : 1,
-            ),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primaryOrange.withOpacity(0.05) : AppColors.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: isSelected ? AppColors.primaryOrange : (isFull ? AppColors.border.withOpacity(0.5) : AppColors.border),
+            width: isSelected ? 2 : 1,
           ),
+          boxShadow: isSelected ? [
+            BoxShadow(color: AppColors.primaryOrange.withOpacity(0.08), blurRadius: 15, offset: const Offset(0, 8))
+          ] : null,
+        ),
+        child: Opacity(
+          opacity: isFull ? 0.6 : 1.0,
           child: Row(
             children: [
-              SizedBox(
-                width: 48,
+              Container(
+                width: 54,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColors.primaryOrange : AppColors.background,
+                  borderRadius: BorderRadius.circular(16),
+                ),
                 child: Column(
                   children: [
                     Text(
                       data['month'],
                       style: TextStyle(
-                        color: isSelected ? _accentColor : AppColors.textSecondary,
+                        color: isSelected ? Colors.white.withOpacity(0.8) : AppColors.textSecondary,
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    const SizedBox(height: 2),
                     Text(
                       data['day'],
-                      style: const TextStyle(color: AppColors.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : AppColors.textPrimary,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
               ),
-              Container(
-                height: 32,
-                width: 1,
-                color: isSelected ? _accentColor.withOpacity(0.2) : AppColors.border,
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-              ),
+              const SizedBox(width: 20),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       data['range'],
-                      style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.plusJakartaSans(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.bold),
                     ),
+                    const SizedBox(height: 4),
                     Text(
                       data['fullRange'],
-                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 10),
+                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
                     ),
                   ],
                 ),
@@ -320,20 +334,10 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   _buildStatusBadge(data),
-                  const SizedBox(height: 8),
-                  Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isSelected ? _accentColor : Colors.transparent,
-                      border: Border.all(
-                        color: isSelected ? _accentColor : AppColors.textSecondary.withOpacity(0.5),
-                        width: 2,
-                      ),
-                    ),
-                    child: isSelected ? const Icon(Icons.check, color: Colors.white, size: 12) : null,
-                  ),
+                  if (isSelected) ...[
+                     const SizedBox(height: 8),
+                     const Icon(Icons.check_circle, color: AppColors.primaryOrange, size: 24),
+                  ],
                 ],
               ),
             ],
@@ -351,31 +355,31 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
     if (data['seats'] == 0) {
       color = AppColors.textSecondary.withOpacity(0.5);
     } else if (data['seats'] <= 5) {
-      color = const Color(0xFFF59E0B);
-      icon = Icons.local_fire_department;
-      label = '${data['seats']} seats left';
+      color = Colors.amber;
+      icon = Icons.bolt;
+      label = '${data['seats']} LEFT';
     } else {
-      color = const Color(0xFF10B981);
-      label = '${data['seats']} seats left';
+      color = AppColors.primaryEmerald;
+      label = 'AVAILABLE';
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: color.withOpacity(0.2)),
+        color: color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.25)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, color: color, size: 10),
+            Icon(icon, color: color, size: 12),
             const SizedBox(width: 4),
           ],
           Text(
             label,
-            style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold),
+            style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
           ),
         ],
       ),
@@ -384,64 +388,73 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
 
   Widget _buildTripSummaryCard() {
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 10))
+        ],
       ),
       child: Row(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             child: Image.network(
-              widget.package.media.isNotEmpty ? widget.package.media.first.url : 'https://via.placeholder.com/300x300.png?text=Trip',
-              width: 64,
-              height: 64,
+              "https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=300",
+              width: 70,
+              height: 70,
               fit: BoxFit.cover,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   widget.package.title,
-                  style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 14),
+                  style: GoogleFonts.plusJakartaSans(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 15),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: _accentColor.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(4),
+                        color: AppColors.primaryOrange.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '${widget.package.duration} days',
-                        style: const TextStyle(color: _accentColor, fontSize: 10, fontWeight: FontWeight.bold),
+                        '${widget.package.duration} DAYS',
+                        style: const TextStyle(color: AppColors.primaryOrange, fontSize: 10, fontWeight: FontWeight.bold),
                       ),
                     ),
                     const SizedBox(width: 8),
                     const Text(
-                      'Public Group Tour',
-                      style: TextStyle(color: AppColors.textSecondary, fontSize: 10),
+                      'Group Expedition',
+                      style: TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
               ],
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '${widget.package.currency} ${widget.package.basePrice}',
-                style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 18),
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '${widget.package.currency} ${widget.package.basePrice}',
+                  style: GoogleFonts.plusJakartaSans(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+                const Text('per guest', style: TextStyle(color: AppColors.textSecondary, fontSize: 10)),
+              ],
+            ),
           ),
         ],
       ),
