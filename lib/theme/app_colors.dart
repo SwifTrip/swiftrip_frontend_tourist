@@ -12,7 +12,7 @@ class AppColors {
   static const Color primaryOrange = Color(0xFFEA580C); // Orange-600
   static const Color primaryEmerald = Color(0xFF10B981); // Emerald-500
   
-  static Color get accent => primaryOrange;
+  static const Color accent = primaryOrange;
   
   // Gradients
   static const List<Color> brandGradient = [
