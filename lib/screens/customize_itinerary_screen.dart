@@ -26,8 +26,6 @@ class CustomizeItineraryScreen extends StatefulWidget {
 class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
   int _selectedDayIndex = 0;
   
-  late final Color _accentColor;
-  
   Map<int, bool> _selectedOptionalItems = {};
   
   Color get _accentColor => AppColors.primaryOrange;

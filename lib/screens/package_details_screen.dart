@@ -219,7 +219,7 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                   offset: const Offset(0, 4),
                 )
               ],
-            ],
+            ),
             child: Icon(
               widget.isPublic ? Icons.tune : Icons.auto_fix_high,
               color: AppColors.primaryOrange,

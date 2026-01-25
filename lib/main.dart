@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'theme/app_colors.dart';
 import 'screens/home_screen.dart';
 import 'screens/signin.dart';
 import 'screens/signup.dart';
