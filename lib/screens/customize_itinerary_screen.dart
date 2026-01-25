@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
@@ -29,10 +30,11 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
   
   Map<int, bool> _selectedOptionalItems = {};
   
+  Color get _accentColor => AppColors.primaryOrange;
+  
   @override
   void initState() {
     super.initState();
-    _accentColor = widget.isPublic ? const Color(0xFF137FEC) : const Color(0xFF8B5CF6);
   }
 
   @override
@@ -53,21 +55,17 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
         ),
         title: Column(
           children: [
-            const Text(
+            Text(
               'Customize Itinerary',
-              style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 16),
+              style: GoogleFonts.plusJakartaSans(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 16),
             ),
             Text(
               widget.package.title,
-              style: const TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.w500),
+              style: GoogleFonts.plusJakartaSans(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.w600),
             ),
           ],
         ),
         centerTitle: true,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Divider(color: AppColors.border, height: 1),
-        ),
       ),
       body: Stack(
         children: [
@@ -117,7 +115,11 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
 
   Widget _buildDaySelector(List<DateTime> dates) {
     return Container(
-      padding: const EdgeInsets.only(top: 16),
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        border: Border(bottom: BorderSide(color: AppColors.border.withOpacity(0.5))),
+      ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -133,32 +135,32 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 margin: const EdgeInsets.only(right: 12),
-                padding: const EdgeInsets.all(10),
-                constraints: const BoxConstraints(minWidth: 70),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: isSelected ? _accentColor : AppColors.surface,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: isSelected ? Colors.transparent : AppColors.border),
                   boxShadow: isSelected ? [
-                    BoxShadow(color: _accentColor.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))
+                    BoxShadow(color: _accentColor.withOpacity(0.2), blurRadius: 12, offset: const Offset(0, 6))
                   ] : null,
                 ),
                 child: Column(
                   children: [
                     Text(
                       'DAY ${index + 1}',
-                      style: TextStyle(
+                      style: GoogleFonts.plusJakartaSans(
                         color: isSelected ? Colors.white.withOpacity(0.8) : AppColors.textSecondary,
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
                       ),
                     ),
+                    const SizedBox(height: 2),
                     Text(
                       '${date.day} ${months[date.month - 1]}',
-                      style: TextStyle(
+                      style: GoogleFonts.plusJakartaSans(
                         color: isSelected ? Colors.white : AppColors.textPrimary,
-                        fontSize: 13,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -181,16 +183,12 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
       children: [
         Text(
           '${weekdays[date.weekday - 1]}, ${date.day} ${months[date.month - 1]}',
-          style: const TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w500),
+          style: GoogleFonts.plusJakartaSans(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w600),
         ),
-        const SizedBox(height: 4),
-        Row(
-          children: [
-            Text(
-              widget.package.itineraries[_selectedDayIndex].title,
-              style: const TextStyle(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(width: 8), ],
+        const SizedBox(height: 8),
+        Text(
+          widget.package.itineraries[_selectedDayIndex].title,
+          style: GoogleFonts.plusJakartaSans(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ],
     );
@@ -202,15 +200,15 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
       children: [
         Text(
           title,
-          style: const TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+          style: GoogleFonts.plusJakartaSans(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.2),
         ),if (isFixed)
           Row(
             children: [
-              Icon(Icons.lock_outline, color: AppColors.textSecondary.withOpacity(0.5), size: 10),
+              Icon(Icons.lock_outline, color: AppColors.textSecondary.withOpacity(0.5), size: 12),
               const SizedBox(width: 4),
               Text(
                 'LOCKED',
-                style: TextStyle(color: AppColors.textSecondary.withOpacity(0.5), fontSize: 9, fontWeight: FontWeight.bold),
+                style: GoogleFonts.plusJakartaSans(color: AppColors.textSecondary.withOpacity(0.5), fontSize: 9, fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -363,42 +361,41 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
       onTap: isCustomizable
           ? () {
               setState(() {
-                // Get all optional accommodation items for this day
                 final optionalAccommodations = _getAccommodationItemsForDay()
                     .where((acc) => acc.optional)
                     .toList();
                 
-                // Deselect all other optional accommodations for this day
                 for (final acc in optionalAccommodations) {
                   if (acc.id != item.id) {
                     _selectedOptionalItems[acc.id] = false;
                   }
                 }
-                
-                // Toggle the selected item
                 _selectedOptionalItems[item.id] = !(_selectedOptionalItems[item.id] ?? false);
               });
             }
           : null,
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? _accentColor.withOpacity(0.04) : AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isSelected ? _accentColor.withOpacity(0.3) : AppColors.border),
+          color: isSelected ? AppColors.primaryOrange.withOpacity(0.05) : AppColors.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: isSelected ? AppColors.primaryOrange : AppColors.border),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 10))
+          ],
         ),
         child: Row(
           children: [
             Container(
-              width: 54,
-              height: 54,
+              width: 56,
+              height: 56,
               decoration: BoxDecoration(
-                color: isSelected ? _accentColor.withOpacity(0.12) : AppColors.background,
-                borderRadius: BorderRadius.circular(12),
+                color: isSelected ? AppColors.primaryOrange.withOpacity(0.1) : AppColors.background,
+                borderRadius: BorderRadius.circular(16),
               ),
-              child: Icon(Icons.hotel_outlined, color: isSelected ? _accentColor : AppColors.textSecondary),
+              child: Icon(Icons.hotel_outlined, color: isSelected ? AppColors.primaryOrange : AppColors.textSecondary),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -409,51 +406,52 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                       Expanded(
                         child: Text(
                           item.name.isNotEmpty ? item.name : 'Stay',
-                          style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 14),
+                          style: GoogleFonts.plusJakartaSans(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 15),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (isFixed)
-                        Row(
-                          children: const [
-                            Icon(Icons.lock_outline, color: AppColors.textSecondary, size: 12),
-                            SizedBox(width: 4),
-                            Text('INCLUDED', style: TextStyle(color: AppColors.textSecondary, fontSize: 9, fontWeight: FontWeight.bold)),
-                          ],
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryEmerald.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text('INCLUDED', style: TextStyle(color: AppColors.primaryEmerald, fontSize: 8, fontWeight: FontWeight.bold)),
                         )
                       else if (isSelected)
-                        const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 18)
+                        const Icon(Icons.check_circle, color: AppColors.primaryOrange, size: 20)
                       else
-                        Icon(Icons.add_circle_outline, color: AppColors.textSecondary.withOpacity(0.6), size: 18),
+                        Icon(Icons.add_circle_outline, color: AppColors.textSecondary.withOpacity(0.4), size: 20),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   Text(
                     item.description.isNotEmpty ? item.description : 'Accommodation for this night.',
-                    style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 12),
+                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 12, height: 1.4),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
-                      Icon(Icons.calendar_today_outlined, size: 12, color: AppColors.textSecondary.withOpacity(0.7)),
-                      const SizedBox(width: 4),
+                      Icon(Icons.calendar_today_outlined, size: 12, color: AppColors.textSecondary.withOpacity(0.5)),
+                      const SizedBox(width: 6),
                       Text(
                         '${date.day}/${date.month}/${date.year}',
-                        style: TextStyle(color: AppColors.textSecondary.withOpacity(0.7), fontSize: 10),
+                        style: TextStyle(color: AppColors.textSecondary.withOpacity(0.6), fontSize: 11),
                       ),
-                      const SizedBox(width: 12),
+                      const Spacer(),
                       if (item.price > 0)
                         Text(
                           item.optional ? '+Rs${item.price}' : 'Rs${item.price}',
-                          style: TextStyle(color: isFixed ? AppColors.textSecondary : _accentColor, fontSize: 11, fontWeight: FontWeight.bold),
+                          style: GoogleFonts.plusJakartaSans(color: isFixed ? AppColors.textSecondary : AppColors.primaryOrange, fontSize: 12, fontWeight: FontWeight.bold),
                         )
                       else
-                        Text(
+                        const Text(
                           'Included',
-                          style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 11),
+                          style: TextStyle(color: AppColors.primaryEmerald, fontSize: 11, fontWeight: FontWeight.w600),
                         ),
                     ],
                   ),
@@ -518,24 +516,27 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
             }
           : null,
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? _accentColor.withOpacity(0.04) : AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isSelected ? _accentColor.withOpacity(0.3) : AppColors.border),
+          color: isSelected ? AppColors.primaryOrange.withOpacity(0.05) : AppColors.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: isSelected ? AppColors.primaryOrange : AppColors.border),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 10))
+          ],
         ),
         child: Row(
           children: [
             Container(
-              width: 54,
-              height: 54,
+              width: 56,
+              height: 56,
               decoration: BoxDecoration(
-                color: isSelected ? _accentColor.withOpacity(0.12) : AppColors.background,
-                borderRadius: BorderRadius.circular(12),
+                color: isSelected ? AppColors.primaryOrange.withOpacity(0.1) : AppColors.background,
+                borderRadius: BorderRadius.circular(16),
               ),
-              child: Icon(Icons.directions_bus_outlined, color: isSelected ? _accentColor : AppColors.textSecondary),
+              child: Icon(Icons.directions_bus_outlined, color: isSelected ? AppColors.primaryOrange : AppColors.textSecondary),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -546,51 +547,52 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                       Expanded(
                         child: Text(
                           item.name.isNotEmpty ? item.name : 'Transport',
-                          style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 14),
+                          style: GoogleFonts.plusJakartaSans(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 15),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (isFixed)
-                        Row(
-                          children: const [
-                            Icon(Icons.lock_outline, color: AppColors.textSecondary, size: 12),
-                            SizedBox(width: 4),
-                            Text('INCLUDED', style: TextStyle(color: AppColors.textSecondary, fontSize: 9, fontWeight: FontWeight.bold)),
-                          ],
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryEmerald.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text('INCLUDED', style: TextStyle(color: AppColors.primaryEmerald, fontSize: 8, fontWeight: FontWeight.bold)),
                         )
                       else if (isSelected)
-                        const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 18)
+                        const Icon(Icons.check_circle, color: AppColors.primaryOrange, size: 20)
                       else
-                        Icon(Icons.add_circle_outline, color: AppColors.textSecondary.withOpacity(0.6), size: 18),
+                        Icon(Icons.add_circle_outline, color: AppColors.textSecondary.withOpacity(0.4), size: 20),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   Text(
                     item.description.isNotEmpty ? item.description : 'Transport for this day.',
-                    style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 12),
+                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 12, height: 1.4),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
-                      Icon(Icons.calendar_today_outlined, size: 12, color: AppColors.textSecondary.withOpacity(0.7)),
-                      const SizedBox(width: 4),
+                      Icon(Icons.calendar_today_outlined, size: 12, color: AppColors.textSecondary.withOpacity(0.5)),
+                      const SizedBox(width: 6),
                       Text(
                         '${date.day}/${date.month}/${date.year}',
-                        style: TextStyle(color: AppColors.textSecondary.withOpacity(0.7), fontSize: 10),
+                        style: TextStyle(color: AppColors.textSecondary.withOpacity(0.6), fontSize: 11),
                       ),
-                      const SizedBox(width: 12),
+                      const Spacer(),
                       if (item.price > 0)
                         Text(
                           item.optional ? '+Rs${item.price}' : 'Rs${item.price}',
-                          style: TextStyle(color: isFixed ? AppColors.textSecondary : _accentColor, fontSize: 11, fontWeight: FontWeight.bold),
+                          style: GoogleFonts.plusJakartaSans(color: isFixed ? AppColors.textSecondary : AppColors.primaryOrange, fontSize: 12, fontWeight: FontWeight.bold),
                         )
                       else
-                        Text(
+                        const Text(
                           'Included',
-                          style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 11),
+                          style: TextStyle(color: AppColors.primaryEmerald, fontSize: 11, fontWeight: FontWeight.w600),
                         ),
                     ],
                   ),
@@ -703,7 +705,6 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
       onTap: isCustomizable
           ? () {
               setState(() {
-                // Get the meal type of the current item
                 String? currentMealType;
                 for (final detail in item.mealDetails) {
                   currentMealType = detail.mealType.toLowerCase();
@@ -711,10 +712,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                 }
                 
                 if (currentMealType != null) {
-                  // Get all meals for this day
                   final allMeals = _getMealItemsForDay();
-                  
-                  // Deselect all other optional meals of the same type
                   for (final meal in allMeals) {
                     if (meal.optional && meal.id != item.id) {
                       for (final detail in meal.mealDetails) {
@@ -726,31 +724,32 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                     }
                   }
                 }
-                
-                // Toggle the selected item
                 _selectedOptionalItems[item.id] = !(_selectedOptionalItems[item.id] ?? false);
               });
             }
           : null,
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? _accentColor.withOpacity(0.04) : AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isSelected ? _accentColor.withOpacity(0.3) : AppColors.border),
+          color: isSelected ? AppColors.primaryOrange.withOpacity(0.05) : AppColors.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: isSelected ? AppColors.primaryOrange : AppColors.border),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 10))
+          ],
         ),
         child: Row(
           children: [
             Container(
-              width: 54,
-              height: 54,
+              width: 56,
+              height: 56,
               decoration: BoxDecoration(
-                color: isSelected ? _accentColor.withOpacity(0.12) : AppColors.background,
-                borderRadius: BorderRadius.circular(12),
+                color: isSelected ? AppColors.primaryOrange.withOpacity(0.1) : AppColors.background,
+                borderRadius: BorderRadius.circular(16),
               ),
-              child: Icon(Icons.restaurant_menu_outlined, color: isSelected ? _accentColor : AppColors.textSecondary),
+              child: Icon(Icons.restaurant_menu_outlined, color: isSelected ? AppColors.primaryOrange : AppColors.textSecondary),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -761,51 +760,52 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                       Expanded(
                         child: Text(
                           item.name.isNotEmpty ? item.name : 'Meal',
-                          style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 14),
+                          style: GoogleFonts.plusJakartaSans(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 15),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (isFixed)
-                        Row(
-                          children: const [
-                            Icon(Icons.lock_outline, color: AppColors.textSecondary, size: 12),
-                            SizedBox(width: 4),
-                            Text('INCLUDED', style: TextStyle(color: AppColors.textSecondary, fontSize: 9, fontWeight: FontWeight.bold)),
-                          ],
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryEmerald.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text('INCLUDED', style: TextStyle(color: AppColors.primaryEmerald, fontSize: 8, fontWeight: FontWeight.bold)),
                         )
                       else if (isSelected)
-                        const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 18)
+                        const Icon(Icons.check_circle, color: AppColors.primaryOrange, size: 20)
                       else
-                        Icon(Icons.add_circle_outline, color: AppColors.textSecondary.withOpacity(0.6), size: 18),
+                        Icon(Icons.add_circle_outline, color: AppColors.textSecondary.withOpacity(0.4), size: 20),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   Text(
                     item.description.isNotEmpty ? item.description : 'Meal for this day.',
-                    style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 12),
+                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 12, height: 1.4),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
-                      Icon(Icons.calendar_today_outlined, size: 12, color: AppColors.textSecondary.withOpacity(0.7)),
-                      const SizedBox(width: 4),
+                      Icon(Icons.calendar_today_outlined, size: 12, color: AppColors.textSecondary.withOpacity(0.5)),
+                      const SizedBox(width: 6),
                       Text(
                         '${date.day}/${date.month}/${date.year}',
-                        style: TextStyle(color: AppColors.textSecondary.withOpacity(0.7), fontSize: 10),
+                        style: TextStyle(color: AppColors.textSecondary.withOpacity(0.6), fontSize: 11),
                       ),
-                      const SizedBox(width: 12),
+                      const Spacer(),
                       if (item.price > 0)
                         Text(
                           item.optional ? '+Rs${item.price}' : 'Rs${item.price}',
-                          style: TextStyle(color: isFixed ? AppColors.textSecondary : _accentColor, fontSize: 11, fontWeight: FontWeight.bold),
+                          style: GoogleFonts.plusJakartaSans(color: isFixed ? AppColors.textSecondary : AppColors.primaryOrange, fontSize: 12, fontWeight: FontWeight.bold),
                         )
                       else
-                        Text(
+                        const Text(
                           'Included',
-                          style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 11),
+                          style: TextStyle(color: AppColors.primaryEmerald, fontSize: 11, fontWeight: FontWeight.w600),
                         ),
                     ],
                   ),
@@ -831,95 +831,98 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
           _selectedOptionalItems[item.id] = !(_selectedOptionalItems[item.id] ?? false);
         });
       },
-      child: Opacity(
-        opacity: isFixed ? 0.7 : 1.0,
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: isSelected ? _accentColor.withOpacity(0.05) : AppColors.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: isSelected ? _accentColor.withOpacity(0.3) : AppColors.border),
-          ),
-          child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: isSelected ? _accentColor.withOpacity(0.1) : AppColors.background,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.local_activity_outlined,
-                color: isSelected ? _accentColor : AppColors.textSecondary,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          item.name,
-                          style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 13),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (isIncluded)
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF10B981).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: const Text(
-                            'INCLUDED',
-                            style: TextStyle(color: Color(0xFF10B981), fontSize: 7, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                    ],
-                  ),
-                  Text(
-                    item.description,
-                    style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 11),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  if (!isFixed)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        item.price > 0 ? '+Rs${item.price}' : 'Free',
-                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 10),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-            if (isFixed)
-              Icon(
-                Icons.lock_outline,
-                color: AppColors.textSecondary.withOpacity(0.5),
-                size: 18,
-              )
-            else if (isSelected)
-              const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 20)
-            else
-              Icon(
-                Icons.add_circle_outline,
-                color: AppColors.textSecondary.withOpacity(0.5),
-                size: 20,
-              ),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primaryOrange.withOpacity(0.05) : AppColors.surface,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: isSelected ? AppColors.primaryOrange : (isFixed ? AppColors.border.withOpacity(0.5) : AppColors.border)),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 10))
           ],
         ),
-      ),
+        child: Opacity(
+          opacity: isFixed ? 0.8 : 1.0,
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColors.primaryOrange.withOpacity(0.1) : AppColors.background,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  Icons.local_activity_outlined,
+                  color: isSelected ? AppColors.primaryOrange : AppColors.textSecondary,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            item.name,
+                            style: GoogleFonts.plusJakartaSans(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 14),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (isIncluded)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryEmerald.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: const Text(
+                              'INCLUDED',
+                              style: TextStyle(color: AppColors.primaryEmerald, fontSize: 7, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      item.description,
+                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 11, height: 1.4),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (!isFixed) ...[
+                       const SizedBox(height: 6),
+                       Text(
+                          item.price > 0 ? '+Rs${item.price}' : 'Free Activity',
+                          style: GoogleFonts.plusJakartaSans(color: isSelected ? AppColors.primaryOrange : AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.bold),
+                        ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              if (isFixed)
+                Icon(
+                  Icons.lock_outline,
+                  color: AppColors.textSecondary.withOpacity(0.3),
+                  size: 18,
+                )
+              else if (isSelected)
+                const Icon(Icons.check_circle, color: AppColors.primaryOrange, size: 24)
+              else
+                Icon(
+                  Icons.add_circle_outline,
+                  color: AppColors.textSecondary.withOpacity(0.3),
+                  size: 24,
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -930,57 +933,58 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
       left: 0,
       right: 0,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+        padding: const EdgeInsets.fromLTRB(24, 20, 24, 34),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          border: const Border(top: BorderSide(color: AppColors.border)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.4), blurRadius: 20, offset: const Offset(0, -10))
+            BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 30, offset: const Offset(0, -10))
           ],
+          border: Border.all(color: AppColors.border.withOpacity(0.5)),
         ),
         child: Row(
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'ESTIMATED TOTAL',
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
-                ),
-                Text(
-                  '${widget.package.currency} ${_calculateTotalPrice()}',
-                  style: const TextStyle(color: AppColors.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  widget.isPublic ? 'Fixed Price' : _buildPriceDescription(),
-                  style: TextStyle(color: widget.isPublic ? AppColors.textSecondary : const Color(0xFF10B981), fontSize: 9, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(width: 24),
             Expanded(
-              child: SizedBox(
-                height: 56,
-                child: CommonButton(
-                  text: 'Review Trip',
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ReviewTripScreen(
-                          package: widget.package,
-                          isPublic: widget.isPublic,
-                          startDate: widget.startDate,
-                          selectedOptionalItems: _selectedOptionalItems,
-                          travelers: widget.travelers,
-                        ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'ESTIMATED TOTAL',
+                    style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${widget.package.currency} ${_calculateTotalPrice()}',
+                    style: GoogleFonts.plusJakartaSans(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    widget.isPublic ? 'Fixed Expedition Price' : _buildPriceDescription(),
+                    style: TextStyle(color: widget.isPublic ? AppColors.textSecondary : AppColors.primaryEmerald, fontSize: 10, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: CommonButton(
+                text: 'Review Trip',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ReviewTripScreen(
+                        package: widget.package,
+                        isPublic: widget.isPublic,
+                        startDate: widget.startDate,
+                        selectedOptionalItems: _selectedOptionalItems,
+                        travelers: widget.travelers,
                       ),
-                    );
-                  },
-                  backgroundColor: _accentColor,
-                  textColor: Colors.white,
-                ),
+                    ),
+                  );
+                },
+                borderRadius: 20,
               ),
             ),
           ],

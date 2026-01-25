@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
@@ -26,17 +27,15 @@ class ReviewTripScreen extends StatefulWidget {
 }
 
 class _ReviewTripScreenState extends State<ReviewTripScreen> {
-  late final Color _accentColor;
   bool _allExpanded = true;
   bool _isSubmitting = false;
   final CustomTourService _customTourService = CustomTourService();
 
+  Color get _accentColor => AppColors.primaryOrange;
+
   @override
   void initState() {
     super.initState();
-    _accentColor = widget.isPublic
-        ? const Color(0xFF137FEC)
-        : const Color(0xFF8B5CF6);
   }
 
   @override
@@ -50,17 +49,13 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Column(
-          children: const [
-            Text(
-              'Review Trip',
-              style: TextStyle(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-          ],
+        title: Text(
+          'Review Trip',
+          style: GoogleFonts.plusJakartaSans(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
         ),
         centerTitle: true,
       ),
@@ -123,31 +118,30 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
       left: 0,
       right: 0,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+        padding: const EdgeInsets.fromLTRB(24, 20, 24, 34),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          border: const Border(top: BorderSide(color: AppColors.border)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.4),
-              blurRadius: 20,
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 30,
               offset: const Offset(0, -10),
             ),
           ],
+          border: Border.all(color: AppColors.border.withOpacity(0.5)),
         ),
         child: CommonButton(
-          text: _isSubmitting ? 'Saving...' : 'Click to save',
+          text: _isSubmitting ? 'Saving Expedition...' : 'Confirm & Save Trip',
           onPressed: _isSubmitting ? null : _saveCustomTour,
           isEnabled: !_isSubmitting,
-          backgroundColor: _accentColor,
-          textColor: Colors.white,
+          borderRadius: 24,
         ),
       ),
     );
   }
 
   Widget _buildPriceBreakdown() {
-    // Calculate breakdowns
     num accommodationTotal = 0;
     num transportTotal = 0;
     num mealTotal = 0;
@@ -169,17 +163,15 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
       }
     }
 
-    num totalAddOns =
-        accommodationTotal + transportTotal + mealTotal + activityTotal;
-    num finalTotal = widget.package.basePrice + totalAddOns;
-    finalTotal *= widget.travelers;
+    num totalAddOns = accommodationTotal + transportTotal + mealTotal + activityTotal;
+    num finalTotal = (widget.package.basePrice + totalAddOns) * widget.travelers;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Price Breakdown',
-          style: TextStyle(
+          style: GoogleFonts.plusJakartaSans(
             color: AppColors.textPrimary,
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -187,11 +179,18 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
         ),
         const SizedBox(height: 16),
         Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: AppColors.surface,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppColors.border),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AppColors.border.withOpacity(0.5)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              )
+            ],
           ),
           child: Column(
             children: [
@@ -199,56 +198,40 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                 'Base Tour Price',
                 '${widget.package.currency} ${widget.package.basePrice}',
               ),
-              if (accommodationTotal > 0) ...[
+              if (totalAddOns > 0) ...[
                 const SizedBox(height: 12),
                 _buildPriceRow(
-                  'Accommodation Add-ons',
-                  '+${widget.package.currency} $accommodationTotal',
-                ),
-              ],
-              if (transportTotal > 0) ...[
-                const SizedBox(height: 12),
-                _buildPriceRow(
-                  'Transport Add-ons',
-                  '+${widget.package.currency} $transportTotal',
-                ),
-              ],
-              if (mealTotal > 0) ...[
-                const SizedBox(height: 12),
-                _buildPriceRow(
-                  'Meal Add-ons',
-                  '+${widget.package.currency} $mealTotal',
-                ),
-              ],
-              if (activityTotal > 0) ...[
-                const SizedBox(height: 12),
-                _buildPriceRow(
-                  'Activities & Extras',
-                  '+${widget.package.currency} $activityTotal',
+                  'Custom Selection Add-ons',
+                  '+${widget.package.currency} $totalAddOns',
+                  accent: true,
                 ),
               ],
               const SizedBox(height: 12),
-              _buildPriceRow("Group Size", '${widget.travelers}'),
+              _buildPriceRow("Group Size", '${widget.travelers} Guests'),
               const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
+                padding: EdgeInsets.symmetric(vertical: 20),
                 child: Divider(color: AppColors.border, height: 1),
               ),
               _buildPriceRow(
-                'Total Amount',
+                'Total Investment',
                 '${widget.package.currency} $finalTotal',
                 isTotal: true,
               ),
-              const SizedBox(height: 8),
-              const Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  'Including all taxes and fees',
-                  style: TextStyle(
-                    color: Color(0xFF10B981),
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const Icon(Icons.verified, color: AppColors.primaryEmerald, size: 14),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Inclusive of all service taxes',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: AppColors.primaryEmerald,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
@@ -257,23 +240,23 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
     );
   }
 
-  Widget _buildPriceRow(String label, String value, {bool isTotal = false}) {
+  Widget _buildPriceRow(String label, String value, {bool isTotal = false, bool accent = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: GoogleFonts.plusJakartaSans(
             color: isTotal ? AppColors.textPrimary : AppColors.textSecondary,
-            fontSize: isTotal ? 16 : 13,
+            fontSize: isTotal ? 16 : 14,
             fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
           ),
         ),
         Text(
           value,
-          style: TextStyle(
-            color: isTotal ? AppColors.textPrimary : AppColors.textPrimary,
-            fontSize: isTotal ? 20 : 13,
+          style: GoogleFonts.plusJakartaSans(
+            color: accent ? AppColors.primaryOrange : AppColors.textPrimary,
+            fontSize: isTotal ? 22 : 14,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -288,19 +271,21 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Trip Itinerary',
-              style: TextStyle(
+              style: GoogleFonts.plusJakartaSans(
                 color: AppColors.textPrimary,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
+            const SizedBox(height: 2),
             Text(
-              '${widget.package.itineraries.length} Days Summary',
-              style: const TextStyle(
+              'Full ${widget.package.itineraries.length}-Day Expedition Summary',
+              style: GoogleFonts.plusJakartaSans(
                 color: AppColors.textSecondary,
                 fontSize: 12,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
@@ -309,9 +294,9 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
           onPressed: () => setState(() => _allExpanded = !_allExpanded),
           child: Text(
             _allExpanded ? 'Collapse All' : 'Expand All',
-            style: TextStyle(
+            style: GoogleFonts.plusJakartaSans(
               color: _accentColor,
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -393,25 +378,34 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
             color: AppColors.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.border),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AppColors.border.withOpacity(0.5)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              )
+            ],
           ),
           child: Theme(
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
             child: ExpansionTile(
               initiallyExpanded: _allExpanded,
+              iconColor: _accentColor,
+              collapsedIconColor: AppColors.textSecondary,
               leading: Container(
-                width: 40,
-                height: 40,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
                   color: _accentColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Center(
                   child: Text(
                     '${date.day}\n${months[date.month - 1]}',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: GoogleFonts.plusJakartaSans(
                       color: _accentColor,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
@@ -422,7 +416,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
               ),
               title: Text(
                 'Day ${index + 1}: ${day.title}',
-                style: const TextStyle(
+                style: GoogleFonts.plusJakartaSans(
                   color: AppColors.textPrimary,
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -624,48 +618,56 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
 
   Widget _buildReviewItem(IconData icon, String text, bool isOptional, {num price = 0, String currency = 'Rs'}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
-          Icon(icon, color: AppColors.textSecondary, size: 16),
-          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: AppColors.textSecondary, size: 14),
+          ),
+          const SizedBox(width: 12),
           Expanded(
             child: Row(
               children: [
                 Expanded(
                   child: Text(
                     text,
-                    style: const TextStyle(
+                    style: GoogleFonts.plusJakartaSans(
                       color: AppColors.textSecondary,
-                      fontSize: 12,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
                 if (isOptional && price > 0)
                   Text(
                     '+$currency $price',
-                    style: TextStyle(
+                    style: GoogleFonts.plusJakartaSans(
                       color: _accentColor,
-                      fontSize: 11,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 if (isOptional) ...[
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 10),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
+                      horizontal: 8,
+                      vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(4),
+                      color: AppColors.primaryEmerald.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(6),
                     ),
                     child: const Text(
                       'ADDED',
                       style: TextStyle(
-                        color: Color(0xFF10B981),
-                        fontSize: 9,
+                        color: AppColors.primaryEmerald,
+                        fontSize: 8,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -707,32 +709,32 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.border.withOpacity(0.5)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
       child: Stack(
         children: [
           Positioned(
-            top: -20,
-            right: -20,
+            top: -30,
+            right: -30,
             child: Container(
-              width: 100,
-              height: 100,
+              width: 120,
+              height: 120,
               decoration: BoxDecoration(
-                color: _accentColor.withOpacity(0.1),
+                color: _accentColor.withOpacity(0.06),
                 shape: BoxShape.circle,
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(24),
             child: Column(
               children: [
                 Row(
@@ -744,29 +746,29 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
+                              horizontal: 10,
+                              vertical: 5,
                             ),
                             decoration: BoxDecoration(
                               color: _accentColor.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              widget.isPublic ? 'PUBLIC TOUR' : 'PRIVATE TOUR',
-                              style: TextStyle(
+                              widget.isPublic ? 'PUBLIC TOUR' : 'PRIVATE EXPERIENCE',
+                              style: GoogleFonts.plusJakartaSans(
                                 color: _accentColor,
                                 fontSize: 9,
                                 fontWeight: FontWeight.bold,
-                                letterSpacing: 1,
+                                letterSpacing: 1.2,
                               ),
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 16),
                           Text(
                             widget.package.title,
-                            style: const TextStyle(
+                            style: GoogleFonts.plusJakartaSans(
                               color: AppColors.textPrimary,
-                              fontSize: 20,
+                              fontSize: 22,
                               fontWeight: FontWeight.bold,
                               height: 1.2,
                             ),
@@ -774,13 +776,16 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 16),
                     Container(
-                      width: 48,
-                      height: 48,
+                      width: 64,
+                      height: 64,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: AppColors.border),
+                        boxShadow: [
+                           BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))
+                        ],
                         image: DecorationImage(
                           image: NetworkImage(
                             widget.package.media.isNotEmpty
@@ -793,9 +798,9 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
-                Divider(color: AppColors.border.withOpacity(0.5), height: 1),
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
+                Divider(color: AppColors.border.withOpacity(0.3), height: 1),
+                const SizedBox(height: 24),
                 Row(
                   children: [
                     Expanded(
@@ -803,16 +808,16 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                         Icons.calendar_month_outlined,
                         'DATES',
                         '${months[widget.startDate.month - 1]} ${widget.startDate.day} - ${months[endDate.month - 1]} ${endDate.day}',
-                        const Color(0xFF3B82F6),
+                        _accentColor,
                       ),
                     ),
-                    Container(width: 1, height: 32, color: AppColors.border),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: _buildInfoItem(
                         Icons.group_outlined,
                         'TRAVELERS',
-                        '${widget.travelers} Persons',
-                        const Color(0xFFF97316),
+                        '${widget.travelers} Guests',
+                        AppColors.primaryEmerald,
                       ),
                     ),
                   ],
@@ -834,35 +839,41 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
     return Row(
       children: [
         Container(
-          width: 32,
-          height: 32,
+          width: 36,
+          height: 36,
           decoration: BoxDecoration(
-            color: iconColor.withOpacity(0.1),
-            shape: BoxShape.circle,
+            color: iconColor.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: iconColor, size: 16),
+          child: Icon(icon, color: iconColor, size: 18),
         ),
-        const SizedBox(width: 10),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 9,
-                fontWeight: FontWeight.bold,
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: GoogleFonts.plusJakartaSans(
+                  color: AppColors.textSecondary,
+                  fontSize: 9,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
               ),
-            ),
-            Text(
-              value,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: GoogleFonts.plusJakartaSans(
+                  color: AppColors.textPrimary,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
