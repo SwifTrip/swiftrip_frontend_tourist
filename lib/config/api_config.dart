@@ -1,4 +1,4 @@
-class ApiConfig {
+﻿class ApiConfig {
   // Base URL for the API
   // For Chrome/Web use localhost
   // For Android Emulator use 10.0.2.2
@@ -26,6 +26,7 @@ class ApiConfig {
 
   // Tourist Bookings Endpoints
   static const String myBookings = '$baseUrl/tourist/bookings/my';
+  static const String createBooking = '$baseUrl/tourist/bookings';
 
   // Request timeout duration
   static const Duration timeout = Duration(seconds: 30);
