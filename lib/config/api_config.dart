@@ -28,6 +28,9 @@
   static const String myBookings = '$baseUrl/tourist/bookings/my';
   static const String createBooking = '$baseUrl/tourist/bookings';
 
+  // Stripe Payment — all-in-one server-side processing
+  static const String processPayment = '$baseUrl/tourist/payment/process';
+
   // Request timeout duration
   static const Duration timeout = Duration(seconds: 30);
 }

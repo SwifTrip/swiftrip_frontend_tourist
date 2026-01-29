@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'theme/app_colors.dart';
 import 'screens/home_screen.dart';
 import 'screens/signin.dart';
@@ -10,6 +10,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const SwifTripTouristApp());
 }
+
 
 class SwifTripTouristApp extends StatefulWidget {
   const SwifTripTouristApp({super.key});
