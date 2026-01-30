@@ -50,4 +50,62 @@ class BookingService {
       return null;
     }
   }
+
+  /// Create a new booking (custom tour or schedule-based)
+  Future<Map<String, dynamic>?> createBooking({
+    int? customTourId,
+    int? scheduleId,
+    required int seats,
+    String? paymentMethod,
+  }) async {
+    try {
+      final token = await TokenService.getToken();
+      if (token == null) {
+        return {'success': false, 'message': 'Authentication required'};
+      }
+
+      final Map<String, dynamic> requestBody = {
+        'seats': seats,
+        if (customTourId != null) 'customTourId': customTourId,
+        if (scheduleId != null) 'scheduleId': scheduleId,
+        if (paymentMethod != null) 'paymentMethod': paymentMethod,
+      };
+
+      final response = await http
+          .post(
+            Uri.parse(ApiConfig.createBooking),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+            body: jsonEncode(requestBody),
+          )
+          .timeout(ApiConfig.timeout);
+
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {
+          'success': true,
+          'data': responseData['data'],
+          'message': responseData['message'] ?? 'Booking created successfully!',
+        };
+      } else {
+        return {
+          'success': false,
+          'message': responseData['message'] ?? 'Failed to create booking',
+        };
+      }
+    } on http.ClientException catch (e) {
+      return {
+        'success': false,
+        'message': 'Connection error: ${e.message}',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'An unexpected error occurred: ${e.toString()}',
+      };
+    }
+  }
 }
