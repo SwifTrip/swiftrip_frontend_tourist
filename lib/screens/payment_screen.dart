@@ -1,205 +1,99 @@
-import 'package:flutter/material.dart';
-import 'package:swift_trip_app/screens/app-theme.dart';
-import 'package:swift_trip_app/widgets/custom_app_bar.dart';
-import 'package:swift_trip_app/widgets/custom_bottom_bar.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../theme/app_colors.dart';
+import '../services/payment_service.dart';
+import 'home_screen.dart';
 
-class PaymentScreen extends StatelessWidget {
-  const PaymentScreen({super.key});
+class StripePaymentScreen extends StatefulWidget {
+  final int customTourId;
+  final int travelers;
+  final num totalAmount;
+  final String currency;
+  final String tripTitle;
+
+  const StripePaymentScreen({
+    super.key,
+    required this.customTourId,
+    required this.travelers,
+    required this.totalAmount,
+    required this.currency,
+    required this.tripTitle,
+  });
+
+  @override
+  State<StripePaymentScreen> createState() => _StripePaymentScreenState();
+}
+
+class _StripePaymentScreenState extends State<StripePaymentScreen>
+    with SingleTickerProviderStateMixin {
+  final _formKey = GlobalKey<FormState>();
+  final _cardNumberCtrl = TextEditingController();
+  final _expiryCtrl = TextEditingController();
+  final _cvcCtrl = TextEditingController();
+  final _nameCtrl = TextEditingController();
+
+  final PaymentService _paymentService = PaymentService();
+
+  bool _isLoading = false;
+  String? _errorMessage;
+  String _paymentStep = '';
+
+  late AnimationController _pulseCtrl;
+  late Animation<double> _pulseAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat(reverse: true);
+    _pulseAnim = Tween<double>(begin: 0.85, end: 1.0).animate(
+      CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulseCtrl.dispose();
+    _cardNumberCtrl.dispose();
+    _expiryCtrl.dispose();
+    _cvcCtrl.dispose();
+    _nameCtrl.dispose();
+    super.dispose();
+  }
+
+  int get _amountInCents => (widget.totalAmount * 100).round();
+
+  String get _formattedAmount {
+    final amount = widget.totalAmount.toStringAsFixed(2);
+    return 'Rs $amount';
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(currentStep: 4),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Payment Details',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.textColor,
-                ),
-              ),
-              const SizedBox(height: 20),
-              _buildPaymentMethodSelector(),
-              const SizedBox(height: 30),
-              _buildCreditCardForm(),
-              const SizedBox(height: 30),
-              _buildOrderSummary(),
-              const SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryColor,
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                ),
-                child: const Text(
-                  'Pay Now',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-          ),
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          onPressed: _isLoading ? null : () => Navigator.pop(context),
         ),
-      ),
-      bottomNavigationBar: CustomBottomBar(currentIndex: 1),
-    );
-  }
-
-  Widget _buildPaymentMethodSelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Select Payment Method',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppTheme.textColor,
-          ),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            Expanded(
-              child: Card(
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  side: const BorderSide(color: AppTheme.primaryColor, width: 2),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Icon(Icons.credit_card, color: AppTheme.primaryColor, size: 30),
-                      SizedBox(height: 5),
-                      Text('Credit Card'),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Card(
-                elevation: 1,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Icon(Icons.paypal, color: Colors.grey, size: 30),
-                       SizedBox(height: 5),
-                      Text('PayPal'),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCreditCardForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Credit Card Details',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppTheme.textColor,
-          ),
-        ),
-        const SizedBox(height: 10),
-        TextFormField(
-          decoration: const InputDecoration(
-            labelText: 'Cardholder Name',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        const SizedBox(height: 10),
-        TextFormField(
-          decoration: const InputDecoration(
-            labelText: 'Card Number',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            Expanded(
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Expiry Date (MM/YY)',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'CVC',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildOrderSummary() {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Order Summary',
-            style: TextStyle(
-              fontSize: 18,
+        title: Center(
+          child: Text(
+            'Payment',
+            style: GoogleFonts.plusJakartaSans(
+              color: AppColors.textPrimary,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textColor,
+              fontSize: 16,
             ),
           ),
-          const SizedBox(height: 10),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Total', style: TextStyle(fontSize: 16)),
-              Text(
-                '\$3,608.00',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
-                ),
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
+      body: const Center(child: CircularProgressIndicator()),
     );
   }
 }
