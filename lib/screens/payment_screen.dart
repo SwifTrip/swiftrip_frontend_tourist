@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_colors.dart';
@@ -64,11 +64,12 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
     super.dispose();
   }
 
+  // Amount in cents for Stripe
   int get _amountInCents => (widget.totalAmount * 100).round();
 
   String get _formattedAmount {
     final amount = widget.totalAmount.toStringAsFixed(2);
-    return 'Rs $amount';
+    return 'Rs $amount'; // force display currency in UI
   }
 
   Future<void> _handlePayment() async {
@@ -77,14 +78,16 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
     setState(() {
       _isLoading = true;
       _errorMessage = null;
-      _paymentStep = 'Processing paymentâ€¦';
+      _paymentStep = 'Processing payment…';
     });
 
+    // Parse expiry MM / YY
     final expParts = _expiryCtrl.text.replaceAll(' ', '').split('/');
     final expMonth = expParts[0].trim();
     final expYear = '20${expParts[1].trim()}';
 
     try {
+      // Single call — backend handles everything with the secret key
       final result = await _paymentService.processPayment(
         cardNumber: _cardNumberCtrl.text,
         expMonth: expMonth,
@@ -93,7 +96,7 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
         customTourId: widget.customTourId,
         seats: widget.travelers,
         amountInCents: _amountInCents,
-        currency: 'usd',
+        currency: 'usd', // backend always USD
       );
 
       if (!mounted) return;
@@ -132,6 +135,7 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Animated check
               TweenAnimationBuilder<double>(
                 tween: Tween(begin: 0, end: 1),
                 duration: const Duration(milliseconds: 600),
@@ -176,7 +180,7 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
               ),
               const SizedBox(height: 8),
               Text(
-                'Your booking is confirmed. \nGet ready for your adventure!',
+                'Your booking is confirmed. \nGet ready for your adventure! 🎉',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 13,
@@ -238,8 +242,8 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
               fontSize: 16,
             ),
           ),
+        )
         ),
-      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         child: Form(
@@ -250,40 +254,14 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
               _buildTripSummaryCard(),
               const SizedBox(height: 24),
               _buildCardForm(),
+              const SizedBox(height: 16),
+              if (_errorMessage != null) ...[
+                _buildErrorBanner(),
+                const SizedBox(height: 12),
+              ],
+              _buildTestCardsHint(),
               const SizedBox(height: 28),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _handlePayment,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryOrange,
-                    disabledBackgroundColor:
-                        AppColors.primaryOrange.withOpacity(0.5),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Text(
-                          'Pay $_formattedAmount',
-                          style: GoogleFonts.plusJakartaSans(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
-                ),
-              ),
+              _buildPayButton(),
               const SizedBox(height: 24),
             ],
           ),
@@ -292,6 +270,7 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
     );
   }
 
+  // ── Trip Summary ─────────────────────────────────────────────────────────
   Widget _buildTripSummaryCard() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -305,7 +284,8 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.primaryOrange.withOpacity(0.2)),
+        border:
+            Border.all(color: AppColors.primaryOrange.withOpacity(0.2)),
       ),
       child: Column(
         children: [
@@ -378,6 +358,7 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
     );
   }
 
+  // ── Card Form ─────────────────────────────────────────────────────────────
   Widget _buildCardForm() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -398,6 +379,7 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
         children: [
           _sectionLabel('Card Details'),
           const SizedBox(height: 14),
+          // Cardholder name
           _buildField(
             controller: _nameCtrl,
             label: 'Cardholder Name',
@@ -408,6 +390,7 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
                 v == null || v.trim().isEmpty ? 'Enter cardholder name' : null,
           ),
           const SizedBox(height: 14),
+          // Card Number
           _buildField(
             controller: _cardNumberCtrl,
             label: 'Card Number',
@@ -430,6 +413,7 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
           const SizedBox(height: 14),
           Row(
             children: [
+              // Expiry
               Expanded(
                 child: _buildField(
                   controller: _expiryCtrl,
@@ -451,6 +435,7 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
                 ),
               ),
               const SizedBox(width: 14),
+              // CVC
               Expanded(
                 child: _buildField(
                   controller: _cvcCtrl,
@@ -564,7 +549,157 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
       ),
     );
   }
+
+  // ── Error Banner ─────────────────────────────────────────────────────────
+  Widget _buildErrorBanner() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.red.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.red.withOpacity(0.3)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline, color: Colors.red, size: 18),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              _errorMessage!,
+              style: GoogleFonts.plusJakartaSans(
+                color: Colors.red,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Test Cards Hint ───────────────────────────────────────────────────────
+  Widget _buildTestCardsHint() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF635BFF).withOpacity(0.06),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF635BFF).withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.science_outlined,
+                  color: Color(0xFF635BFF), size: 16),
+              const SizedBox(width: 8),
+              Text(
+                'Stripe Sandbox — Test Cards',
+                style: GoogleFonts.plusJakartaSans(
+                  color: const Color(0xFF635BFF),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          _testRow('✅ Success', '4242 4242 4242 4242'),
+          _testRow('❌ Card Declined', '4000 0000 0000 0002'),
+          _testRow('⚠️ Insufficient Funds', '4000 0000 0000 9995'),
+          const SizedBox(height: 6),
+          Text(
+            'Expiry: any future date  ·  CVC: any 3 digits  ·  ZIP: any 5 digits',
+            style: GoogleFonts.plusJakartaSans(
+              color: AppColors.textSecondary,
+              fontSize: 10.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _testRow(String label, String number) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 5),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 150,
+            child: Text(
+              label,
+              style: GoogleFonts.plusJakartaSans(
+                color: AppColors.textSecondary,
+                fontSize: 11,
+              ),
+            ),
+          ),
+          Text(
+            number,
+            style: GoogleFonts.plusJakartaSans(
+              color: AppColors.textPrimary,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Pay Button ────────────────────────────────────────────────────────────
+  Widget _buildPayButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: _isLoading ? null : _handlePayment,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primaryOrange,
+          disabledBackgroundColor: AppColors.primaryOrange.withOpacity(0.5),
+          padding: const EdgeInsets.symmetric(vertical: 16), // same as review screen
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24), // same as review screen
+          ),
+          elevation: 0, // same as review screen
+        ),
+        child: _isLoading
+            ? const SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.confirmation_number_outlined,
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Pay $_formattedAmount',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                ],
+              ),
+      ),
+    );
+  }
 }
+
+// ── Input Formatters ─────────────────────────────────────────────────────────
 
 class _CardNumberFormatter extends TextInputFormatter {
   @override
