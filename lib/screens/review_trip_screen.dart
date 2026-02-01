@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
@@ -104,7 +104,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                const SizedBox(height: 120), // Spacing for footer
+                const SizedBox(height: 150), // Spacing for footer
               ],
             ),
           ),
@@ -115,6 +115,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
   }
 
   Widget _buildStickyFooter() {
+    final bool busy = _isSubmitting || _isBooking;
     return Positioned(
       bottom: 0,
       left: 0,
@@ -133,11 +134,91 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
           ],
           border: Border.all(color: AppColors.border.withOpacity(0.5)),
         ),
-        child: CommonButton(
-          text: _isSubmitting ? 'Saving Expedition...' : 'Confirm & Save Trip',
-          onPressed: _isSubmitting ? null : _saveCustomTour,
-          isEnabled: !_isSubmitting,
-          borderRadius: 24,
+        child: Row(
+          children: [
+            // ── Save Trip (secondary) ──
+            Expanded(
+              child: OutlinedButton(
+                onPressed: busy ? null : _saveCustomTour,
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  side: BorderSide(
+                    color: busy
+                        ? AppColors.border.withOpacity(0.3)
+                        : AppColors.primaryOrange,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+                child: _isSubmitting
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.primaryOrange,
+                        ),
+                      )
+                    : Text(
+                        'Save Trip',
+                        style: GoogleFonts.plusJakartaSans(
+                          color: busy
+                              ? AppColors.textSecondary
+                              : AppColors.primaryOrange,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                        ),
+                      ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            // ── Book Now (primary) ──
+            Expanded(
+              flex: 2,
+              child: ElevatedButton(
+                onPressed: busy ? null : _saveAndBook,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryOrange,
+                  disabledBackgroundColor:
+                      AppColors.primaryOrange.withOpacity(0.5),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  elevation: 0,
+                ),
+                child: _isBooking
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.confirmation_number_outlined,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Book Now',
+                            style: GoogleFonts.plusJakartaSans(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -881,7 +962,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
     );
   }
 
-  // â”€â”€ Shared: builds the itineraries payload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Shared: builds the itineraries payload ──────────────────────────────
   List<Map<String, dynamic>> _buildItineraries() {
     return widget.package.itineraries.map((day) {
       final selectedItems = day.items.map((item) {
@@ -893,7 +974,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
     }).toList();
   }
 
-  // â”€â”€ Shared: calls backend to create the custom tour, returns its ID â”€â”€â”€â”€â”€
+  // ── Shared: calls backend to create the custom tour, returns its ID ─────
   Future<int?> _createCustomTourAndGetId() async {
     final durationDays =
         ((widget.package.duration is int)
@@ -914,6 +995,9 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
       throw Exception(result?['message'] ?? 'Failed to save custom tour');
     }
 
+    // Extract ID from response
+    // customTourService wraps response: { success, data: <raw response body> }
+    // Raw backend response: { success, message, data: { id, ... } }
     final dynamic wrapper = result['data'];
     if (wrapper is Map<String, dynamic>) {
       final dynamic inner = wrapper['data'];
@@ -925,7 +1009,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
     return null;
   }
 
-  // â”€â”€ Save Trip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Save Trip ────────────────────────────────────────────────────────────
   Future<void> _saveCustomTour() async {
     setState(() => _isSubmitting = true);
     try {
@@ -958,10 +1042,11 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
     }
   }
 
-  // â”€â”€ Book Now (save first, then navigate to payment) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Book Now (save first, then navigate to payment) ─────────────────────
   Future<void> _saveAndBook() async {
     setState(() => _isBooking = true);
     try {
+      // Step 1: Save the custom tour to get its ID
       final tourId = await _createCustomTourAndGetId();
 
       if (!mounted) return;
@@ -978,6 +1063,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
         return;
       }
 
+      // Step 2: Compute total price for Stripe
       num totalAddOns = 0;
       for (final day in widget.package.itineraries) {
         for (final item in day.items) {
@@ -990,6 +1076,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
       final num totalAmount =
           (widget.package.basePrice + totalAddOns) * widget.travelers;
 
+      // Step 3: Navigate to Stripe payment screen
       if (!mounted) return;
       Navigator.of(context).push(
         MaterialPageRoute(
@@ -997,7 +1084,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
             customTourId: tourId,
             travelers: widget.travelers,
             totalAmount: totalAmount,
-            currency: 'usd',
+            currency: 'usd', // Stripe sandbox uses USD for test cards
             tripTitle: widget.package.title,
           ),
         ),
