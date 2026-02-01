@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
-import '../widgets/common_button.dart';
 import '../services/custom_tour_service.dart';
 import 'home_screen.dart';
 import 'payment_screen.dart';

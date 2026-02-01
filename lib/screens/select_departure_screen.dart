@@ -69,8 +69,6 @@ class _SelectDepartureScreenState extends State<SelectDepartureScreen> {
     },
   ];
 
-  Color get _accentColor => AppColors.primaryOrange;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -37,10 +37,8 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
 
   bool _isLoading = false;
   String? _errorMessage;
-  String _paymentStep = '';
 
   late AnimationController _pulseCtrl;
-  late Animation<double> _pulseAnim;
 
   @override
   void initState() {
@@ -49,9 +47,6 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     )..repeat(reverse: true);
-    _pulseAnim = Tween<double>(begin: 0.85, end: 1.0).animate(
-      CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut),
-    );
   }
 
   @override
@@ -78,7 +73,6 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
     setState(() {
       _isLoading = true;
       _errorMessage = null;
-      _paymentStep = 'Processing payment…';
     });
 
     // Parse expiry MM / YY
@@ -104,7 +98,6 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
       if (result != null && result['success'] == true) {
         setState(() {
           _isLoading = false;
-          _paymentStep = '';
         });
         _showSuccessDialog();
       } else {
@@ -120,7 +113,6 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
     setState(() {
       _errorMessage = msg;
       _isLoading = false;
-      _paymentStep = '';
     });
   }
 

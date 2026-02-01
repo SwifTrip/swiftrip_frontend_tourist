@@ -14,12 +14,6 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  // Validation patterns
-  static final RegExp _nameRegExp = RegExp(r'^[A-Za-z]+$');
-  static final RegExp _digitsOnlyRegExp = RegExp(r'^\d+$');
-  static final RegExp _strongPasswordRegExp =
-    RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$');
-
   // Form key and controllers
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late final TextEditingController _firstNameController;
