@@ -72,7 +72,150 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
   }
 
   Future<void> _handlePayment() async {
-    // TODO: implement payment processing
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+      _paymentStep = 'Processing paymentâ€¦';
+    });
+
+    final expParts = _expiryCtrl.text.replaceAll(' ', '').split('/');
+    final expMonth = expParts[0].trim();
+    final expYear = '20${expParts[1].trim()}';
+
+    try {
+      final result = await _paymentService.processPayment(
+        cardNumber: _cardNumberCtrl.text,
+        expMonth: expMonth,
+        expYear: expYear,
+        cvc: _cvcCtrl.text,
+        customTourId: widget.customTourId,
+        seats: widget.travelers,
+        amountInCents: _amountInCents,
+        currency: 'usd',
+      );
+
+      if (!mounted) return;
+
+      if (result != null && result['success'] == true) {
+        setState(() {
+          _isLoading = false;
+          _paymentStep = '';
+        });
+        _showSuccessDialog();
+      } else {
+        _setError(result?['message'] ?? 'Payment failed. Please try again.');
+      }
+    } catch (e) {
+      _setError(e.toString().replaceFirst('Exception: ', ''));
+    }
+  }
+
+  void _setError(String msg) {
+    if (!mounted) return;
+    setState(() {
+      _errorMessage = msg;
+      _isLoading = false;
+      _paymentStep = '';
+    });
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0, end: 1),
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.elasticOut,
+                builder: (ctx, val, child) => Transform.scale(
+                  scale: val,
+                  child: child,
+                ),
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.primaryEmerald,
+                        AppColors.primaryEmerald.withOpacity(0.7),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryEmerald.withOpacity(0.35),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.check_rounded,
+                      color: Colors.white, size: 44),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Payment Successful!',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Your booking is confirmed. \nGet ready for your adventure!',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 13,
+                  color: AppColors.textSecondary,
+                  height: 1.6,
+                ),
+              ),
+              const SizedBox(height: 28),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const HomeScreen()),
+                      (route) => false,
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryEmerald,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'Back to Home',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -114,20 +257,31 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
                   onPressed: _isLoading ? null : _handlePayment,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryOrange,
+                    disabledBackgroundColor:
+                        AppColors.primaryOrange.withOpacity(0.5),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
                     ),
                     elevation: 0,
                   ),
-                  child: Text(
-                    'Pay $_formattedAmount',
-                    style: GoogleFonts.plusJakartaSans(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    ),
-                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(
+                          'Pay $_formattedAmount',
+                          style: GoogleFonts.plusJakartaSans(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -262,6 +416,7 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
             keyboardType: TextInputType.number,
             inputFormatters: [
               FilteringTextInputFormatter.digitsOnly,
+              _CardNumberFormatter(),
             ],
             maxLength: 19,
             validator: (v) {
@@ -284,6 +439,7 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
                   keyboardType: TextInputType.number,
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
+                    _ExpiryFormatter(),
                   ],
                   maxLength: 7,
                   validator: (v) {
@@ -406,6 +562,42 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
           borderSide: const BorderSide(color: Colors.red, width: 1.5),
         ),
       ),
+    );
+  }
+}
+
+class _CardNumberFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    final digits = newValue.text.replaceAll(RegExp(r'\D'), '');
+    final buffer = StringBuffer();
+    for (int i = 0; i < digits.length; i++) {
+      if (i > 0 && i % 4 == 0) buffer.write(' ');
+      buffer.write(digits[i]);
+    }
+    final formatted = buffer.toString();
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
+}
+
+class _ExpiryFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    final digits = newValue.text.replaceAll(RegExp(r'\D'), '');
+    String formatted = digits;
+    if (digits.length >= 3) {
+      formatted = '${digits.substring(0, 2)} / ${digits.substring(2)}';
+    } else if (digits.length == 2 && oldValue.text.length == 1) {
+      formatted = '$digits / ';
+    }
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
     );
   }
 }
