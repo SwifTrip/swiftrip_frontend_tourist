@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
@@ -879,88 +879,80 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
     );
   }
 
-  Future<void> _saveCustomTour() async {
-    setState(() {
-      _isSubmitting = true;
-    });
-
-    try {
-      // Calculate end date based on package duration
-      final durationDays =
-          ((widget.package.duration is int)
-              ? (widget.package.duration as int)
-              : widget.package.duration.toInt()) -
-          1;
-      final endDate = widget.startDate.add(Duration(days: durationDays));
-
-      // Build itineraries list
-      final itineraries = widget.package.itineraries.map((day) {
-        // Include ALL items (both optional and required) with their inclusion status
-        final selectedItems = day.items.map((item) {
-          // If item is optional, check if user selected it
-          // If item is required (not optional), it's always included
-          final included =
-              !item.optional ||
-              (widget.selectedOptionalItems[item.id] ?? false);
-
-          return {'itemId': item.id, 'included': included};
-        }).toList();
-
-        return {'dayNumber': day.dayNumber, 'selectedItems': selectedItems};
+  // â”€â”€ Shared: builds the itineraries payload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  List<Map<String, dynamic>> _buildItineraries() {
+    return widget.package.itineraries.map((day) {
+      final selectedItems = day.items.map((item) {
+        final included =
+            !item.optional || (widget.selectedOptionalItems[item.id] ?? false);
+        return {'itemId': item.id, 'included': included};
       }).toList();
+      return {'dayNumber': day.dayNumber, 'selectedItems': selectedItems};
+    }).toList();
+  }
 
-      final result = await _customTourService.createCustomTour(
-        basePackageId: widget.package.id,
-        startDate: widget.startDate,
-        endDate: endDate,
-        travelerCount: widget.travelers,
-        itineraries: itineraries,
-      );
+  // â”€â”€ Shared: calls backend to create the custom tour, returns its ID â”€â”€â”€â”€â”€
+  Future<int?> _createCustomTourAndGetId() async {
+    final durationDays =
+        ((widget.package.duration is int)
+            ? (widget.package.duration as int)
+            : widget.package.duration.toInt()) -
+        1;
+    final endDate = widget.startDate.add(Duration(days: durationDays));
+
+    final result = await _customTourService.createCustomTour(
+      basePackageId: widget.package.id,
+      startDate: widget.startDate,
+      endDate: endDate,
+      travelerCount: widget.travelers,
+      itineraries: _buildItineraries(),
+    );
+
+    if (result == null || result['success'] != true) {
+      throw Exception(result?['message'] ?? 'Failed to save custom tour');
+    }
+
+    final dynamic wrapper = result['data'];
+    if (wrapper is Map<String, dynamic>) {
+      final dynamic inner = wrapper['data'];
+      if (inner is Map<String, dynamic> && inner['id'] != null) {
+        return inner['id'] as int;
+      }
+      if (wrapper['id'] != null) return wrapper['id'] as int;
+    }
+    return null;
+  }
+
+  // â”€â”€ Save Trip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  Future<void> _saveCustomTour() async {
+    setState(() => _isSubmitting = true);
+    try {
+      await _createCustomTourAndGetId();
 
       if (!mounted) return;
-
-      if (result != null && result['success'] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              result['message'] ?? 'Custom tour saved successfully!',
-            ),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 3),
-          ),
-        );
-        // Return to home after successful save
-        if (!mounted) return;
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
-          (route) => false,
-        );
-      } else {
-        // Show error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result?['message'] ?? 'Failed to save custom tour'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 3),
-          ),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Trip saved successfully!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        (route) => false,
+      );
     } catch (e) {
       if (!mounted) return;
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error: ${e.toString()}'),
+          content: Text(e.toString().replaceFirst('Exception: ', '')),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 3),
         ),
       );
     } finally {
-      if (mounted) {
-        setState(() {
-          _isSubmitting = false;
-        });
-      }
+      if (mounted) setState(() => _isSubmitting = false);
     }
   }
 }
