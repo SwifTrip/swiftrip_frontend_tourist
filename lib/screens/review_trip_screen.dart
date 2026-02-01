@@ -5,6 +5,7 @@ import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
 import '../services/custom_tour_service.dart';
 import 'home_screen.dart';
+import 'payment_screen.dart';
 
 class ReviewTripScreen extends StatefulWidget {
   final CustomizeItineraryModel package;
@@ -29,6 +30,7 @@ class ReviewTripScreen extends StatefulWidget {
 class _ReviewTripScreenState extends State<ReviewTripScreen> {
   bool _allExpanded = true;
   bool _isSubmitting = false;
+  bool _isBooking = false;
   final CustomTourService _customTourService = CustomTourService();
 
   Color get _accentColor => AppColors.primaryOrange;
@@ -953,6 +955,64 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
       );
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
+  // â”€â”€ Book Now (save first, then navigate to payment) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  Future<void> _saveAndBook() async {
+    setState(() => _isBooking = true);
+    try {
+      final tourId = await _createCustomTourAndGetId();
+
+      if (!mounted) return;
+
+      if (tourId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                'Trip saved but could not retrieve tour ID. Please book from your trips.'),
+            backgroundColor: Colors.orange,
+            duration: Duration(seconds: 4),
+          ),
+        );
+        return;
+      }
+
+      num totalAddOns = 0;
+      for (final day in widget.package.itineraries) {
+        for (final item in day.items) {
+          if (item.optional &&
+              (widget.selectedOptionalItems[item.id] ?? false)) {
+            totalAddOns += item.price;
+          }
+        }
+      }
+      final num totalAmount =
+          (widget.package.basePrice + totalAddOns) * widget.travelers;
+
+      if (!mounted) return;
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => StripePaymentScreen(
+            customTourId: tourId,
+            travelers: widget.travelers,
+            totalAmount: totalAmount,
+            currency: 'usd',
+            tripTitle: widget.package.title,
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceFirst('Exception: ', '')),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isBooking = false);
     }
   }
 }
