@@ -49,7 +49,7 @@ class TourPackageResult {
   final PackageIncludes includes;
   final String? coverImage;
   final Company company;
-  final String? nextDeparture;
+  final Map<String, dynamic>? nextDeparture;
 
   TourPackageResult({
     required this.id,
@@ -89,7 +89,9 @@ class TourPackageResult {
       company: Company.fromJson(
         (json['company'] as Map<String, dynamic>?) ?? {},
       ),
-      nextDeparture: json['nextDeparture'] as String?,
+        nextDeparture: json['nextDeparture'] is Map<String, dynamic>
+          ? json['nextDeparture'] as Map<String, dynamic>
+          : null,
     );
   }
 

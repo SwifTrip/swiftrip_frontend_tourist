@@ -11,9 +11,9 @@ class PackageService {
     String? category,
     int? travelers,
     String? tourType,
+    String? startDate,
     // double? minBudget,
     // double? maxBudget,
-    // String? startDate,
     // int page = 1,
     // int limit = 20,
   }) async {
@@ -36,14 +36,14 @@ class PackageService {
       if (tourType != null && tourType.isNotEmpty) {
         queryParams['tourType'] = tourType;
       }
+      if (startDate != null && startDate.isNotEmpty) {
+        queryParams['startDate'] = startDate;
+      }
       // if (minBudget != null) {
       //   queryParams['minBudget'] = minBudget.toString();
       // }
       // if (maxBudget != null) {
       //   queryParams['maxBudget'] = maxBudget.toString();
-      // }
-      // if (startDate != null && startDate.isNotEmpty) {
-      //   queryParams['startDate'] = startDate;
       // }
       // queryParams['page'] = page.toString();
       // queryParams['limit'] = limit.toString();

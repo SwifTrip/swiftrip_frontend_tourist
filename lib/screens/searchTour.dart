@@ -26,6 +26,14 @@ class _SearchTourState extends State<SearchTour> {
 
   final PackageService _packageService = PackageService();
 
+  String? _buildStartDateForSearch() {
+    if (!isPublicTrip || selectedDate == null) return null;
+    final year = selectedDate!.year.toString().padLeft(4, '0');
+    final month = selectedDate!.month.toString().padLeft(2, '0');
+    final day = selectedDate!.day.toString().padLeft(2, '0');
+    return '$year-$month-$day';
+  }
+
   @override
   void initState() {
     super.initState();
@@ -99,7 +107,7 @@ class _SearchTourState extends State<SearchTour> {
         travelers: travelers,
         category: selectedStyle.toUpperCase(),
         tourType: isPublicTrip ? 'PUBLIC' : 'PRIVATE',
-        // startDate: selectedDate?.toIso8601String(),
+        startDate: _buildStartDateForSearch(),
       );
 
       setState(() {
