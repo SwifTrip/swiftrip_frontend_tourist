@@ -587,57 +587,74 @@ class AgencySelection extends StatelessWidget {
                         height: 40,
                         onPressed: () async {
                           CustomizeItineraryModel? packageDetails;
-                          if (!packageIsPublic) {
-                            // Private package - fetch detailed itinerary
-                            showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (context) => const Center(
-                                child: CircularProgressIndicator(),
-                              ),
+
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) => const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+
+                          try {
+                            final packageService = PackageService();
+                            final response =
+                                await packageService.getPackageDetailsWithItinerary(
+                              packageResult.id,
                             );
 
-                            try {
-                              final packageService = PackageService();
-                              final response = await packageService
-                                  .getPackageDetailsWithItinerary(
-                                      packageResult.id);
+                            Navigator.pop(context); // Close loading dialog
 
-                              Navigator.pop(context); // Close loading dialog
-
-                              if (response != null && response.success) {
-                                packageDetails = response.data;
-                                
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                        'Failed to load package details'),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                              }
-                            } catch (e) {
-                              Navigator.pop(context); // Close loading dialog
+                            if (response != null && response.success) {
+                              packageDetails = response.data;
+                            } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Error: ${e.toString()}'),
+                                const SnackBar(
+                                  content: Text('Failed to load package details'),
                                   backgroundColor: Colors.red,
                                 ),
                               );
+                              return;
                             }
-
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PackageDetailsScreen(
-                                  isPublic: packageIsPublic,
-                                  customizeItinerary: packageDetails!,
-                                  travelers: travelers,
-                                ),
+                          } catch (e) {
+                            Navigator.pop(context); // Close loading dialog
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Error: ${e.toString()}'),
+                                backgroundColor: Colors.red,
                               ),
                             );
+                            return;
                           }
+
+
+                          final details = packageDetails;
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PackageDetailsScreen(
+                                isPublic: packageIsPublic,
+                                customizeItinerary: details,
+                                travelers: travelers,
+                                publicScheduleId: packageIsPublic
+                                  ? int.tryParse(
+                                    packageResult.nextDeparture?['id']
+                                        ?.toString() ??
+                                      '',
+                                    )
+                                  : null,
+                                fixedStartDate: packageIsPublic
+                                    ? DateTime.tryParse(
+                                        packageResult
+                                                .nextDeparture?['departureDate']
+                                                ?.toString() ??
+                                            '',
+                                      )
+                                    : null,
+                              ),
+                            ),
+                          );
                         },
                       ),
                     ),
