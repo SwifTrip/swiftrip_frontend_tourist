@@ -12,6 +12,7 @@ class ReviewTripScreen extends StatefulWidget {
   final DateTime startDate;
   final Map<int, bool> selectedOptionalItems;
   final int travelers;
+  final int? scheduleId;
 
   const ReviewTripScreen({
     super.key,
@@ -20,6 +21,7 @@ class ReviewTripScreen extends StatefulWidget {
     required this.startDate,
     required this.selectedOptionalItems,
     required this.travelers,
+    this.scheduleId,
   });
 
   @override
@@ -135,46 +137,48 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
         ),
         child: Row(
           children: [
-            // ── Save Trip (secondary) ──
-            Expanded(
-              child: OutlinedButton(
-                onPressed: busy ? null : _saveCustomTour,
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: BorderSide(
-                    color: busy
-                        ? AppColors.border.withOpacity(0.3)
-                        : AppColors.primaryOrange,
+            if (!widget.isPublic) ...[
+              // Save Trip is only valid for private/custom tours.
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: busy ? null : _saveCustomTour,
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    side: BorderSide(
+                      color: busy
+                          ? AppColors.border.withOpacity(0.3)
+                          : AppColors.primaryOrange,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.primaryOrange,
+                          ),
+                        )
+                      : Text(
+                          'Save Trip',
+                          style: GoogleFonts.plusJakartaSans(
+                            color: busy
+                                ? AppColors.textSecondary
+                                : AppColors.primaryOrange,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 14,
+                          ),
+                        ),
                 ),
-                child: _isSubmitting
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppColors.primaryOrange,
-                        ),
-                      )
-                    : Text(
-                        'Save Trip',
-                        style: GoogleFonts.plusJakartaSans(
-                          color: busy
-                              ? AppColors.textSecondary
-                              : AppColors.primaryOrange,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                        ),
-                      ),
               ),
-            ),
-            const SizedBox(width: 12),
+              const SizedBox(width: 12),
+            ],
             // ── Book Now (primary) ──
             Expanded(
-              flex: 2,
+              flex: widget.isPublic ? 1 : 2,
               child: ElevatedButton(
                 onPressed: busy ? null : _saveAndBook,
                 style: ElevatedButton.styleFrom(
@@ -206,7 +210,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'Book Now',
+                            widget.isPublic ? 'Proceed to Payment' : 'Book Now',
                             style: GoogleFonts.plusJakartaSans(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -1010,6 +1014,17 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
 
   // ── Save Trip ────────────────────────────────────────────────────────────
   Future<void> _saveCustomTour() async {
+    if (widget.isPublic) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Public tours cannot be saved as custom trips.'),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
     setState(() => _isSubmitting = true);
     try {
       await _createCustomTourAndGetId();
@@ -1045,6 +1060,46 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
   Future<void> _saveAndBook() async {
     setState(() => _isBooking = true);
     try {
+      if (widget.isPublic) {
+        if (widget.scheduleId == null) {
+          throw Exception('No schedule selected for this public tour');
+        }
+
+        num totalAddOns = 0;
+        final List<Map<String, dynamic>> optionalSelections = [];
+
+        for (final day in widget.package.itineraries) {
+          for (final item in day.items) {
+            final selected = widget.selectedOptionalItems[item.id] ?? false;
+            if (item.optional && selected) {
+              totalAddOns += item.price;
+              optionalSelections.add({
+                'itineraryItemId': item.id,
+                'quantity': 1,
+              });
+            }
+          }
+        }
+
+        final num totalAmount =
+            (widget.package.basePrice + totalAddOns) * widget.travelers;
+
+        if (!mounted) return;
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => StripePaymentScreen(
+              scheduleId: widget.scheduleId,
+              travelers: widget.travelers,
+              totalAmount: totalAmount,
+              currency: 'usd',
+              tripTitle: widget.package.title,
+              optionalSelections: optionalSelections,
+            ),
+          ),
+        );
+        return;
+      }
+
       // Step 1: Save the custom tour to get its ID
       final tourId = await _createCustomTourAndGetId();
 
