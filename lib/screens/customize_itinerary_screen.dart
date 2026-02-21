@@ -10,6 +10,7 @@ class CustomizeItineraryScreen extends StatefulWidget {
   final bool isPublic;
   final DateTime startDate;
   final int travelers;
+  final int? scheduleId;
 
   const CustomizeItineraryScreen({
     super.key, 
@@ -17,6 +18,7 @@ class CustomizeItineraryScreen extends StatefulWidget {
     required this.isPublic,
     required this.startDate,
     required this.travelers,
+    this.scheduleId,
   });
 
   @override
@@ -351,7 +353,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
     required ItineraryItem item,
     required DateTime date,
   }) {
-    final isCustomizable = !widget.isPublic && item.optional;
+    final isCustomizable = item.optional;
     final isFixed = !item.optional;
     final isSelected = _selectedOptionalItems[item.id] ?? item.optional == false;
 
@@ -501,7 +503,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
     required ItineraryItem item,
     required DateTime date,
   }) {
-    final isCustomizable = !widget.isPublic && item.optional;
+    final isCustomizable = item.optional;
     final isFixed = !item.optional;
     final isSelected = _selectedOptionalItems[item.id] ?? item.optional == false;
 
@@ -695,7 +697,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
     required ItineraryItem item,
     required DateTime date,
   }) {
-    final isCustomizable = !widget.isPublic && item.optional;
+    final isCustomizable = item.optional;
     final isFixed = !item.optional;
     final isSelected = _selectedOptionalItems[item.id] ?? item.optional == false;
 
@@ -978,6 +980,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                         startDate: widget.startDate,
                         selectedOptionalItems: _selectedOptionalItems,
                         travelers: widget.travelers,
+                        scheduleId: widget.scheduleId,
                       ),
                     ),
                   );
