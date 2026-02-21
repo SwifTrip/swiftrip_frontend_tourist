@@ -6,20 +6,27 @@ import '../services/payment_service.dart';
 import 'home_screen.dart';
 
 class StripePaymentScreen extends StatefulWidget {
-  final int customTourId;
+  final int? customTourId;
+  final int? scheduleId;
   final int travelers;
   final num totalAmount;
   final String currency;
   final String tripTitle;
+  final List<Map<String, dynamic>> optionalSelections;
 
   const StripePaymentScreen({
     super.key,
-    required this.customTourId,
+    this.customTourId,
+    this.scheduleId,
     required this.travelers,
     required this.totalAmount,
     required this.currency,
     required this.tripTitle,
-  });
+    this.optionalSelections = const [],
+  }) : assert(
+          (customTourId != null) != (scheduleId != null),
+          'Provide exactly one of customTourId or scheduleId.',
+        );
 
   @override
   State<StripePaymentScreen> createState() => _StripePaymentScreenState();
@@ -88,9 +95,11 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
         expYear: expYear,
         cvc: _cvcCtrl.text,
         customTourId: widget.customTourId,
+        scheduleId: widget.scheduleId,
         seats: widget.travelers,
         amountInCents: _amountInCents,
         currency: 'usd', // backend always USD
+        optionalSelections: widget.optionalSelections,
       );
 
       if (!mounted) return;
