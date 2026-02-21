@@ -3,19 +3,23 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
-import 'select_departure_screen.dart';
+import 'customize_itinerary_screen.dart';
 import 'select_start_date_screen.dart';
 
 class PackageDetailsScreen extends StatefulWidget {
   final CustomizeItineraryModel customizeItinerary;
   final bool isPublic;
   final int travelers;
+  final DateTime? fixedStartDate;
+  final int? publicScheduleId;
 
   const PackageDetailsScreen({
     super.key,
     required this.customizeItinerary,
     this.isPublic = true,
     required this.travelers,
+    this.fixedStartDate,
+    this.publicScheduleId,
   });
 
   @override
@@ -97,10 +101,6 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                       const SizedBox(height: 32),
                       _buildOverview(),
                       const SizedBox(height: 32),
-                      if (widget.isPublic) ...[
-                        _buildItinerarySection(),
-                        const SizedBox(height: 32),
-                      ],
                       _buildIncludedSection(),
                       const SizedBox(height: 32),
                       _buildCustomizableCard(),
@@ -537,15 +537,28 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
             const SizedBox(width: 20),
             Expanded(
               child: CommonButton(
-                text: widget.isPublic ? 'Choose Date' : 'Customize Plan',
+                text: 'Customize Plan',
                 onPressed: () {
+                  if (widget.isPublic && widget.fixedStartDate == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('No fixed departure date found for this tour.'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
+                  }
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => widget.isPublic
-                          ? SelectDepartureScreen(
+                          ? CustomizeItineraryScreen(
                               package: widget.customizeItinerary,
+                              isPublic: true,
+                              startDate: widget.fixedStartDate!,
                               travelers: widget.travelers,
+                              scheduleId: widget.publicScheduleId,
                             )
                           : SelectStartDateScreen(
                               package: widget.customizeItinerary,
