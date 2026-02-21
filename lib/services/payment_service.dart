@@ -34,12 +34,21 @@ class PaymentService {
     required String expMonth,
     required String expYear,
     required String cvc,
-    required int customTourId,
+    int? customTourId,
+    int? scheduleId,
     required int seats,
     required int amountInCents,
     String currency = 'usd',
+    List<Map<String, dynamic>> optionalSelections = const [],
   }) async {
     try {
+      if ((customTourId == null) == (scheduleId == null)) {
+        return {
+          'success': false,
+          'message': 'Provide exactly one of customTourId or scheduleId',
+        };
+      }
+
       final jwtToken = await TokenService.getToken();
       if (jwtToken == null) {
         return {'success': false, 'message': 'Authentication required'};
@@ -57,10 +66,13 @@ class PaymentService {
             },
             body: jsonEncode({
               'tokenId': stripeToken,
-              'customTourId': customTourId,
+              if (customTourId != null) 'customTourId': customTourId,
+              if (scheduleId != null) 'scheduleId': scheduleId,
               'seats': seats,
               'amount': amountInCents,
               'currency': currency,
+              if (optionalSelections.isNotEmpty)
+                'optionalSelections': optionalSelections,
             }),
           )
           .timeout(const Duration(seconds: 30));
