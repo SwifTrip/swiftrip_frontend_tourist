@@ -6,7 +6,7 @@ import 'token_service.dart';
 
 class BookingService {
   /// Get all bookings for the logged-in user
-  Future<BookingsResponse?> getUserBookings() async {
+  Future<BookingsResponse?> getUserBookings({String when = 'UPCOMING'}) async {
     try {
       // Get the auth token
       final token = await TokenService.getToken();
@@ -15,9 +15,13 @@ class BookingService {
         return null;
       }
 
+      final uri = Uri.parse(ApiConfig.myBookings).replace(
+        queryParameters: {'when': when},
+      );
+
       final response = await http
           .get(
-            Uri.parse(ApiConfig.myBookings),
+            uri,
             headers: {
               'Content-Type': 'application/json',
               // Send bearer token per API requirement
