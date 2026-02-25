@@ -73,7 +73,7 @@ class PublicTourBooking {
       status: json['status'] ?? '',
       paymentStatus: json['paymentStatus'] ?? '',
       seats: json['seats'] ?? 1,
-      totalAmount: json['totalAmount'] ?? '0',
+      totalAmount: (json['totalAmount'] ?? 0).toString(),
       departureDate: DateTime.parse(json['departureDate']),
       arrivalDate: DateTime.parse(json['arrivalDate']),
       package: PackageInfo.fromJson(json['package'] ?? {}),
