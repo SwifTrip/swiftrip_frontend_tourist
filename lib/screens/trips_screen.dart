@@ -149,11 +149,31 @@ class _TripsScreenState extends State<TripsScreen> {
               // Date filter button
               GestureDetector(
                 onTap: () async {
+                  final now = DateTime.now();
+                  DateTime initialDate = _selectedStartDate ?? now;
+                  DateTime firstDate;
+                  DateTime lastDate;
+
+                  if (_selectedTripsTab == 'UPCOMING') {
+                    firstDate = DateTime(now.year, now.month, now.day);
+                    lastDate = DateTime(2030);
+                    if (initialDate.isBefore(firstDate)) {
+                      initialDate = firstDate;
+                    }
+                  } else {
+                    firstDate = DateTime(2020);
+                    final todayStart = DateTime(now.year, now.month, now.day);
+                    lastDate = todayStart.subtract(const Duration(days: 1));
+                    if (initialDate.isAfter(lastDate)) {
+                      initialDate = lastDate;
+                    }
+                  }
+
                   final picked = await showDatePicker(
                     context: context,
-                    initialDate: _selectedStartDate ?? DateTime.now(),
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime(2030),
+                    initialDate: initialDate,
+                    firstDate: firstDate,
+                    lastDate: lastDate,
                     builder: (context, child) {
                       return Theme(
                         data: Theme.of(context).copyWith(
@@ -166,6 +186,7 @@ class _TripsScreenState extends State<TripsScreen> {
                       );
                     },
                   );
+
                   if (picked != null) {
                     setState(() {
                       _selectedStartDate = picked;
