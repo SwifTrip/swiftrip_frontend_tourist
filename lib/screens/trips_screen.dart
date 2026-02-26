@@ -537,7 +537,6 @@ class _TripsScreenState extends State<TripsScreen> {
       date:
           '${_formatDate(booking.departureDate)} - ${_formatDate(booking.arrivalDate)}',
       countdown: countdown,
-      status: booking.status,
       statusColor: statusColor,
       imageUrl: booking.package.coverImage ?? '',
       additionalInfo:
@@ -572,7 +571,6 @@ class _TripsScreenState extends State<TripsScreen> {
       date:
           '${_formatDate(booking.startDate)} - ${_formatDate(booking.endDate)}',
       countdown: countdown,
-      status: booking.status,
       statusColor: statusColor,
       imageUrl: '',
       additionalInfo:
@@ -585,7 +583,6 @@ class _TripsScreenState extends State<TripsScreen> {
     required String provider,
     required String date,
     required String countdown,
-    required String status,
     required Color statusColor,
     required String imageUrl,
     String? additionalInfo,
@@ -629,26 +626,6 @@ class _TripsScreenState extends State<TripsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border:
-                        Border.all(color: statusColor.withOpacity(0.5)),
-                  ),
-                  child: Text(
-                    status.toUpperCase(),
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      color: statusColor,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
                 Text(
                   title,
                   style: GoogleFonts.plusJakartaSans(

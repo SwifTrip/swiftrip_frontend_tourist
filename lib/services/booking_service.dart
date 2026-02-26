@@ -16,7 +16,10 @@ class BookingService {
       }
 
       final uri = Uri.parse(ApiConfig.myBookings).replace(
-        queryParameters: {'when': when},
+        queryParameters: {
+          'when': when,
+          'status': 'CONFIRMED',
+        },
       );
 
       final response = await http
