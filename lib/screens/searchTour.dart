@@ -15,7 +15,6 @@ class SearchTour extends StatefulWidget {
 
 class _SearchTourState extends State<SearchTour> {
   bool isPublicTrip = true;
-  String selectedMonth = 'Anytime';
   DateTime? selectedDate;
   int travelers = 1;
   String selectedStyle = 'Adventure';
@@ -78,7 +77,6 @@ class _SearchTourState extends State<SearchTour> {
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
-        selectedMonth = "${picked.day}/${picked.month}/${picked.year}";
       });
     }
   }
@@ -114,13 +112,17 @@ class _SearchTourState extends State<SearchTour> {
         isLoading = false;
       });
 
-      if (result != null && result.success) {
+        if (result != null && result.success) {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => AgencySelection(
               destination: toLocation,
-              dates: isPublicTrip ? selectedMonth : '',
+                dates: isPublicTrip
+                    ? (selectedDate != null
+                        ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
+                        : '')
+                    : '',
               travelers: travelers,
               isPublic: isPublicTrip,
               packages: result.data,
@@ -401,7 +403,7 @@ class _SearchTourState extends State<SearchTour> {
                   // When Section
                   if (isPublicTrip) ...[
                   const Text(
-                    'When?',
+                    'Start Date (on or after)',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -410,7 +412,7 @@ class _SearchTourState extends State<SearchTour> {
                   ),
                   
                   const SizedBox(height: 16),
-                  _buildMonthSelector(),
+                  _buildDateSelector(),
                   const SizedBox(height: 32),
                   ],
                   // Travelers Section
@@ -693,84 +695,39 @@ class _SearchTourState extends State<SearchTour> {
     );
   }
 
-  Widget _buildMonthSelector() {
-    final months = [
-      {'label': 'ANYTIME', 'value': 'Flexible'},
-      {'label': 'JUN', 'value': 'Next Month'},
-      {'label': 'JUL', 'value': 'Summer'},
-    ];
+  Widget _buildDateSelector() {
+    final display = selectedDate != null
+      ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
+      : 'Select start date';
 
-    return SizedBox(
-      height: 80,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          ...months.map((m) {
-            final isSelected = selectedMonth == m['value'];
-            return GestureDetector(
-              onTap: () => setState(() => selectedMonth = m['value']!),
-              child: Container(
-                width: 110,
-                margin: const EdgeInsets.only(right: 12),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.accent.withValues(alpha: 0.1)
-                      : AppColors.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: isSelected ? AppColors.accent : AppColors.border,
-                  ),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      m['label']!,
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: isSelected
-                            ? AppColors.accent
-                            : AppColors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      m['value']!,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }),
-          GestureDetector(
-            onTap: () => _selectDate(context),
-            child: Container(
-              width: 50,
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: selectedDate != null
-                      ? AppColors.accent
-                      : AppColors.border,
-                ),
-              ),
-              child: Icon(
-                Icons.calendar_month,
-                color: selectedDate != null
-                    ? AppColors.accent
-                    : AppColors.textSecondary,
+    return GestureDetector(
+      onTap: () => _selectDate(context),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selectedDate != null ? AppColors.accent : AppColors.border,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.calendar_month,
+              color: selectedDate != null ? AppColors.accent : AppColors.textSecondary,
+            ),
+            const SizedBox(width: 12),
+            Text(
+              display,
+              style: TextStyle(
+                color: selectedDate != null ? AppColors.textPrimary : AppColors.textSecondary,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
