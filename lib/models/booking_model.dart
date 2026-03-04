@@ -46,10 +46,10 @@ class PublicTourBooking {
   final String paymentStatus;
   final int seats;
   final String totalAmount;
-  final DateTime departureDate;
-  final DateTime arrivalDate;
-  final PackageInfo package;
-  final CompanyInfo company;
+  final DateTime? departureDate;
+  final DateTime? arrivalDate;
+  final PackageInfo? package;
+  final CompanyInfo? company;
   final DateTime createdAt;
 
   PublicTourBooking({
@@ -59,10 +59,10 @@ class PublicTourBooking {
     required this.paymentStatus,
     required this.seats,
     required this.totalAmount,
-    required this.departureDate,
-    required this.arrivalDate,
-    required this.package,
-    required this.company,
+    this.departureDate,
+    this.arrivalDate,
+    this.package,
+    this.company,
     required this.createdAt,
   });
 
@@ -74,10 +74,18 @@ class PublicTourBooking {
       paymentStatus: json['paymentStatus'] ?? '',
       seats: json['seats'] ?? 1,
       totalAmount: (json['totalAmount'] ?? 0).toString(),
-      departureDate: DateTime.parse(json['departureDate']),
-      arrivalDate: DateTime.parse(json['arrivalDate']),
-      package: PackageInfo.fromJson(json['package'] ?? {}),
-      company: CompanyInfo.fromJson(json['company'] ?? {}),
+      departureDate: json['departureDate'] != null
+          ? DateTime.tryParse(json['departureDate'].toString())
+          : null,
+      arrivalDate: json['arrivalDate'] != null
+          ? DateTime.tryParse(json['arrivalDate'].toString())
+          : null,
+      package: json['package'] != null
+          ? PackageInfo.fromJson(json['package'])
+          : null,
+      company: json['company'] != null
+          ? CompanyInfo.fromJson(json['company'])
+          : null,
       createdAt: DateTime.parse(json['createdAt']),
     );
   }
@@ -87,24 +95,24 @@ class PrivateTourBooking {
   final int id;
   final String type;
   final String status;
-  final DateTime startDate;
-  final DateTime endDate;
+  final DateTime? startDate;
+  final DateTime? endDate;
   final int travelerCount;
   final String? totalPrice;
   final int duration;
-  final CompanyInfo company;
+  final CompanyInfo? company;
   final DateTime createdAt;
 
   PrivateTourBooking({
     required this.id,
     required this.type,
     required this.status,
-    required this.startDate,
-    required this.endDate,
+    this.startDate,
+    this.endDate,
     required this.travelerCount,
     this.totalPrice,
     required this.duration,
-    required this.company,
+    this.company,
     required this.createdAt,
   });
 
@@ -113,12 +121,18 @@ class PrivateTourBooking {
       id: json['id'] ?? 0,
       type: json['type'] ?? 'PRIVATE',
       status: json['status'] ?? '',
-      startDate: DateTime.parse(json['startDate']),
-      endDate: DateTime.parse(json['endDate']),
+      startDate: json['startDate'] != null
+          ? DateTime.tryParse(json['startDate'].toString())
+          : null,
+      endDate: json['endDate'] != null
+          ? DateTime.tryParse(json['endDate'].toString())
+          : null,
       travelerCount: json['travelerCount'] ?? 1,
       totalPrice: json['totalPrice']?.toString(),
       duration: json['duration'] ?? 0,
-      company: CompanyInfo.fromJson(json['company'] ?? {}),
+      company: json['company'] != null
+          ? CompanyInfo.fromJson(json['company'])
+          : null,
       createdAt: DateTime.parse(json['createdAt']),
     );
   }
