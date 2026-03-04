@@ -35,17 +35,15 @@ class PaymentService {
     required String expYear,
     required String cvc,
     int? customTourId,
-    int? scheduleId,
+    int? publicTourId,
     required int seats,
-    required int amountInCents,
     String currency = 'usd',
-    List<Map<String, dynamic>> optionalSelections = const [],
   }) async {
     try {
-      if ((customTourId == null) == (scheduleId == null)) {
+      if ((customTourId == null) == (publicTourId == null)) {
         return {
           'success': false,
-          'message': 'Provide exactly one of customTourId or scheduleId',
+          'message': 'Provide exactly one of customTourId or publicTourId',
         };
       }
 
@@ -67,12 +65,9 @@ class PaymentService {
             body: jsonEncode({
               'tokenId': stripeToken,
               if (customTourId != null) 'customTourId': customTourId,
-              if (scheduleId != null) 'scheduleId': scheduleId,
+              if (publicTourId != null) 'publicTourId': publicTourId,
               'seats': seats,
-              'amount': amountInCents,
               'currency': currency,
-              if (optionalSelections.isNotEmpty)
-                'optionalSelections': optionalSelections,
             }),
           )
           .timeout(const Duration(seconds: 30));
