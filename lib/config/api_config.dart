@@ -20,6 +20,9 @@
   static const String createCustomTour = '$baseUrl/custom-tour/create';
   static const String touristCustomTours = '$baseUrl/tourist/custom-tours';
 
+  // Public Tour Endpoints
+  static const String touristPublicTours = '$baseUrl/tourist/public-tours';
+
   // Tourist Package Search Endpoints (Public)
   static const String searchPackages = '$baseUrl/tourist/packages/search';
   static const String touristPackages = '$baseUrl/tourist/packages';
