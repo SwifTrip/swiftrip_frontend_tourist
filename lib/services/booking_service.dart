@@ -61,7 +61,7 @@ class BookingService {
   /// Create a new booking (custom tour or schedule-based)
   Future<Map<String, dynamic>?> createBooking({
     int? customTourId,
-    int? scheduleId,
+    int? publicTourId,
     required int seats,
     String? paymentMethod,
   }) async {
@@ -74,7 +74,7 @@ class BookingService {
       final Map<String, dynamic> requestBody = {
         'seats': seats,
         if (customTourId != null) 'customTourId': customTourId,
-        if (scheduleId != null) 'scheduleId': scheduleId,
+        if (publicTourId != null) 'publicTourId': publicTourId,
         if (paymentMethod != null) 'paymentMethod': paymentMethod,
       };
 
