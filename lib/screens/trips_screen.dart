@@ -473,12 +473,12 @@ class _TripsScreenState extends State<TripsScreen> {
       );
       bookings = bookings.where((b) {
         DateTime? tripDate;
-        if (b is PublicTourBooking) {
-          tripDate = DateTime(b.departureDate.year, b.departureDate.month,
-              b.departureDate.day);
-        } else if (b is PrivateTourBooking) {
+        if (b is PublicTourBooking && b.departureDate != null) {
+          tripDate = DateTime(b.departureDate!.year, b.departureDate!.month,
+              b.departureDate!.day);
+        } else if (b is PrivateTourBooking && b.startDate != null) {
           tripDate =
-              DateTime(b.startDate.year, b.startDate.month, b.startDate.day);
+              DateTime(b.startDate!.year, b.startDate!.month, b.startDate!.day);
         }
         return tripDate != null && !tripDate.isBefore(filterDate);
       }).toList();
@@ -534,8 +534,8 @@ class _TripsScreenState extends State<TripsScreen> {
   }
 
   Widget _buildPublicTourCard(PublicTourBooking booking) {
-    final daysUntil = booking.departureDate.difference(DateTime.now()).inDays;
-    final countdown = daysUntil > 0 ? '$daysUntil Days' : 'Today';
+    final daysUntil = booking.departureDate?.difference(DateTime.now()).inDays;
+    final countdown = (daysUntil != null && daysUntil > 0) ? '$daysUntil Days' : 'Today';
 
     Color statusColor;
     switch (booking.status.toUpperCase()) {
@@ -553,21 +553,22 @@ class _TripsScreenState extends State<TripsScreen> {
     }
 
     return _buildTripCard(
-      title: booking.package.title,
-      provider: booking.company.name,
-      date:
-          '${_formatDate(booking.departureDate)} - ${_formatDate(booking.arrivalDate)}',
+      title: booking.package?.title ?? 'Public Tour',
+      provider: booking.company?.name ?? '',
+      date: booking.departureDate != null && booking.arrivalDate != null
+          ? '${_formatDate(booking.departureDate!)} - ${_formatDate(booking.arrivalDate!)}'
+          : 'Date TBD',
       countdown: countdown,
       statusColor: statusColor,
-      imageUrl: booking.package.coverImage ?? '',
+      imageUrl: booking.package?.coverImage ?? '',
       additionalInfo:
           '${booking.seats} seat(s) • PKR ${booking.totalAmount}',
     );
   }
 
   Widget _buildPrivateTourCard(PrivateTourBooking booking) {
-    final daysUntil = booking.startDate.difference(DateTime.now()).inDays;
-    final countdown = daysUntil > 0 ? '$daysUntil Days' : 'Today';
+    final daysUntil = booking.startDate?.difference(DateTime.now()).inDays;
+    final countdown = (daysUntil != null && daysUntil > 0) ? '$daysUntil Days' : 'Today';
 
     Color statusColor;
     switch (booking.status.toUpperCase()) {
@@ -588,9 +589,10 @@ class _TripsScreenState extends State<TripsScreen> {
 
     return _buildTripCard(
       title: 'Custom Tour (${booking.duration} days)',
-      provider: booking.company.name,
-      date:
-          '${_formatDate(booking.startDate)} - ${_formatDate(booking.endDate)}',
+      provider: booking.company?.name ?? '',
+      date: booking.startDate != null && booking.endDate != null
+          ? '${_formatDate(booking.startDate!)} - ${_formatDate(booking.endDate!)}'
+          : 'Date TBD',
       countdown: countdown,
       statusColor: statusColor,
       imageUrl: '',
