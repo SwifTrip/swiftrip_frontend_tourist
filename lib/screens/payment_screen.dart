@@ -7,25 +7,23 @@ import 'home_screen.dart';
 
 class StripePaymentScreen extends StatefulWidget {
   final int? customTourId;
-  final int? scheduleId;
+  final int? publicTourId;
   final int travelers;
   final num totalAmount;
   final String currency;
   final String tripTitle;
-  final List<Map<String, dynamic>> optionalSelections;
 
   const StripePaymentScreen({
     super.key,
     this.customTourId,
-    this.scheduleId,
+    this.publicTourId,
     required this.travelers,
     required this.totalAmount,
     required this.currency,
     required this.tripTitle,
-    this.optionalSelections = const [],
   }) : assert(
-          (customTourId != null) != (scheduleId != null),
-          'Provide exactly one of customTourId or scheduleId.',
+          (customTourId != null) != (publicTourId != null),
+          'Provide exactly one of customTourId or publicTourId.',
         );
 
   @override
@@ -66,9 +64,6 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
     super.dispose();
   }
 
-  // Amount in cents for Stripe
-  int get _amountInCents => (widget.totalAmount * 100).round();
-
   String get _formattedAmount {
     final amount = widget.totalAmount.toStringAsFixed(2);
     return 'Rs $amount'; // force display currency in UI
@@ -95,11 +90,9 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
         expYear: expYear,
         cvc: _cvcCtrl.text,
         customTourId: widget.customTourId,
-        scheduleId: widget.scheduleId,
+        publicTourId: widget.publicTourId,
         seats: widget.travelers,
-        amountInCents: _amountInCents,
         currency: 'usd', // backend always USD
-        optionalSelections: widget.optionalSelections,
       );
 
       if (!mounted) return;
