@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
 import '../services/custom_tour_service.dart';
+import '../services/public_tour_service.dart';
 import 'home_screen.dart';
 import 'payment_screen.dart';
 
@@ -33,6 +34,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
   bool _isSubmitting = false;
   bool _isBooking = false;
   final CustomTourService _customTourService = CustomTourService();
+  final PublicTourService _publicTourService = PublicTourService();
 
   Color get _accentColor => AppColors.primaryOrange;
 
@@ -1056,44 +1058,76 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
     }
   }
 
+  // ── Creates a PublicTour on backend and returns its ID ──────────────────
+  Future<int?> _createPublicTourAndGetId() async {
+    if (widget.scheduleId == null) {
+      throw Exception('No schedule selected for this public tour');
+    }
+
+    final result = await _publicTourService.createPublicTour(
+      scheduleId: widget.scheduleId!,
+      travelerCount: widget.travelers,
+      itineraries: _buildItineraries(),
+    );
+
+    if (result == null || result['success'] != true) {
+      throw Exception(result?['message'] ?? 'Failed to create public tour');
+    }
+
+    final dynamic wrapper = result['data'];
+    if (wrapper is Map<String, dynamic>) {
+      final dynamic inner = wrapper['data'];
+      if (inner is Map<String, dynamic> && inner['id'] != null) {
+        return inner['id'] as int;
+      }
+      if (wrapper['id'] != null) return wrapper['id'] as int;
+    }
+    return null;
+  }
+
   // ── Book Now (save first, then navigate to payment) ─────────────────────
   Future<void> _saveAndBook() async {
     setState(() => _isBooking = true);
     try {
       if (widget.isPublic) {
-        if (widget.scheduleId == null) {
-          throw Exception('No schedule selected for this public tour');
+        // Step 1: Create PublicTour to get its ID
+        final publicTourId = await _createPublicTourAndGetId();
+
+        if (!mounted) return;
+
+        if (publicTourId == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Could not create public tour. Please try again.'),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 4),
+            ),
+          );
+          return;
         }
 
+        // Compute total for display only (backend uses server-side amount)
         num totalAddOns = 0;
-        final List<Map<String, dynamic>> optionalSelections = [];
-
         for (final day in widget.package.itineraries) {
           for (final item in day.items) {
             final selected = widget.selectedOptionalItems[item.id] ?? false;
             if (item.optional && selected) {
               totalAddOns += item.price;
-              optionalSelections.add({
-                'itineraryItemId': item.id,
-                'quantity': 1,
-              });
             }
           }
         }
-
         final num totalAmount =
             (widget.package.basePrice + totalAddOns) * widget.travelers;
 
-        if (!mounted) return;
+        // Step 2: Navigate to payment with publicTourId
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => StripePaymentScreen(
-              scheduleId: widget.scheduleId,
+              publicTourId: publicTourId,
               travelers: widget.travelers,
               totalAmount: totalAmount,
               currency: 'usd',
               tripTitle: widget.package.title,
-              optionalSelections: optionalSelections,
             ),
           ),
         );
