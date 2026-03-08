@@ -97,10 +97,18 @@ class PrivateTourBooking {
   final String status;
   final DateTime? startDate;
   final DateTime? endDate;
+  // Backend may return departure/arrival for private bookings as well
+  final DateTime? departureDate;
+  final DateTime? arrivalDate;
   final int travelerCount;
+  // backend may return seats and totalAmount for private bookings
+  final int? seats;
   final String? totalPrice;
+  final String? totalAmount;
   final int duration;
   final CompanyInfo? company;
+  final PackageInfo? package;
+  final List<dynamic>? itineraries;
   final DateTime createdAt;
 
   PrivateTourBooking({
@@ -109,10 +117,16 @@ class PrivateTourBooking {
     required this.status,
     this.startDate,
     this.endDate,
+    this.departureDate,
+    this.arrivalDate,
     required this.travelerCount,
+    this.seats,
     this.totalPrice,
+    this.totalAmount,
     required this.duration,
     this.company,
+    this.package,
+    this.itineraries,
     required this.createdAt,
   });
 
@@ -127,12 +141,22 @@ class PrivateTourBooking {
       endDate: json['endDate'] != null
           ? DateTime.tryParse(json['endDate'].toString())
           : null,
+      departureDate: json['departureDate'] != null
+        ? DateTime.tryParse(json['departureDate'].toString())
+        : null,
+      arrivalDate: json['arrivalDate'] != null
+        ? DateTime.tryParse(json['arrivalDate'].toString())
+        : null,
       travelerCount: json['travelerCount'] ?? 1,
+      seats: json['seats'] ?? (json['travelerCount'] as int?),
       totalPrice: json['totalPrice']?.toString(),
+      totalAmount: json['totalAmount']?.toString(),
       duration: json['duration'] ?? 0,
       company: json['company'] != null
           ? CompanyInfo.fromJson(json['company'])
           : null,
+      package: json['package'] != null ? PackageInfo.fromJson(json['package']) : null,
+      itineraries: (json['itineraries'] as List<dynamic>?)?.map((i) => i).toList(),
       createdAt: DateTime.parse(json['createdAt']),
     );
   }

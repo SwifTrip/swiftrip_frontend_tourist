@@ -476,9 +476,9 @@ class _TripsScreenState extends State<TripsScreen> {
         if (b is PublicTourBooking && b.departureDate != null) {
           tripDate = DateTime(b.departureDate!.year, b.departureDate!.month,
               b.departureDate!.day);
-        } else if (b is PrivateTourBooking && b.startDate != null) {
-          tripDate =
-              DateTime(b.startDate!.year, b.startDate!.month, b.startDate!.day);
+        } else if (b is PrivateTourBooking && b.departureDate != null) {
+          tripDate = DateTime(b.departureDate!.year, b.departureDate!.month,
+              b.departureDate!.day);
         }
         return tripDate != null && !tripDate.isBefore(filterDate);
       }).toList();
@@ -552,22 +552,31 @@ class _TripsScreenState extends State<TripsScreen> {
         statusColor = Colors.blueAccent;
     }
 
+    final pubInfo = '${booking.seats} seat(s)';
+    final pubPrice = booking.totalAmount;
+    final pubAdditional = pubPrice.isNotEmpty ? '$pubInfo • PKR $pubPrice' : pubInfo;
     return _buildTripCard(
       title: booking.package?.title ?? 'Public Tour',
       provider: booking.company?.name ?? '',
+      routeText: (booking.package?.fromLocation != null && booking.package?.toLocation != null)
+          ? '${booking.package?.fromLocation} → ${booking.package?.toLocation}'
+          : (booking.package?.fromLocation ?? booking.package?.toLocation ?? ''),
       date: booking.departureDate != null && booking.arrivalDate != null
           ? '${_formatDate(booking.departureDate!)} - ${_formatDate(booking.arrivalDate!)}'
           : 'Date TBD',
       countdown: countdown,
       statusColor: statusColor,
       imageUrl: booking.package?.coverImage ?? '',
-      additionalInfo:
-          '${booking.seats} seat(s) • PKR ${booking.totalAmount}',
+      onTap: () => Navigator.pushNamed(context, '/tripDetails', arguments: {
+        'bookingId': booking.id,
+        'type': booking.type,
+      }),
+      additionalInfo: pubAdditional,
     );
   }
 
   Widget _buildPrivateTourCard(PrivateTourBooking booking) {
-    final daysUntil = booking.startDate?.difference(DateTime.now()).inDays;
+    final daysUntil = booking.departureDate?.difference(DateTime.now()).inDays;
     final countdown = (daysUntil != null && daysUntil > 0) ? '$daysUntil Days' : 'Today';
 
     Color statusColor;
@@ -587,31 +596,46 @@ class _TripsScreenState extends State<TripsScreen> {
         statusColor = Colors.blueAccent;
     }
 
+    final privCount = booking.seats ?? booking.travelerCount;
+    final privPrice = booking.totalPrice ?? booking.totalAmount;
+    final privInfo = '$privCount seat(s)';
+    final privAdditional = (privPrice != null && privPrice.isNotEmpty) ? '$privInfo • PKR $privPrice' : privInfo;
+
     return _buildTripCard(
-      title: 'Custom Tour (${booking.duration} days)',
+      title: booking.package?.title ?? 'Private Tour',
       provider: booking.company?.name ?? '',
-      date: booking.startDate != null && booking.endDate != null
-          ? '${_formatDate(booking.startDate!)} - ${_formatDate(booking.endDate!)}'
+      routeText: (booking.package?.fromLocation != null && booking.package?.toLocation != null)
+          ? '${booking.package?.fromLocation} → ${booking.package?.toLocation}'
+          : (booking.package?.fromLocation ?? booking.package?.toLocation ?? ''),
+      date: booking.departureDate != null && booking.arrivalDate != null
+          ? '${_formatDate(booking.departureDate!)} - ${_formatDate(booking.arrivalDate!)}'
           : 'Date TBD',
       countdown: countdown,
       statusColor: statusColor,
-      imageUrl: '',
-      additionalInfo:
-          '${booking.travelerCount} traveler(s)${booking.totalPrice != null ? ' • PKR ${booking.totalPrice}' : ''}',
+      imageUrl: booking.package?.coverImage ?? '',
+      onTap: () => Navigator.pushNamed(context, '/tripDetails', arguments: {
+        'bookingId': booking.id,
+        'type': booking.type,
+      }),
+        additionalInfo: privAdditional,
     );
   }
 
   Widget _buildTripCard({
     required String title,
     required String provider,
+    String? routeText,
     required String date,
     required String countdown,
     required Color statusColor,
     required String imageUrl,
     String? additionalInfo,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
@@ -657,6 +681,17 @@ class _TripsScreenState extends State<TripsScreen> {
                     color: AppColors.textPrimary,
                   ),
                 ),
+                if (routeText != null && routeText.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    routeText,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.accent,
+                    ),
+                  ),
+                ],
                 Text(
                   provider,
                   style: GoogleFonts.plusJakartaSans(
@@ -716,7 +751,7 @@ class _TripsScreenState extends State<TripsScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   String _formatDate(DateTime date) {
