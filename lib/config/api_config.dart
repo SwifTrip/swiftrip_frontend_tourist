@@ -1,4 +1,4 @@
-﻿class ApiConfig {
+class ApiConfig {
   // Base URL for the API
   // For Chrome/Web use localhost
   // For Android Emulator use 10.0.2.2
@@ -33,6 +33,11 @@
 
   // Stripe Payment — all-in-one server-side processing
   static const String processPayment = '$baseUrl/tourist/payment/process';
+
+  // Chat Endpoints
+  static const String chatSocket = 'http://localhost:3000'; // Socket Server URL
+  static const String myChatRooms = '$baseUrl/chat/rooms';
+  static String chatMessages(String roomId) => '$baseUrl/chat/rooms/$roomId/messages';
 
   // Request timeout duration
   static const Duration timeout = Duration(seconds: 30);
