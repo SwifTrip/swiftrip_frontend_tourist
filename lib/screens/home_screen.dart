@@ -8,6 +8,7 @@ import 'guide_list_screen.dart';
 import 'signin.dart';
 import 'profile_screen.dart';
 import 'trips_screen.dart';
+import 'chat/chat_hub_screen.dart';
 import '../models/user_model.dart';
 import '../services/token_service.dart';
 import '../services/auth_service.dart';
@@ -53,6 +54,12 @@ class _HomeScreenState extends State<HomeScreen> {
         content = TripsScreen(
           key: const ValueKey('trips'),
           onBack: () => setState(() => _currentIndex = 0),
+        );
+        break;
+      case 3:
+        content = ChatHubScreen(
+          key: const ValueKey('chats'),
+          onExplore: () => setState(() => _currentIndex = 0),
         );
         break;
       case 0:
