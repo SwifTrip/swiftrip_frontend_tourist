@@ -35,7 +35,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   Future<void> _initChat() async {
     // 1. Get current user ID to distinguish sender/receiver bubbles
     final user = await TokenService.getUser();
-    _currentUserId = user?.id;
+    _currentUserId = user?.id?.toString();
 
     // 2. Fetch history via REST
     try {
