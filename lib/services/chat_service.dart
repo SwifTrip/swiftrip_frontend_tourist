@@ -44,14 +44,14 @@ class ChatService {
 
   // Join a specific room
   void joinRoom(String roomId) {
-    if (socket != null && socket!.connected) {
+    if (socket != null) {
       socket!.emit('join_room', roomId);
     }
   }
 
   // Send a message via Socket
   void sendMessage(String roomId, String content, {String msgType = 'TEXT'}) {
-    if (socket != null && socket!.connected) {
+    if (socket != null) {
       socket!.emit('send_message', {
         'roomId': roomId,
         'content': content,

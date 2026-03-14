@@ -111,7 +111,7 @@ class Message {
       content: json['content'] ?? '',
       mediaUrl: json['mediaUrl'],
       msgType: json['msgType'] ?? 'TEXT',
-      chatRoomId: json['chatRoomId'] ?? '',
+      chatRoomId: json['chatRoomId'] ?? json['roomId'] ?? '',
       senderId: extractSenderId,
       isRead: json['isRead'] ?? false,
       createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : DateTime.now(),
