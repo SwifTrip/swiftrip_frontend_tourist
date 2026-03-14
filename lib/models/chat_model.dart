@@ -34,12 +34,14 @@ class ChatRoom {
     if (json['customTour'] != null) {
       title = json['customTour']['destination'] ?? 'Custom Tour';
       status = json['customTour']['status'] ?? 'PENDING';
-      tourStringId = "CT-${json['customTourId']?.substring(0, 4) ?? '0000'}".toUpperCase();
+      final ctIdStr = json['customTourId']?.toString() ?? '0000';
+      tourStringId = "CT-${ctIdStr.length > 4 ? ctIdStr.substring(0, 4) : ctIdStr}".toUpperCase();
     } else if (json['booking'] != null) {
       // Logic for public booking title extraction if available
       title = "Public Tour Booking";
       status = json['booking']['status'] ?? 'PENDING';
-      tourStringId = "BK-${json['bookingId']?.substring(0, 4) ?? '0000'}".toUpperCase();
+      final bkIdStr = json['bookingId']?.toString() ?? '0000';
+      tourStringId = "BK-${bkIdStr.length > 4 ? bkIdStr.substring(0, 4) : bkIdStr}".toUpperCase();
     }
 
     // Extract Guide info
@@ -61,8 +63,8 @@ class ChatRoom {
 
     return ChatRoom(
       id: json['id'],
-      bookingId: json['bookingId'],
-      customTourId: json['customTourId'],
+      bookingId: json['bookingId']?.toString(),
+      customTourId: json['customTourId']?.toString(),
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
       guideName: guideName,
@@ -99,9 +101,9 @@ class Message {
     // Extract senderId carefully (REST returns participant object usually, Socket might just send senderId or full message)
     String extractSenderId = '';
     if (json['participant'] != null && json['participant']['userId'] != null) {
-      extractSenderId = json['participant']['userId'];
+      extractSenderId = json['participant']['userId'].toString();
     } else if (json['senderId'] != null) {
-      extractSenderId = json['senderId'];
+      extractSenderId = json['senderId'].toString();
     }
 
     return Message(
