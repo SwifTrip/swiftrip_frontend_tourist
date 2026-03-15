@@ -11,6 +11,7 @@ class CommonButton extends StatelessWidget {
   final double? fontSize;
   final double? height;
   final double? borderRadius;
+  final bool isLoading;
 
   const CommonButton({
     super.key,
@@ -23,6 +24,7 @@ class CommonButton extends StatelessWidget {
     this.fontSize,
     this.height,
     this.borderRadius,
+    this.isLoading = false,
   });
 
   @override
@@ -60,14 +62,23 @@ class CommonButton extends StatelessWidget {
           child: Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                text,
-                style: TextStyle(
-                  fontSize: fontSize ?? 16,
-                  fontWeight: FontWeight.bold,
-                  color: isEnabled ? (textColor ?? Colors.white) : AppColors.textSecondary,
-                ),
-              ),
+              child: isLoading
+                  ? const SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2.5,
+                      ),
+                    )
+                  : Text(
+                      text,
+                      style: TextStyle(
+                        fontSize: fontSize ?? 16,
+                        fontWeight: FontWeight.bold,
+                        color: isEnabled ? (textColor ?? Colors.white) : AppColors.textSecondary,
+                      ),
+                    ),
             ),
           ),
         ),

@@ -292,6 +292,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       text: 'Create Account',
                       onPressed: _isLoading ? null : _handleCreateAccount,
                       isEnabled: !_isLoading,
+                      isLoading: _isLoading,
                     ),
 
                     const SizedBox(height: 32),

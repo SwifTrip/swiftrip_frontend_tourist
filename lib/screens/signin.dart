@@ -296,6 +296,7 @@ class SigninState extends State<Signin> {
                       text: 'Sign In',
                       onPressed: _isLoading ? null : _handleLogin,
                       isEnabled: !_isLoading,
+                      isLoading: _isLoading,
                     ),
 
                     const SizedBox(height: 40),
