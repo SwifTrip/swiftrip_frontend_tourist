@@ -7,7 +7,7 @@ import '../models/search_result.dart';
 import '../services/package_service.dart';
 import 'package_details_screen.dart';
 
-class AgencySelection extends StatelessWidget {
+class AgencySelection extends StatefulWidget {
   final String destination;
   final String dates;
   final int travelers;
@@ -24,6 +24,13 @@ class AgencySelection extends StatelessWidget {
     this.packages = const [],
     this.pagination,
   });
+
+  @override
+  State<AgencySelection> createState() => _AgencySelectionState();
+}
+
+class _AgencySelectionState extends State<AgencySelection> {
+  String _activeFilter = 'Recommended';
 
   @override
   Widget build(BuildContext context) {
@@ -200,11 +207,11 @@ class AgencySelection extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
-          _buildFilterChip('Recommended', isActive: true, hasDropdown: true),
+          _buildFilterChip('Recommended', isActive: _activeFilter == 'Recommended', hasDropdown: true),
           const SizedBox(width: 8),
-          _buildFilterChip('Price: Low to High'),
+          _buildFilterChip('Price: Low to High', isActive: _activeFilter == 'Price: Low to High'),
           const SizedBox(width: 8),
-          _buildFilterChip('Duration'),
+          _buildFilterChip('Duration', isActive: _activeFilter == 'Duration'),
         ],
       ),
     );
@@ -215,35 +222,42 @@ class AgencySelection extends StatelessWidget {
     bool isActive = false,
     bool hasDropdown = false,
   }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: isActive ? AppColors.surface : Colors.transparent,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isActive ? AppColors.accent : AppColors.border,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-              color: isActive ? AppColors.accent : AppColors.textSecondary,
-            ),
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _activeFilter = label;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: isActive ? AppColors.surface : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isActive ? AppColors.accent : AppColors.border,
           ),
-          if (hasDropdown) ...[
-            const SizedBox(width: 4),
-            Icon(
-              Icons.keyboard_arrow_down,
-              size: 16,
-              color: isActive ? AppColors.accent : AppColors.textSecondary,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+                color: isActive ? AppColors.accent : AppColors.textSecondary,
+              ),
             ),
+            if (hasDropdown) ...[
+              const SizedBox(width: 4),
+              Icon(
+                Icons.keyboard_arrow_down,
+                size: 16,
+                color: isActive ? AppColors.accent : AppColors.textSecondary,
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
