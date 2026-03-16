@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
@@ -46,7 +47,7 @@ class _AgencySelectionState extends State<AgencySelection> {
         title: Column(
           children: [
             Text(
-              '$destination ${isPublic ? 'Public' : 'Private'} Tours',
+              '${widget.destination} ${widget.isPublic ? 'Public' : 'Private'} Tours',
               style: const TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 18,
@@ -54,7 +55,7 @@ class _AgencySelectionState extends State<AgencySelection> {
               ),
             ),
             Text(
-              '$dates • $travelers travelers',
+              '${widget.dates} • ${widget.travelers} travelers',
               style: const TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 12,
@@ -81,14 +82,14 @@ class _AgencySelectionState extends State<AgencySelection> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${packages.length} tours found',
+                  '${widget.packages.length} tours found',
                   style: const TextStyle(
                     color: AppColors.textPrimary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
-                  destination,
+                  widget.destination,
                   style: const TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 12,
@@ -98,13 +99,13 @@ class _AgencySelectionState extends State<AgencySelection> {
             ),
           ),
           Expanded(
-            child: packages.isEmpty
+            child: widget.packages.isEmpty
                 ? _buildEmptyState()
                 : ListView.builder(
                     padding: const EdgeInsets.all(16),
-                    itemCount: packages.length,
+                    itemCount: widget.packages.length,
                     itemBuilder: (context, index) {
-                      final pkg = packages[index];
+                      final pkg = widget.packages[index];
                       final agencyName = pkg.company.name;
                       final packageIsPublic = pkg.isPublic;
                       final price = pkg.basePrice;
@@ -112,9 +113,13 @@ class _AgencySelectionState extends State<AgencySelection> {
                       final durationLabel = pkg.duration > 0
                           ? '${pkg.duration.round()} day${pkg.duration.round() == 1 ? '' : 's'}'
                           : 'Flexible';
-                      final coverImage = pkg.coverImage?.isNotEmpty == true
+                      final rawImage = pkg.coverImage?.isNotEmpty == true
                           ? pkg.coverImage!
                           : 'https://via.placeholder.com/600x400.png?text=Tour+Package';
+                          
+                      final String coverImage = (kIsWeb && rawImage.startsWith('http'))
+                          ? 'https://corsproxy.io/?${Uri.encodeComponent(rawImage)}'
+                          : rawImage;
                       final from = pkg.fromLocation;
                       final to = pkg.toLocation;
                       final locations = '$from → $to';
@@ -650,7 +655,7 @@ class _AgencySelectionState extends State<AgencySelection> {
                               builder: (context) => PackageDetailsScreen(
                                 isPublic: packageIsPublic,
                                 customizeItinerary: details,
-                                travelers: travelers,
+                                travelers: widget.travelers,
                                 publicScheduleId: packageIsPublic
                                   ? int.tryParse(
                                     packageResult.nextDeparture?['id']
