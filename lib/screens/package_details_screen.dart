@@ -272,9 +272,9 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
       child: IntrinsicHeight(
         child: Row(
           children: [
-            _buildInfoItem(Icons.calendar_month, 'Duration', '${widget.customizeItinerary.duration} Days'),
+            _buildInfoItem(Icons.calendar_month, 'Duration', '${widget.customizeItinerary.duration} Day${widget.customizeItinerary.duration == 1 ? '' : 's'}'),
             const VerticalDivider(width: 1, indent: 12, endIndent: 12, color: AppColors.border),
-            _buildInfoItem(Icons.group, 'Travelers', '${widget.travelers} Guests'),
+            _buildInfoItem(Icons.group, 'Travelers', '${widget.travelers} Guest${widget.travelers == 1 ? '' : 's'}'),
             const VerticalDivider(width: 1, indent: 12, endIndent: 12, color: AppColors.border),
             _buildInfoItem(Icons.verified_user, 'Type', widget.isPublic ? 'Public' : 'Private'),
           ],

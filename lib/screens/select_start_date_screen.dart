@@ -165,7 +165,7 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
                     border: Border.all(color: AppColors.primaryEmerald.withOpacity(0.15)),
                   ),
                   child: Text(
-                    '$_durationDays DAYS',
+                    '$_durationDays DAY${_durationDays == 1 ? '' : 'S'}',
                     style: const TextStyle(
                       color: AppColors.primaryEmerald,
                       fontSize: 11,
@@ -472,7 +472,7 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      '${widget.package.duration} DAYS',
+                      '${widget.package.duration} DAY${widget.package.duration == 1 ? '' : 'S'}',
                       style: const TextStyle(
                         color: AppColors.textSecondary,
                         fontSize: 11,
