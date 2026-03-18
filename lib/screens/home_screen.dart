@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:ui';
 import '../theme/app_colors.dart';
 import '../widgets/custom_bottom_nav.dart';
 import 'searchTour.dart';
@@ -24,11 +25,26 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   bool _isProfileOverlayVisible = false;
   UserModel? _user;
+  late PageController _pageController;
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
+    _pageController = PageController(viewportFraction: 0.85);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  String _getTimeBasedGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
   }
 
   Future<void> _loadUserData() async {
@@ -76,49 +92,59 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             content,
             // Profile Overlay Backdrop
-            if (_isProfileOverlayVisible == true)
-              Positioned.fill(
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _isProfileOverlayVisible = false;
-                    });
-                  },
-                  child: Container(color: Colors.black.withOpacity(0.3)),
-                ),
-              ),
+            AnimatedOpacity(
+              opacity: _isProfileOverlayVisible ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 200),
+              child: _isProfileOverlayVisible
+                  ? Positioned.fill(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _isProfileOverlayVisible = false;
+                          });
+                        },
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
+                          child: Container(color: Colors.black.withOpacity(0.2)),
+                        ),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
 
             // Profile Overlay Card
-            if (_isProfileOverlayVisible == true)
-              Positioned(
-                top: 60,
-                right: 16,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    // Triangle
-                    Padding(
-                      padding: const EdgeInsets.only(right: 12.0),
-                      child: CustomPaint(
-                        size: const Size(20, 10),
-                        painter: TrianglePainter(color: AppColors.surface),
-                      ),
-                    ),
-                    Container(
-                      width: 220,
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutBack,
+              top: _isProfileOverlayVisible ? 60 : 40,
+              right: 16,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: _isProfileOverlayVisible ? 1.0 : 0.0,
+                child: _isProfileOverlayVisible
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        // Triangle
+                        Padding(
+                          padding: const EdgeInsets.only(right: 12.0),
+                          child: CustomPaint(
+                            size: const Size(20, 10),
+                            painter: TrianglePainter(color: AppColors.surface.withOpacity(0.85)),
                           ),
-                        ],
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: _user != null
+                        ),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+                            child: Container(
+                              width: 220,
+                              decoration: BoxDecoration(
+                                color: AppColors.surface.withOpacity(0.85),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: AppColors.border.withOpacity(0.5)),
+                              ),
+                              child: _user != null
                           ? Column(
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,19 +285,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                     setState(() {
                                       _isProfileOverlayVisible = false;
                                     });
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) => const Signin(),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) => const Signin(),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                      ),
                     ),
-                  ],
-                ),
-              ),
+                  ),
+                ],
+              )
+              : const SizedBox.shrink(),
+            ),
+          ),
 
             // Custom Bottom Navigation
             Positioned(
@@ -350,16 +380,30 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
 
           // Greeting
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
-            child: Text(
-              'Good morning, ${_user?.firstName ?? 'Traveler'}!',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-                height: 1.2,
-                letterSpacing: -0.5,
+          TweenAnimationBuilder<double>(
+            tween: Tween<double>(begin: 0.0, end: 1.0),
+            duration: const Duration(milliseconds: 800),
+            curve: Curves.easeOutCubic,
+            builder: (context, value, child) {
+              return Opacity(
+                opacity: value,
+                child: Transform.translate(
+                  offset: Offset(0, 20 * (1 - value)),
+                  child: child,
+                ),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+              child: Text(
+                '${_getTimeBasedGreeting()}, ${_user?.firstName ?? 'Traveler'}!',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                  height: 1.2,
+                  letterSpacing: -0.5,
+                ),
               ),
             ),
           ),
@@ -485,38 +529,23 @@ class _HomeScreenState extends State<HomeScreen> {
           // Trending Packages List
           SizedBox(
             height: 224,
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              scrollDirection: Axis.horizontal,
-              children: [
-                _buildTrendingCard(
-                  title: 'Santorini',
-                  subtitle: 'Greece',
-                  imageUrl:
-                      'https://lh3.googleusercontent.com/aida-public/AB6AXuBJdkqFbopIonmv84lNk92j7slgCuqCA5JRK-XW2YqFNIGQCoQvm-NGt0n7HH2FTdTSp15p8PUHpK-8pVdhcXVTPxi4nmiNwSK557z8TD5AG92sw9CP7UFx757eWYtTrvcfmOSQfsDytLFXw6hAnCe-FEdDE3F1qMo5GCMaoD555arYp-zjaawylfBYszLLfab7UZZvvtKLY8OINgKRE1qapgVlfSnR0VHIVKr5-FNiPVWMp2T1BvtlMb7_ykXpBk639NHrbbKgTAI',
-                ),
-                const SizedBox(width: 16),
-                _buildTrendingCard(
-                  title: 'Rome',
-                  subtitle: 'Italy',
-                  imageUrl:
-                      'https://lh3.googleusercontent.com/aida-public/AB6AXuB3crKlLElKPhJEhQrpF-F2ae_cxNgI1yVoVobxX-wBBuigYk65wamFdpMix0UUCRW-lQQeGjwuAPLXmlte4lQPcWqJui1uLlMRKZroWFmpPh6B7f0loGu79CIYmUc7D1pWB6BEx5cuYyw729EEjUlZZMtYCGWrXv_9k_NvG7FBTjD20mScBFeAOlnssK9yh0tmhYGNvWYNHUxPy_EuuDI7sueu2N1ysJw_iiA6jIQsypItjuKJswcyG1jRfiAbVNVKDAYpiKhe8So',
-                ),
-                const SizedBox(width: 16),
-                _buildTrendingCard(
-                  title: 'Kyoto',
-                  subtitle: 'Japan',
-                  imageUrl:
-                      'https://lh3.googleusercontent.com/aida-public/AB6AXuCW9Wch6_8oLPTNsWAmmljWbYR1q3GqHM06d1dTKF5d_QMkyuAirI0QWkH3kpHQESd_rg2dLUYH6SJ8f7zYYBadPhYGqO0tTouizkKPr4KA5T8V9aKd8rNJzdHLZMzn7lCQtqeGIHYfoxJCQcbYeKC7Ks-2Zw51FMaofVICBJraNE4vF8xeo8f9Z_DqcZx8fi0MOGNWn-6nCrrZ9MrWG4ZDL0dDlHsob8o3-w8L-x3MiR9wX2_1gSMn36Ok9pjxa9dGytmREmEHeb8',
-                ),
-                const SizedBox(width: 16),
-                _buildTrendingCard(
-                  title: 'Paris',
-                  subtitle: 'France',
-                  imageUrl:
-                      'https://lh3.googleusercontent.com/aida-public/AB6AXuDafIA-MVsOlBEe8dt8skOTVlZfanfIGzgkui4eL3xtirNwFtoe-bUaL_BbwJBl8XxOcOLsoMZOgMneEUiRxpgld4eX97aRE88iV7VOYB41yYexXaABFZi_oHU3W5sFgu-sAeTs_LM5WVKzu1PS9do3OQwjczTJgf22yXQ_7p3vets2drbfRGAwFHzvaxIrj74XYDsfJTAvfW1aeECj3dYz7ZyYIXJ3kCluRvRGaohbmNKuYRlPdFrjxYsKjKEcziUw5OCEsxFpn2M',
-                ),
-              ],
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: 4,
+              itemBuilder: (context, index) {
+                final packages = [
+                  {'title': 'Santorini', 'subtitle': 'Greece', 'img': 'https://lh3.googleusercontent.com/aida-public/AB6AXuBJdkqFbopIonmv84lNk92j7slgCuqCA5JRK-XW2YqFNIGQCoQvm-NGt0n7HH2FTdTSp15p8PUHpK-8pVdhcXVTPxi4nmiNwSK557z8TD5AG92sw9CP7UFx757eWYtTrvcfmOSQfsDytLFXw6hAnCe-FEdDE3F1qMo5GCMaoD555arYp-zjaawylfBYszLLfab7UZZvvtKLY8OINgKRE1qapgVlfSnR0VHIVKr5-FNiPVWMp2T1BvtlMb7_ykXpBk639NHrbbKgTAI'},
+                  {'title': 'Rome', 'subtitle': 'Italy', 'img': 'https://lh3.googleusercontent.com/aida-public/AB6AXuB3crKlLElKPhJEhQrpF-F2ae_cxNgI1yVoVobxX-wBBuigYk65wamFdpMix0UUCRW-lQQeGjwuAPLXmlte4lQPcWqJui1uLlMRKZroWFmpPh6B7f0loGu79CIYmUc7D1pWB6BEx5cuYyw729EEjUlZZMtYCGWrXv_9k_NvG7FBTjD20mScBFeAOlnssK9yh0tmhYGNvWYNHUxPy_EuuDI7sueu2N1ysJw_iiA6jIQsypItjuKJswcyG1jRfiAbVNVKDAYpiKhe8So'},
+                  {'title': 'Kyoto', 'subtitle': 'Japan', 'img': 'https://lh3.googleusercontent.com/aida-public/AB6AXuCW9Wch6_8oLPTNsWAmmljWbYR1q3GqHM06d1dTKF5d_QMkyuAirI0QWkH3kpHQESd_rg2dLUYH6SJ8f7zYYBadPhYGqO0tTouizkKPr4KA5T8V9aKd8rNJzdHLZMzn7lCQtqeGIHYfoxJCQcbYeKC7Ks-2Zw51FMaofVICBJraNE4vF8xeo8f9Z_DqcZx8fi0MOGNWn-6nCrrZ9MrWG4ZDL0dDlHsob8o3-w8L-x3MiR9wX2_1gSMn36Ok9pjxa9dGytmREmEHeb8'},
+                  {'title': 'Paris', 'subtitle': 'France', 'img': 'https://lh3.googleusercontent.com/aida-public/AB6AXuDafIA-MVsOlBEe8dt8skOTVlZfanfIGzgkui4eL3xtirNwFtoe-bUaL_BbwJBl8XxOcOLsoMZOgMneEUiRxpgld4eX97aRE88iV7VOYB41yYexXaABFZi_oHU3W5sFgu-sAeTs_LM5WVKzu1PS9do3OQwjczTJgf22yXQ_7p3vets2drbfRGAwFHzvaxIrj74XYDsfJTAvfW1aeECj3dYz7ZyYIXJ3kCluRvRGaohbmNKuYRlPdFrjxYsKjKEcziUw5OCEsxFpn2M'},
+                ];
+                return _buildTrendingCard(
+                  index: index,
+                  title: packages[index]['title']!,
+                  subtitle: packages[index]['subtitle']!,
+                  imageUrl: packages[index]['img']!,
+                );
+              },
             ),
           ),
 
@@ -536,22 +565,77 @@ class _HomeScreenState extends State<HomeScreen> {
           // Upcoming Trips List
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              children: [
-                _buildUpcomingTripCard(
-                  title: 'Adventure in the Alps',
-                  date: 'Sep 15 - Sep 22, 2024',
-                  imageUrl:
-                      'https://lh3.googleusercontent.com/aida-public/AB6AXuD3v-eQ0bCf7AUA2yHx5z7vx97CP8VtbiJpcuNL3sk2X0Qju0GZ5z67d-jsbDXC27uizBSJnxB05l47amJtOBgPX5Ly1ZFDKZxzuGjUDgsWWLcUQgGJg-Q9qTYE6UEkaCHPdv-2fnGQpCIrSB8Rpy5tPxGeJigHQm__PAP3E1bdMY-SNzpKO_OOzwY6wyUHl1QTnp-tbp6CmKDe7KWTsAZ1uBbg6H6sVO7FsGPY6VamL5m3lOJ5b9-znjmrgmCdg9kIQpvjufQiVDw',
-                ),
-                const SizedBox(height: 12),
-                _buildUpcomingTripCard(
-                  title: 'Bali Beach Retreat',
-                  date: 'Nov 01 - Nov 08, 2024',
-                  imageUrl:
-                      'https://lh3.googleusercontent.com/aida-public/AB6AXuAmyJq2tgg9i4YHCjmJY8cKiJPm7N-d4bYpvisZD1LE-qyVHVgm-Ixtoc91-PLQA86xp9nup98PtQYynYvIwOQi1GEI4x5JsZIT9ToyFdCxKk1s16EC02aZZeBvYMOQ70A0dThQaetf93ippgYO3BJ2L0VF6RIiVzGrO18nqjgS0Rt2xOaOPoDjgEz7FHLWtNy2zoHqTT3SJt1mANE_IvWWxZc_CjJbSEc_Bz80-qS6K3WpjlY00xX9BbkdQwsnpTnw6Iqv7-SPAos',
-                ),
-              ],
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.border, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.02),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.accent.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.flight_takeoff,
+                      size: 40,
+                      color: AppColors.accent,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No incoming adventures',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Your upcoming trips will appear here.\nStart exploring tours today!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 13,
+                      height: 1.5,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  _BounceButton(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const SearchTour()),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.accent,
+                        borderRadius: BorderRadius.circular(999),
+                        boxShadow: [
+                          BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4)),
+                        ],
+                      ),
+                      child: const Text('Find a Tour', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -568,7 +652,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Expanded(
       child: AspectRatio(
         aspectRatio: 1,
-        child: GestureDetector(
+        child: _BounceButton(
           onTap: onTap,
           child: Container(
             decoration: BoxDecoration(
@@ -610,54 +694,80 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildTrendingCard({
+    required int index,
     required String title,
     required String subtitle,
     required String imageUrl,
   }) {
-    return Container(
-      width: 160, // w-40
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        image: DecorationImage(
-          image: NetworkImage(imageUrl),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.transparent, Colors.black.withOpacity(0.6)],
-            stops: const [0.6, 1.0],
+    return AnimatedBuilder(
+      animation: _pageController,
+      builder: (context, child) {
+        double value = 0.0;
+        if (_pageController.position.haveDimensions) {
+          value = _pageController.page! - index;
+        }
+        return Transform.scale(
+          scale: 1 - (value.abs() * 0.05).clamp(0.0, 0.05),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Parallax Image
+                  Transform.translate(
+                    offset: Offset(value * 60, 0),
+                    child: Image.network(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  // Gradient Overlay
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                        stops: const [0.5, 1.0],
+                      ),
+                    ),
+                  ),
+                  // Text Content
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            height: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          subtitle,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                height: 1.2,
-              ),
-            ),
-            Text(
-              subtitle,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.9),
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -740,4 +850,50 @@ class TrianglePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+
+class _BounceButton extends StatefulWidget {
+  final Widget child;
+  final VoidCallback? onTap;
+
+  const _BounceButton({required this.child, this.onTap});
+
+  @override
+  State<_BounceButton> createState() => _BounceButtonState();
+}
+
+class _BounceButtonState extends State<_BounceButton> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 150));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.93).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => _controller.forward(),
+      onTapUp: (_) {
+        _controller.reverse();
+        if (widget.onTap != null) widget.onTap!();
+      },
+      onTapCancel: () => _controller.reverse(),
+      child: ScaleTransition(
+        scale: _scaleAnimation,
+        child: widget.child,
+      ),
+    );
+  }
 }
