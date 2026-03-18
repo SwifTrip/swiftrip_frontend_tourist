@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:swift_trip_app/models/package_model.dart';
+import '../config/api_config.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
 import '../models/search_result.dart';
@@ -118,7 +119,7 @@ class _AgencySelectionState extends State<AgencySelection> {
                           : 'https://via.placeholder.com/600x400.png?text=Tour+Package';
                           
                       final String coverImage = (kIsWeb && rawImage.startsWith('http'))
-                          ? 'https://corsproxy.io/?${Uri.encodeComponent(rawImage)}'
+                          ? '${ApiConfig.chatSocket}/proxy-image?url=${Uri.encodeComponent(rawImage)}'
                           : rawImage;
                       final from = pkg.fromLocation;
                       final to = pkg.toLocation;
