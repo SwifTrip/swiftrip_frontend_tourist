@@ -116,7 +116,7 @@ class _AgencySelectionState extends State<AgencySelection> {
                           : 'Flexible';
                       final rawImage = pkg.coverImage?.isNotEmpty == true
                           ? pkg.coverImage!
-                          : 'https://via.placeholder.com/600x400.png?text=Tour+Package';
+                          : 'https://placehold.co/600x400/png?text=Tour+Package';
                           
                       final String coverImage = (kIsWeb && rawImage.startsWith('http'))
                           ? '${ApiConfig.chatSocket}/proxy-image?url=${Uri.encodeComponent(rawImage)}'
