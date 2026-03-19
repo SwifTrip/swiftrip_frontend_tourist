@@ -20,6 +20,7 @@ class SigninState extends State<Signin> {
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
   bool _isLoading = false;
+  String? _errorMessage;
 
   // Service
   final AuthService _authService = AuthService();
@@ -44,6 +45,7 @@ class SigninState extends State<Signin> {
       // Show loading state briefly
       setState(() {
         _isLoading = true;
+        _errorMessage = null;
       });
 
       try {
@@ -70,24 +72,16 @@ class SigninState extends State<Signin> {
             MaterialPageRoute(builder: (context) => const HomeScreen()),
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(result['message'] ?? 'Login failed'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          setState(() {
+            _errorMessage = result['message'] ?? 'Login failed. Please check your credentials.';
+          });
         }
       } catch (e) {
         if (!mounted) return;
         setState(() {
           _isLoading = false;
+          _errorMessage = 'An error occurred: ${e.toString()}';
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('An error occurred: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
       }
     } else {
       // Show error if validation fails
@@ -269,6 +263,25 @@ class SigninState extends State<Signin> {
 
                     const SizedBox(height: 16),
                     
+                    if (_errorMessage != null) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade50,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.red.shade200),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.error_outline, color: Colors.red, size: 20),
+                            const SizedBox(width: 8),
+                            Expanded(child: Text(_errorMessage!, style: const TextStyle(color: Colors.red, fontSize: 13, fontWeight: FontWeight.w500))),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
