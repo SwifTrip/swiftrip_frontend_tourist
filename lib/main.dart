@@ -1,10 +1,12 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'theme/app_colors.dart';
 import 'screens/home_screen.dart';
 import 'screens/signin.dart';
 import 'screens/signup.dart';
 import 'screens/verification_screen.dart';
 import 'services/token_service.dart';
+import 'screens/trip_details_screen.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -90,6 +92,19 @@ class _SwifTripTouristAppState extends State<SwifTripTouristApp> {
             builder: (_) => VerificationScreen(token: token),
           );
         }
+
+        if (uri.path == '/tripDetails') {
+          final args = settings.arguments as Map<String, dynamic>?;
+          if (args != null && args.containsKey('bookingId') && args.containsKey('type')) {
+            return MaterialPageRoute(
+              builder: (_) => TripDetailsScreen(
+                bookingId: args['bookingId'],
+                type: args['type'],
+              ),
+            );
+          }
+        }
+
         
         return null;
       },

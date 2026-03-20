@@ -10,6 +10,7 @@ class CommonButton extends StatelessWidget {
   final bool isEnabled;
   final double? fontSize;
   final double? height;
+  final double? width;
   final double? borderRadius;
   final bool isLoading;
 
@@ -23,6 +24,7 @@ class CommonButton extends StatelessWidget {
     this.textColor,
     this.fontSize,
     this.height,
+    this.width,
     this.borderRadius,
     this.isLoading = false,
   });
@@ -30,7 +32,7 @@ class CommonButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
+      width: width ?? double.infinity,
       height: height ?? 56,
       decoration: BoxDecoration(
         gradient: isEnabled && backgroundColor == null

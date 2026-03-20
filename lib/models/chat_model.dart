@@ -98,23 +98,38 @@ class Message {
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
-    // Extract senderId carefully (REST returns participant object usually, Socket might just send senderId or full message)
+    // Robust senderId extraction
     String extractSenderId = '';
-    if (json['participant'] != null && json['participant']['userId'] != null) {
-      extractSenderId = json['participant']['userId'].toString();
-    } else if (json['senderId'] != null) {
+    if (json['senderId'] != null) {
       extractSenderId = json['senderId'].toString();
+    } else if (json['participant'] != null && json['participant']['userId'] != null) {
+      extractSenderId = json['participant']['userId'].toString();
+    } else if (json['participantId'] != null) {
+      // Fallback if needed
+      extractSenderId = 'PARTICIPANT_${json['participantId']}';
+    }
+
+    // Backend uses 'messageType' in socket, Prisma uses 'msgType' in some places or 'messageType' in schema
+    final type = json['msgType'] ?? json['messageType'] ?? 'TEXT';
+    
+    // Backend uses 'timestamp' in socket, Prisma uses 'createdAt'
+    final dateStr = json['createdAt'] ?? json['timestamp'];
+    DateTime parsedDate;
+    if (dateStr != null) {
+      parsedDate = DateTime.parse(dateStr.toString());
+    } else {
+      parsedDate = DateTime.now();
     }
 
     return Message(
-      id: json['id'] ?? '',
+      id: json['id']?.toString() ?? '',
       content: json['content'] ?? '',
       mediaUrl: json['mediaUrl'],
-      msgType: json['msgType'] ?? 'TEXT',
+      msgType: type,
       chatRoomId: json['chatRoomId'] ?? json['roomId'] ?? '',
       senderId: extractSenderId,
       isRead: json['isRead'] ?? false,
-      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : DateTime.now(),
+      createdAt: parsedDate,
     );
   }
 }

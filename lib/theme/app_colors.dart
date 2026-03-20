@@ -12,6 +12,10 @@ class AppColors {
   static const Color primaryOrange = Color(0xFFEA580C); // Orange-600
   static const Color primaryEmerald = Color(0xFF10B981); // Emerald-500
   
+  // High Contrast Text Colors (WCAG AA Compliant)
+  static const Color textEmerald = Color(0xFF065F46);  // Emerald-800
+  static const Color textOrange = Color(0xFF9A3412);   // Orange-800
+  
   static const Color accent = primaryOrange;
   
   // Gradients
