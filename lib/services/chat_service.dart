@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import '../config/api_config.dart';
@@ -9,24 +10,34 @@ class ChatService {
   IO.Socket? socket;
   Function(Message)? onMessageReceived;
 
-  // Initialize Socket Connection
+  // Initialize Socket Connection and wait for it to be ready
   Future<void> connect() async {
     if (socket != null && socket!.connected) return;
 
+    final Completer<void> completer = Completer<void>();
     final token = await TokenService.getToken();
     if (token == null) return;
 
-    // Connect to websocket matching backend port
+    print('Attempting to connect to socket: ${ApiConfig.chatSocket}');
     socket = IO.io(ApiConfig.chatSocket, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
       'auth': {'token': token},
     });
 
-    socket!.connect();
-
     socket!.onConnect((_) {
       print('Socket connected: ${socket!.id}');
+      if (!completer.isCompleted) completer.complete();
+    });
+
+    socket!.onConnectError((err) {
+      print('Socket connection error: $err');
+      if (!completer.isCompleted) completer.completeError(err);
+    });
+
+    socket!.on('connect_timeout', (_) {
+      print('Socket connection timeout');
+      if (!completer.isCompleted) completer.completeError('Timeout');
     });
 
     socket!.onDisconnect((_) {
@@ -35,11 +46,21 @@ class ChatService {
 
     // Listen for incoming messages
     socket!.on('receive_message', (data) {
+      print('Socket received message packet: $data');
       if (onMessageReceived != null && data != null) {
-        final message = Message.fromJson(data);
-        onMessageReceived!(message);
+        try {
+          final message = Message.fromJson(data);
+          onMessageReceived!(message);
+        } catch (e) {
+          print('Error parsing incoming socket message: $e');
+        }
       }
     });
+
+    socket!.connect();
+    
+    // Wait for connection or error
+    return completer.future;
   }
 
   // Join a specific room

@@ -57,8 +57,35 @@ class BookingService {
       return null;
     }
   }
+  
+  /// Get single booking details
+  Future<dynamic> getBookingDetails(int bookingId, String type) async {
+    try {
+      final token = await TokenService.getToken();
+      if (token == null) return null;
+
+      // Note: If backend doesn't have a direct single-booking endpoint, 
+      // we fetch all and filter, or assume /tourist/bookings/:id
+      // For now, let's try to fetch from the general list and filter for simplicity 
+      // if a specific endpoint isn't confirmed.
+      // But usually it's better to have a specific one.
+      final response = await getUserBookings(when: 'ALL');
+      if (response != null && response.success) {
+        if (type == 'PUBLIC') {
+          return response.data.publicTours.firstWhere((b) => b.id == bookingId);
+        } else {
+          return response.data.privateTours.firstWhere((b) => b.id == bookingId);
+        }
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching booking details: $e');
+      return null;
+    }
+  }
 
   /// Create a new booking (custom tour or schedule-based)
+
   Future<Map<String, dynamic>?> createBooking({
     int? customTourId,
     int? publicTourId,
