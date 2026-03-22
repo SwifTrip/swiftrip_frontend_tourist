@@ -3,6 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_colors.dart';
 import '../models/booking_model.dart';
 import '../services/booking_service.dart';
+import 'package:shimmer/shimmer.dart';
+import 'dart:ui';
+import '../widgets/common_button.dart';
 
 class TripsScreen extends StatefulWidget {
   final VoidCallback onBack;
@@ -78,258 +81,236 @@ class _TripsScreenState extends State<TripsScreen> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Header
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: AppColors.background.withOpacity(0.9),
-            border: Border(
-              bottom: BorderSide(
-                color: AppColors.border.withOpacity(0.5),
-                width: 1,
-              ),
-            ),
-          ),
-          child: Row(
+        // Main Body with Background elements if any
+        Expanded(
+          child: Stack(
             children: [
-              GestureDetector(
-                onTap: widget.onBack,
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.surface,
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back,
-                    color: AppColors.textPrimary,
-                    size: 20,
-                  ),
-                ),
+              // Content Area
+              Positioned.fill(
+                child: _buildAnimatedContent(),
               ),
-              Expanded(
-                child: Text(
-                  'My Trips',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 40),
-            ],
-          ),
-        ),
-
-        // Upcoming / Past Tab Switcher
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.border),
-          ),
-          child: Row(
-            children: [
-              _buildTabButton('Upcoming', 'UPCOMING'),
-              _buildTabButton('Past', 'PAST'),
-            ],
-          ),
-        ),
-
-        // Filters Row: Date + Tour Type
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-          child: Row(
-            children: [
-              // Date filter button
-              GestureDetector(
-                onTap: () async {
-                  final now = DateTime.now();
-                  DateTime initialDate = _selectedStartDate ?? now;
-                  DateTime firstDate;
-                  DateTime lastDate;
-
-                  if (_selectedTripsTab == 'UPCOMING') {
-                    firstDate = DateTime(now.year, now.month, now.day);
-                    lastDate = DateTime(2030);
-                    if (initialDate.isBefore(firstDate)) {
-                      initialDate = firstDate;
-                    }
-                  } else {
-                    firstDate = DateTime(2020);
-                    final todayStart = DateTime(now.year, now.month, now.day);
-                    lastDate = todayStart.subtract(const Duration(days: 1));
-                    if (initialDate.isAfter(lastDate)) {
-                      initialDate = lastDate;
-                    }
-                  }
-
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: initialDate,
-                    firstDate: firstDate,
-                    lastDate: lastDate,
-                    builder: (context, child) {
-                      return Theme(
-                        data: Theme.of(context).copyWith(
-                          colorScheme: ColorScheme.light(
-                            primary: AppColors.accent,
-                            onSurface: AppColors.textPrimary,
+              
+              // Sticky Glassmorphism Header
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: Column(
+                  children: [
+                    // Header
+                    ClipRRect(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: AppColors.background.withOpacity(0.7),
+                            border: Border(
+                              bottom: BorderSide(
+                                color: AppColors.border.withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              _BounceButton(
+                                onTap: widget.onBack,
+                                child: Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: AppColors.surface.withOpacity(0.8),
+                                    border: Border.all(color: AppColors.border.withOpacity(0.5)),
+                                  ),
+                                  child: const Icon(
+                                    Icons.arrow_back,
+                                    color: AppColors.textPrimary,
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  'My Trips',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 40),
+                            ],
                           ),
                         ),
-                        child: child!,
-                      );
-                    },
-                  );
-
-                  if (picked != null) {
-                    setState(() {
-                      _selectedStartDate = picked;
-                    });
-                  }
-                },
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                  decoration: BoxDecoration(
-                    color: _selectedStartDate != null
-                        ? AppColors.accent.withOpacity(0.1)
-                        : AppColors.surface,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: _selectedStartDate != null
-                          ? AppColors.accent
-                          : AppColors.border,
-                      width: 1.5,
+                      ),
                     ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.calendar_today_rounded,
-                        size: 14,
-                        color: _selectedStartDate != null
-                            ? AppColors.accent
-                            : AppColors.textSecondary,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        _selectedStartDate != null
-                            ? '${_selectedStartDate!.day}/${_selectedStartDate!.month}/${_selectedStartDate!.year}'
-                            : 'Start Date',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: _selectedStartDate != null
-                              ? AppColors.accent
-                              : AppColors.textSecondary,
-                        ),
-                      ),
-                      if (_selectedStartDate != null) ...[
-                        const SizedBox(width: 6),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _selectedStartDate = null;
-                            });
-                          },
-                          child: const Icon(
-                            Icons.close_rounded,
-                            size: 14,
-                            color: AppColors.accent,
+
+                    // Upcoming / Past Tab Switcher Area
+                    ClipRRect(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Container(
+                          color: AppColors.background.withOpacity(0.7),
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Column(
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: AppColors.surface.withOpacity(0.8),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: AppColors.border.withOpacity(0.5)),
+                                ),
+                                child: Row(
+                                  children: [
+                                    _buildTabButton('Upcoming', 'UPCOMING'),
+                                    _buildTabButton('Ongoing', 'ONGOING'),
+                                    _buildTabButton('Past', 'PAST'),
+                                  ],
+                                ),
+                              ),
+
+                              // Quick Filters
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                child: Row(
+                                  children: [
+                                    _buildDateFilter(),
+                                    const Spacer(),
+                                    _buildTypeFilter(),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-              const Spacer(),
-              // Tour type popup filter
-              PopupMenuButton<String>(
-                onSelected: (value) {
-                  if (value != _selectedTypeFilter) {
-                    setState(() {
-                      _selectedTypeFilter = value;
-                    });
-                  }
-                },
-                color: AppColors.surface,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: AppColors.border),
-                ),
-                offset: const Offset(0, 36),
-                itemBuilder: (context) => [
-                  _buildPopupItem('All', 'ALL'),
-                  _buildPopupItem('Public', 'PUBLIC'),
-                  _buildPopupItem('Private', 'PRIVATE'),
-                ],
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                  decoration: BoxDecoration(
-                    color: _selectedTypeFilter != 'ALL'
-                        ? AppColors.accent.withOpacity(0.1)
-                        : AppColors.surface,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: _selectedTypeFilter != 'ALL'
-                          ? AppColors.accent
-                          : AppColors.border,
-                      width: 1.5,
+                      ),
                     ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.filter_list_rounded,
-                        size: 16,
-                        color: _selectedTypeFilter != 'ALL'
-                            ? AppColors.accent
-                            : AppColors.textSecondary,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        _selectedTypeFilter == 'ALL'
-                            ? 'All'
-                            : _selectedTypeFilter == 'PUBLIC'
-                                ? 'Public'
-                                : 'Private',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: _selectedTypeFilter != 'ALL'
-                              ? AppColors.accent
-                              : AppColors.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        size: 18,
-                        color: _selectedTypeFilter != 'ALL'
-                            ? AppColors.accent
-                            : AppColors.textSecondary,
-                      ),
-                    ],
-                  ),
+                  ],
                 ),
               ),
             ],
           ),
         ),
-
-        // Trips List
-        Expanded(child: _buildListContent()),
       ],
+    );
+  }
+
+  Widget _buildAnimatedContent() {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 400),
+      child: Container(
+        key: ValueKey(_selectedTripsTab),
+        padding: const EdgeInsets.only(top: 170), // Push down below sticky header
+        child: _buildListContent(),
+      ),
+    );
+  }
+
+  Widget _buildDateFilter() {
+    return _BounceButton(
+      onTap: () async {
+        final now = DateTime.now();
+        DateTime initialDate = _selectedStartDate ?? now;
+        DateTime firstDate;
+        DateTime lastDate;
+
+        if (_selectedTripsTab == 'UPCOMING') {
+          firstDate = DateTime(now.year, now.month, now.day);
+          lastDate = DateTime(2030);
+          if (initialDate.isBefore(firstDate)) {
+            initialDate = firstDate;
+          }
+        } else {
+          firstDate = DateTime(2020);
+          final todayStart = DateTime(now.year, now.month, now.day);
+          lastDate = todayStart.subtract(const Duration(days: 1));
+          if (initialDate.isAfter(lastDate)) {
+            initialDate = lastDate;
+          }
+        }
+
+        final picked = await showDatePicker(
+          context: context,
+          initialDate: initialDate,
+          firstDate: firstDate,
+          lastDate: lastDate,
+          builder: (context, child) {
+            return Theme(
+              data: Theme.of(context).copyWith(
+                colorScheme: const ColorScheme.light(
+                  primary: AppColors.accent,
+                  onSurface: AppColors.textPrimary,
+                ),
+              ),
+              child: child!,
+            );
+          },
+        );
+
+        if (picked != null) {
+          setState(() => _selectedStartDate = picked);
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: _selectedStartDate != null ? AppColors.accent.withOpacity(0.1) : AppColors.surface,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: _selectedStartDate != null ? AppColors.accent : AppColors.border,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.calendar_today_rounded, size: 14, color: _selectedStartDate != null ? AppColors.accent : AppColors.textSecondary),
+            const SizedBox(width: 6),
+            Text(
+              _selectedStartDate != null ? '${_selectedStartDate!.day}/${_selectedStartDate!.month}/${_selectedStartDate!.year}' : 'Date',
+              style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.bold, color: _selectedStartDate != null ? AppColors.accent : AppColors.textSecondary),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTypeFilter() {
+    return PopupMenuButton<String>(
+      onSelected: (val) => setState(() => _selectedTypeFilter = val),
+      color: AppColors.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.border)),
+      itemBuilder: (context) => [
+        _buildPopupItem('All', 'ALL'),
+        _buildPopupItem('Public', 'PUBLIC'),
+        _buildPopupItem('Private', 'PRIVATE'),
+      ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: _selectedTypeFilter != 'ALL' ? AppColors.accent.withOpacity(0.1) : AppColors.surface,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: _selectedTypeFilter != 'ALL' ? AppColors.accent : AppColors.border, width: 1.5),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.tune_rounded, size: 16, color: _selectedTypeFilter != 'ALL' ? AppColors.accent : AppColors.textSecondary),
+            const SizedBox(width: 6),
+            Text(
+              _selectedTypeFilter == 'ALL' ? 'Type' : _selectedTypeFilter,
+              style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.bold, color: _selectedTypeFilter != 'ALL' ? AppColors.accent : AppColors.textSecondary),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -391,39 +372,57 @@ class _TripsScreenState extends State<TripsScreen> {
 
   Widget _buildListContent() {
     if (_isLoadingBookings) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.accent),
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Shimmer.fromColors(
+          baseColor: Colors.grey[300]!,
+          highlightColor: Colors.grey[100]!,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: 4,
+            itemBuilder: (context, index) => Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Container(height: 140, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16))),
+            ),
+          ),
+        ),
       );
     }
 
     if (_bookingsError != null) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline,
-                size: 64, color: AppColors.textSecondary),
-            const SizedBox(height: 16),
-            Text(
-              _bookingsError!,
-              style: GoogleFonts.plusJakartaSans(
-                  fontSize: 16, color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _fetchBookings,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.accent,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.05),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.cloud_off_rounded, size: 48, color: Colors.redAccent),
               ),
-              child: Text(
-                'Retry',
-                style: GoogleFonts.plusJakartaSans(
-                    color: Colors.white, fontWeight: FontWeight.bold),
+              const SizedBox(height: 24),
+              Text(
+                'Something went wrong',
+                style: GoogleFonts.plusJakartaSans(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              Text(
+                _bookingsError!,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.plusJakartaSans(fontSize: 14, color: AppColors.textSecondary),
+              ),
+              const SizedBox(height: 32),
+              CommonButton(
+                text: 'Try Again',
+                onPressed: _fetchBookings,
+                width: 160,
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -534,22 +533,28 @@ class _TripsScreenState extends State<TripsScreen> {
   }
 
   Widget _buildPublicTourCard(PublicTourBooking booking) {
-    final daysUntil = booking.departureDate?.difference(DateTime.now()).inDays;
-    final countdown = (daysUntil != null && daysUntil > 0) ? '$daysUntil Days' : 'Today';
+    final now = DateTime.now();
+    String countdown;
+    if (_selectedTripsTab == 'ONGOING') {
+      countdown = 'ONGOING';
+    } else {
+      final daysUntil = booking.departureDate?.difference(now).inDays;
+      countdown = (daysUntil != null && daysUntil > 0) ? '$daysUntil Days' : 'Today';
+    }
 
     Color statusColor;
     switch (booking.status.toUpperCase()) {
       case 'CONFIRMED':
-        statusColor = Colors.greenAccent;
+        statusColor = AppColors.textEmerald;
         break;
       case 'PENDING':
-        statusColor = Colors.amberAccent;
+        statusColor = AppColors.textOrange;
         break;
       case 'CANCELLED':
-        statusColor = Colors.redAccent;
+        statusColor = Colors.red.shade800;
         break;
       default:
-        statusColor = Colors.blueAccent;
+        statusColor = Colors.blue.shade800;
     }
 
     final pubInfo = '${booking.seats} seat(s)';
@@ -567,7 +572,7 @@ class _TripsScreenState extends State<TripsScreen> {
       countdown: countdown,
       statusColor: statusColor,
       imageUrl: booking.package?.coverImage ?? '',
-      onTap: () => Navigator.pushNamed(context, '/tripDetails', arguments: {
+      onTap: () => Navigator.pushNamed(this.context, '/tripDetails', arguments: {
         'bookingId': booking.id,
         'type': booking.type,
       }),
@@ -576,24 +581,30 @@ class _TripsScreenState extends State<TripsScreen> {
   }
 
   Widget _buildPrivateTourCard(PrivateTourBooking booking) {
-    final daysUntil = booking.departureDate?.difference(DateTime.now()).inDays;
-    final countdown = (daysUntil != null && daysUntil > 0) ? '$daysUntil Days' : 'Today';
+    final now = DateTime.now();
+    String countdown;
+    if (_selectedTripsTab == 'ONGOING') {
+      countdown = 'ONGOING';
+    } else {
+      final daysUntil = booking.departureDate?.difference(now).inDays;
+      countdown = (daysUntil != null && daysUntil > 0) ? '$daysUntil Days' : 'Today';
+    }
 
     Color statusColor;
     switch (booking.status.toUpperCase()) {
       case 'CONFIRMED':
       case 'ACCEPTED':
-        statusColor = Colors.greenAccent;
+        statusColor = AppColors.textEmerald;
         break;
       case 'PENDING':
-        statusColor = Colors.amberAccent;
+        statusColor = AppColors.textOrange;
         break;
       case 'CANCELLED':
       case 'REJECTED':
-        statusColor = Colors.redAccent;
+        statusColor = Colors.red.shade800;
         break;
       default:
-        statusColor = Colors.blueAccent;
+        statusColor = Colors.blue.shade800;
     }
 
     final privCount = booking.seats ?? booking.travelerCount;
@@ -613,7 +624,7 @@ class _TripsScreenState extends State<TripsScreen> {
       countdown: countdown,
       statusColor: statusColor,
       imageUrl: booking.package?.coverImage ?? '',
-      onTap: () => Navigator.pushNamed(context, '/tripDetails', arguments: {
+      onTap: () => Navigator.pushNamed(this.context, '/tripDetails', arguments: {
         'bookingId': booking.id,
         'type': booking.type,
       }),
@@ -632,126 +643,153 @@ class _TripsScreenState extends State<TripsScreen> {
     String? additionalInfo,
     VoidCallback? onTap,
   }) {
-    return GestureDetector(
+    return _BounceButton(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Image
-          Container(
-            width: 100,
-            height: 110,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: AppColors.background,
-              image: imageUrl.isNotEmpty
-                  ? DecorationImage(
-                      image: NetworkImage(imageUrl), fit: BoxFit.cover)
-                  : null,
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border.withOpacity(0.5)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
             ),
-            child: imageUrl.isEmpty
-                ? const Icon(Icons.landscape,
-                    color: AppColors.textSecondary, size: 40)
-                : null,
-          ),
-          const SizedBox(width: 16),
-          // Details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                if (routeText != null && routeText.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    routeText,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.accent,
-                    ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Immersive Image
+            Container(
+              width: 90,
+              height: 100,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                color: AppColors.background,
+                image: imageUrl.isNotEmpty ? DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover) : null,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
                 ],
-                Text(
-                  provider,
-                  style: GoogleFonts.plusJakartaSans(
-                      fontSize: 12, color: AppColors.textSecondary),
-                ),
-                if (additionalInfo != null) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    additionalInfo,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 11,
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w500,
-                    ),
+              ),
+              child: imageUrl.isEmpty ? const Icon(Icons.terrain_rounded, color: AppColors.textSecondary, size: 30) : null,
+            ),
+            const SizedBox(width: 16),
+            // Details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: GoogleFonts.plusJakartaSans(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(color: statusColor.withOpacity(0.1), borderRadius: BorderRadius.circular(6), border: Border.all(color: statusColor.withOpacity(0.3))),
+                        child: Text(
+                          (countdown == 'Today' || countdown == 'ONGOING') ? 'LIVE' : countdown.toUpperCase(),
+                          style: GoogleFonts.plusJakartaSans(fontSize: 9, fontWeight: FontWeight.bold, color: statusColor),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-                const SizedBox(height: 12),
-                const Divider(height: 1, color: AppColors.border),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('DATE',
-                            style: GoogleFonts.plusJakartaSans(
-                                fontSize: 10,
-                                color: AppColors.textSecondary,
-                                fontWeight: FontWeight.w600)),
-                        Text(date,
-                            style: GoogleFonts.plusJakartaSans(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary)),
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text('STARTS IN',
-                            style: GoogleFonts.plusJakartaSans(
-                                fontSize: 10,
-                                color: AppColors.textSecondary,
-                                fontWeight: FontWeight.w600)),
-                        Text(countdown,
-                            style: GoogleFonts.plusJakartaSans(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.accent)),
-                      ],
+                  if (routeText != null && routeText.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      routeText,
+                      style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.accent),
                     ),
                   ],
-                ),
-              ],
+                  const SizedBox(height: 2),
+                  Text(
+                    provider,
+                    style: GoogleFonts.plusJakartaSans(fontSize: 11, color: AppColors.textSecondary),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(color: AppColors.background.withOpacity(0.5), borderRadius: BorderRadius.circular(10), border: Border.all(color: AppColors.border.withOpacity(0.3))),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.event_available_rounded, size: 14, color: AppColors.textSecondary),
+                        const SizedBox(width: 8),
+                        Text(
+                          date,
+                          style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ));
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    return '${months[date.month - 1]} ${date.day}';
+  }
+}
+
+// Reuse the Boing Animation widget
+class _BounceButton extends StatefulWidget {
+  final Widget child;
+  final VoidCallback? onTap;
+
+  const _BounceButton({required this.child, this.onTap});
+
+  @override
+  State<_BounceButton> createState() => _BounceButtonState();
+}
+
+class _BounceButtonState extends State<_BounceButton> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 150));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => _controller.forward(),
+      onTapUp: (_) {
+       _controller.reverse();
+       if (widget.onTap != null) widget.onTap!();
+      },
+      onTapCancel: () => _controller.reverse(),
+      child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
+    );
   }
 
   String _formatDate(DateTime date) {
