@@ -81,12 +81,7 @@ class ChatBubble extends StatelessWidget {
                         ),
                       ),
                       if (isMe) ...[
-                        const SizedBox(width: 4),
-                        Icon(
-                          Icons.done_all,
-                          size: 14,
-                          color: message.isRead ? AppColors.accent : AppColors.textSecondary.withOpacity(0.5),
-                        ),
+                        _buildStatusIcon(),
                       ],
                     ],
                   ),
@@ -98,6 +93,24 @@ class ChatBubble extends StatelessWidget {
           if (isMe) const SizedBox(width: 24), // Balance spacing with avatar side
         ],
       ),
+    );
+  }
+
+  Widget _buildStatusIcon() {
+    final bool isTemp = message.id.startsWith('temp_');
+    
+    if (isTemp) {
+      return Icon(
+        Icons.access_time_rounded,
+        size: 12,
+        color: AppColors.textSecondary.withOpacity(0.5),
+      );
+    }
+    
+    return Icon(
+      message.isRead ? Icons.done_all_rounded : Icons.done_rounded,
+      size: 14,
+      color: message.isRead ? AppColors.accent : AppColors.textSecondary.withOpacity(0.5),
     );
   }
 }

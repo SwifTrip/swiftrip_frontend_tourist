@@ -1,10 +1,12 @@
 import 'package:swift_trip_app/screens/agencySelection.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../widgets/common_button.dart';
 import '../services/package_service.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
+import 'dart:ui';
 
 class SearchTour extends StatefulWidget {
   const SearchTour({super.key});
@@ -388,10 +390,10 @@ class _SearchTourState extends State<SearchTour> {
                   const SizedBox(height: 32),
 
                   // Where to Section
-                  const Text(
+                  Text(
                     'Where to?',
-                    style: TextStyle(
-                      fontSize: 20,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
                     ),
@@ -477,28 +479,181 @@ class _SearchTourState extends State<SearchTour> {
     );
   }
 
-  Widget _buildPackageStyles() {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      childAspectRatio: 1.05,
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
-      children: [
-        _buildStyleCard(
-          title: 'Adventure',
-          description: 'Hiking, camping and outdoor activities.',
-          icon: Icons.landscape,
-          iconColor: Colors.blue,
-          isPopular: true,
+  Widget _buildTripTypeToggle() {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _BounceButton(
+              onTap: () => setState(() => isPublicTrip = true),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: isPublicTrip ? AppColors.accent : Colors.transparent,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: isPublicTrip ? [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4))] : null,
+                ),
+                child: Center(
+                  child: Text(
+                    'Public Tour',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: isPublicTrip ? Colors.white : AppColors.textSecondary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: _BounceButton(
+              onTap: () => setState(() => isPublicTrip = false),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: !isPublicTrip ? AppColors.accent : Colors.transparent,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: !isPublicTrip ? [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4))] : null,
+                ),
+                child: Center(
+                  child: Text(
+                    'Private Tour',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: !isPublicTrip ? Colors.white : AppColors.textSecondary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLocationInputs() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.border.withOpacity(0.5)),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 10))
+        ],
+      ),
+      child: Column(
+        children: [
+          _buildLocationField(
+            label: 'FROM',
+            value: fromLocation,
+            hint: 'Departure City',
+            icon: Icons.trip_origin_rounded,
+            iconColor: Colors.blue,
+            onTap: () => _showLocationPicker(context, true),
+          ),
+          Container(
+            padding: const EdgeInsets.only(left: 32),
+            child: Column(
+              children: List.generate(3, (index) => Container(
+                width: 2,
+                height: 6,
+                margin: const EdgeInsets.symmetric(vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(1),
+                ),
+              )),
+            ),
+          ),
+          _buildLocationField(
+            label: 'TO',
+            value: toLocation,
+            hint: 'Arrival City',
+            icon: Icons.location_on_rounded,
+            iconColor: Colors.redAccent,
+            onTap: () => _showLocationPicker(context, false),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLocationField({
+    required String label,
+    required String value,
+    String? hint,
+    required IconData icon,
+    required Color iconColor,
+    required VoidCallback onTap,
+  }) {
+    return _BounceButton(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        color: Colors.transparent,
+        child: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(color: iconColor.withOpacity(0.1), shape: BoxShape.circle),
+              child: Icon(icon, color: iconColor, size: 16),
+            ),
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textSecondary, letterSpacing: 1)),
+                const SizedBox(height: 4),
+                Text(
+                  value.isEmpty ? (hint ?? 'Select City') : value,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: value.isEmpty ? AppColors.textSecondary.withOpacity(0.3) : AppColors.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
-        _buildStyleCard(
-          title: 'Cultural',
-          description: 'Historical sites and local traditions.',
-          icon: Icons.museum,
-          iconColor: Colors.purple,
-          isPopular: false,
+      ),
+    );
+  }
+
+  Widget _buildPackageStyles() {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildStyleCard(
+            title: 'Adventure',
+            description: 'Outdoor thrills',
+            icon: Icons.landscape_rounded,
+            iconColor: Colors.blue,
+            isPopular: true,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _buildStyleCard(
+            title: 'Cultural',
+            description: 'Local traditions',
+            icon: Icons.museum_rounded,
+            iconColor: Colors.purple,
+            isPopular: false,
+          ),
         ),
       ],
     );
@@ -512,77 +667,29 @@ class _SearchTourState extends State<SearchTour> {
     bool isPopular = false,
   }) {
     final isSelected = selectedStyle == title;
-    return GestureDetector(
+    return _BounceButton(
       onTap: () => setState(() => selectedStyle = title),
-      child: Container(
-        padding: const EdgeInsets.all(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected ? AppColors.accent : AppColors.border,
-            width: isSelected ? 2 : 1,
-          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: isSelected ? AppColors.accent : AppColors.border, width: isSelected ? 2 : 1),
+          boxShadow: isSelected ? [BoxShadow(color: AppColors.accent.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))] : null,
         ),
-        child: Stack(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: iconColor.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(icon, color: iconColor, size: 18),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  description,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
-                    fontSize: 10,
-                  ),
-                ),
-              ],
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(color: iconColor.withOpacity(0.1), shape: BoxShape.circle),
+              child: Icon(icon, color: iconColor, size: 18),
             ),
-            if (isPopular)
-              Positioned(
-                top: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.accent,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Text(
-                    'Popular',
-                    style: TextStyle(
-                      color: AppColors.background,
-                      fontSize: 8,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
+            const SizedBox(height: 12),
+            Text(title, style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+            Text(description, style: GoogleFonts.plusJakartaSans(fontSize: 10, color: AppColors.textSecondary)),
           ],
         ),
       ),
@@ -732,176 +839,48 @@ class _SearchTourState extends State<SearchTour> {
     );
   }
 
-  Widget _buildLocationInputs() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        children: [
-          _buildLocationField(
-            label: 'FROM',
-            value: fromLocation,
-            hint: 'Departure City',
-            icon: Icons.circle_outlined,
-            iconColor: Colors.blue,
-            onTap: () => _showLocationPicker(context, true),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 26),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Column(
-                children: List.generate(
-                  4,
-                  (index) => Container(
-                    width: 1,
-                    height: 4,
-                    margin: const EdgeInsets.symmetric(vertical: 2),
-                    color: AppColors.textSecondary.withOpacity(0.3),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          _buildLocationField(
-            label: 'TO',
-            value: toLocation,
-            hint: 'Arrival City',
-            icon: Icons.location_on,
-            iconColor: Colors.red,
-            onTap: () => _showLocationPicker(context, false),
-          ),
-        ],
-      ),
+}
+
+// Boing Physics Button
+class _BounceButton extends StatefulWidget {
+  final Widget child;
+  final VoidCallback? onTap;
+
+  const _BounceButton({required this.child, this.onTap});
+
+  @override
+  State<_BounceButton> createState() => _BounceButtonState();
+}
+
+class _BounceButtonState extends State<_BounceButton> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 150));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
     );
   }
 
-  Widget _buildLocationField({
-    required String label,
-    required String value,
-    String? hint,
-    required IconData icon,
-    required Color iconColor,
-    required VoidCallback onTap,
-  }) {
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textSecondary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Icon(icon, color: iconColor, size: 20),
-              const SizedBox(width: 12),
-              Expanded(
-                child: value.isNotEmpty
-                    ? Text(
-                        value,
-                        style: const TextStyle(
-                          color: AppColors.textPrimary,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      )
-                    : Text(
-                        hint ?? '',
-                        style: TextStyle(
-                          color: AppColors.textSecondary.withOpacity(0.5),
-                          fontSize: 16,
-                        ),
-                      ),
-              ),
-              Icon(
-                Icons.arrow_drop_down,
-                color: AppColors.textSecondary,
-                size: 24,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTripTypeToggle() {
-    return Container(
-      height: 50,
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Stack(
-        children: [
-          AnimatedAlign(
-            duration: const Duration(milliseconds: 250),
-            alignment: isPublicTrip
-                ? Alignment.centerLeft
-                : Alignment.centerRight,
-            child: Container(
-              width: MediaQuery.of(context).size.width * 0.44,
-              height: 42,
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              decoration: BoxDecoration(
-                color: AppColors.accent,
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => isPublicTrip = true),
-                  child: Container(
-                    color: Colors.transparent,
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Public Trip',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: isPublicTrip
-                            ? AppColors.background
-                            : AppColors.textSecondary,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => setState(() => isPublicTrip = false),
-                  child: Container(
-                    color: Colors.transparent,
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Private Trip',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: !isPublicTrip
-                            ? AppColors.background
-                            : AppColors.textSecondary,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+      onTapDown: (_) => _controller.forward(),
+      onTapUp: (_) {
+       _controller.reverse();
+       if (widget.onTap != null) widget.onTap!();
+      },
+      onTapCancel: () => _controller.reverse(),
+      child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
     );
   }
 }

@@ -51,19 +51,33 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       if (mounted) setState(() => _isLoading = false);
     }
 
-    // 3. Connect Socket and Join Room
-    await _chatService.connect();
-    _chatService.joinRoom(widget.room.id);
-
-    // 4. Listen for incoming messages
-    _chatService.onMessageReceived = (message) {
-      if (message.chatRoomId == widget.room.id) {
-        setState(() {
-          _messages.add(message);
-        });
-        _scrollToBottom();
+    // 4. Connect Socket and Join Room
+    try {
+      await _chatService.connect();
+      _chatService.joinRoom(widget.room.id);
+      
+      // 5. Listen for incoming messages
+      _chatService.onMessageReceived = (message) {
+        if (message.chatRoomId == widget.room.id) {
+          if (mounted) {
+            setState(() {
+              _messages.add(message);
+            });
+            _scrollToBottom();
+          }
+        }
+      };
+    } catch (e) {
+      print('Chat Socket Error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Working offline. Real-time messages may be delayed.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
       }
-    };
+    }
   }
 
   @override
@@ -83,7 +97,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     // Optimistically add to UI
     setState(() {
       _messages.add(Message(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        id: 'temp_${DateTime.now().millisecondsSinceEpoch}',
         content: text,
         msgType: 'TEXT',
         chatRoomId: widget.room.id,

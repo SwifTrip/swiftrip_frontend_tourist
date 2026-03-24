@@ -432,11 +432,14 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
   Widget _buildHeroSection() {
     return Stack(
       children: [
-        Image.network(
-          "https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200",
-          height: 420,
-          width: double.infinity,
-          fit: BoxFit.cover,
+        Hero(
+          tag: 'package_${widget.customizeItinerary.id}',
+          child: Image.network(
+            "https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200",
+            height: 420,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          ),
         ),
         Container(
           height: 420,

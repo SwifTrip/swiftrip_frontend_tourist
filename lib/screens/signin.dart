@@ -20,6 +20,7 @@ class SigninState extends State<Signin> {
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
   bool _isLoading = false;
+  bool _obscurePassword = true;
   String? _errorMessage;
 
   // Service
@@ -233,13 +234,17 @@ class SigninState extends State<Signin> {
                           ),
                           const Divider(height: 1, indent: 20, endIndent: 20, color: AppColors.border),
                           // Password field
-                          TextFormField(
+                           TextFormField(
                             controller: _passwordController,
-                            obscureText: true,
+                            obscureText: _obscurePassword,
                             style: const TextStyle(color: AppColors.textPrimary, fontSize: 15),
                             decoration: InputDecoration(
                               hintText: 'Password',
                               prefixIcon: const Icon(Icons.lock_outline, size: 20),
+                              suffixIcon: IconButton(
+                                icon: Icon(_obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 20, color: AppColors.textSecondary),
+                                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                              ),
                               fillColor: Colors.transparent,
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
@@ -330,7 +335,7 @@ class SigninState extends State<Signin> {
                           },
                           child: const Text('Create Account', 
                             style: TextStyle(
-                              color: AppColors.primaryEmerald, 
+                              color: AppColors.textEmerald, 
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                             )),

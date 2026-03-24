@@ -4,6 +4,7 @@ import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
 import 'review_trip_screen.dart';
+import 'dart:ui';
 
 class CustomizeItineraryScreen extends StatefulWidget {
   final CustomizeItineraryModel package;
@@ -30,7 +31,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
   
   Map<int, bool> _selectedOptionalItems = {};
   
-  Color get _accentColor => AppColors.primaryOrange;
+  Color get _accentColor => AppColors.accent;
   
   @override
   void initState() {
@@ -46,9 +47,16 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(color: AppColors.background.withOpacity(0.7)),
+          ),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
@@ -61,7 +69,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
             ),
             Text(
               widget.package.title,
-              style: GoogleFonts.plusJakartaSans(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.w600),
+              style: GoogleFonts.plusJakartaSans(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -69,43 +77,46 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
       ),
       body: Stack(
         children: [
-          Column(
+          ListView(
+            padding: const EdgeInsets.only(top: kToolbarHeight + 110, bottom: 150),
             children: [
-              _buildDaySelector(dates),
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildDayHeader(dates[_selectedDayIndex]),
+                    const SizedBox(height: 24),
+                    if (_getAccommodationItemsForDay().isNotEmpty) ...[
+                      _buildSectionHeader('ACCOMMODATION', isFixed: widget.isPublic),
+                      const SizedBox(height: 12),
+                      _buildAccommodationSection(dates[_selectedDayIndex]),
                       const SizedBox(height: 24),
-                      _buildDayHeader(dates[_selectedDayIndex]),
-                      const SizedBox(height: 24),
-                      if (_getAccommodationItemsForDay().isNotEmpty) ...[
-                        _buildSectionHeader('ACCOMMODATION', isCustomizable: !widget.isPublic),
-                        const SizedBox(height: 12),
-                        _buildAccommodationSection(dates[_selectedDayIndex]),
-                        const SizedBox(height: 24),
-                      ],
-                      if (_getTransportItemsForDay().isNotEmpty) ...[
-                        _buildSectionHeader('TRANSPORT', isCustomizable: !widget.isPublic),
-                        const SizedBox(height: 12),
-                        _buildTransportSection(dates[_selectedDayIndex]),
-                        const SizedBox(height: 24),
-                      ],
-                      if (_getMealItemsForDay().isNotEmpty) ...[
-                        _buildSectionHeader('MEALS', isCustomizable: !widget.isPublic),
-                        const SizedBox(height: 12),
-                        _buildMealSection(dates[_selectedDayIndex]),
-                        const SizedBox(height: 24),
-                      ],
-                      if (_getActivityItemsForDay().isNotEmpty) ..._buildActivitySection(),
-                      const SizedBox(height: 140), // Spacing for footer
                     ],
-                  ),
+                    if (_getTransportItemsForDay().isNotEmpty) ...[
+                      _buildSectionHeader('TRANSPORT', isFixed: widget.isPublic),
+                      const SizedBox(height: 12),
+                      _buildTransportSection(dates[_selectedDayIndex]),
+                      const SizedBox(height: 24),
+                    ],
+                    if (_getMealItemsForDay().isNotEmpty) ...[
+                      _buildSectionHeader('MEALS', isFixed: widget.isPublic),
+                      const SizedBox(height: 12),
+                      _buildMealSection(dates[_selectedDayIndex]),
+                      const SizedBox(height: 24),
+                    ],
+                    if (_getActivityItemsForDay().isNotEmpty) ..._buildActivitySection(),
+                  ],
                 ),
               ),
             ],
+          ),
+          // Floating Day Selector
+          Positioned(
+            top: kToolbarHeight + 10,
+            left: 0,
+            right: 0,
+            child: _buildDaySelector(dates),
           ),
           _buildStickyFooter(),
         ],
@@ -114,61 +125,63 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
   }
 
   Widget _buildDaySelector(List<DateTime> dates) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        border: Border(bottom: BorderSide(color: AppColors.border.withOpacity(0.5))),
-      ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Row(
-          children: dates.asMap().entries.map((entry) {
-            final index = entry.key;
-            final date = entry.value;
-            final isSelected = _selectedDayIndex == index;
-            final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            
-            return GestureDetector(
-              onTap: () => setState(() => _selectedDayIndex = index),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                margin: const EdgeInsets.only(right: 12),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: isSelected ? _accentColor : AppColors.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: isSelected ? Colors.transparent : AppColors.border),
-                  boxShadow: isSelected ? [
-                    BoxShadow(color: _accentColor.withOpacity(0.2), blurRadius: 12, offset: const Offset(0, 6))
-                  ] : null,
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'DAY ${index + 1}',
-                      style: GoogleFonts.plusJakartaSans(
-                        color: isSelected ? Colors.white.withOpacity(0.8) : AppColors.textSecondary,
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
-                      ),
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          color: AppColors.background.withOpacity(0.4),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: dates.asMap().entries.map((entry) {
+                final index = entry.key;
+                final date = entry.value;
+                final isSelected = _selectedDayIndex == index;
+                final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                
+                return _BounceButton(
+                  onTap: () => setState(() => _selectedDayIndex = index),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    margin: const EdgeInsets.only(right: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: isSelected ? _accentColor : AppColors.surface.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: isSelected ? Colors.transparent : AppColors.border.withOpacity(0.5)),
+                      boxShadow: isSelected ? [
+                        BoxShadow(color: _accentColor.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 8))
+                      ] : null,
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${date.day} ${months[date.month - 1]}',
-                      style: GoogleFonts.plusJakartaSans(
-                        color: isSelected ? Colors.white : AppColors.textPrimary,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    child: Column(
+                      children: [
+                        Text(
+                          'DAY ${index + 1}',
+                          style: GoogleFonts.plusJakartaSans(
+                            color: isSelected ? Colors.white.withOpacity(0.8) : AppColors.textSecondary,
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${date.day} ${months[date.month - 1]}',
+                          style: GoogleFonts.plusJakartaSans(
+                            color: isSelected ? Colors.white : AppColors.textPrimary,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
         ),
       ),
     );
@@ -357,7 +370,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
     final isFixed = !item.optional;
     final isSelected = _selectedOptionalItems[item.id] ?? item.optional == false;
 
-    return GestureDetector(
+    return _BounceButton(
       onTap: isCustomizable
           ? () {
               setState(() {
@@ -377,11 +390,11 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryOrange.withOpacity(0.05) : AppColors.surface,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: isSelected ? AppColors.primaryOrange : AppColors.border),
+          color: isSelected ? AppColors.primaryOrange.withOpacity(0.08) : AppColors.surface,
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: isSelected ? AppColors.primaryOrange : AppColors.border.withOpacity(0.5), width: isSelected ? 1.5 : 1),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 10))
+            BoxShadow(color: Colors.black.withOpacity(isSelected ? 0.08 : 0.04), blurRadius: 20, offset: const Offset(0, 10))
           ],
         ),
         child: Row(
@@ -390,10 +403,10 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primaryOrange.withOpacity(0.1) : AppColors.background,
-                borderRadius: BorderRadius.circular(16),
+                color: isSelected ? AppColors.primaryOrange.withOpacity(0.12) : AppColors.background,
+                borderRadius: BorderRadius.circular(20),
               ),
-              child: Icon(Icons.hotel_outlined, color: isSelected ? AppColors.primaryOrange : AppColors.textSecondary),
+              child: Icon(Icons.hotel_rounded, color: isSelected ? AppColors.primaryOrange : AppColors.textSecondary),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -406,52 +419,60 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                       Expanded(
                         child: Text(
                           item.name.isNotEmpty ? item.name : 'Stay',
-                          style: GoogleFonts.plusJakartaSans(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 15),
+                          style: GoogleFonts.plusJakartaSans(color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 16),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (isFixed)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
                             color: AppColors.primaryEmerald.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Text('INCLUDED', style: TextStyle(color: AppColors.primaryEmerald, fontSize: 8, fontWeight: FontWeight.bold)),
                         )
                       else if (isSelected)
-                        const Icon(Icons.check_circle, color: AppColors.primaryOrange, size: 20)
+                        const Icon(Icons.check_circle_rounded, color: AppColors.primaryOrange, size: 24)
                       else
-                        Icon(Icons.add_circle_outline, color: AppColors.textSecondary.withOpacity(0.4), size: 20),
+                        Icon(Icons.add_circle_outline_rounded, color: AppColors.textSecondary.withOpacity(0.3), size: 24),
                     ],
                   ),
                   const SizedBox(height: 6),
                   Text(
                     item.description.isNotEmpty ? item.description : 'Accommodation for this night.',
-                    style: const TextStyle(color: AppColors.textSecondary, fontSize: 12, height: 1.4),
+                    style: GoogleFonts.plusJakartaSans(color: AppColors.textSecondary, fontSize: 12, height: 1.4),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                   Row(
                     children: [
-                      Icon(Icons.calendar_today_outlined, size: 12, color: AppColors.textSecondary.withOpacity(0.5)),
-                      const SizedBox(width: 6),
-                      Text(
-                        '${date.day}/${date.month}/${date.year}',
-                        style: TextStyle(color: AppColors.textSecondary.withOpacity(0.6), fontSize: 11),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(8)),
+                        child: Row(
+                          children: [
+                            Icon(Icons.calendar_today_rounded, size: 10, color: AppColors.textSecondary.withOpacity(0.6)),
+                            const SizedBox(width: 6),
+                            Text(
+                              '${date.day}/${date.month}',
+                              style: TextStyle(color: AppColors.textSecondary.withOpacity(0.8), fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
                       ),
                       const Spacer(),
                       if (item.price > 0)
                         Text(
                           item.optional ? '+Rs${item.price}' : 'Rs${item.price}',
-                          style: GoogleFonts.plusJakartaSans(color: isFixed ? AppColors.textSecondary : AppColors.primaryOrange, fontSize: 12, fontWeight: FontWeight.bold),
+                          style: GoogleFonts.plusJakartaSans(color: isFixed ? AppColors.textSecondary : AppColors.primaryOrange, fontSize: 14, fontWeight: FontWeight.bold),
                         )
                       else
                         const Text(
                           'Included',
-                          style: TextStyle(color: AppColors.primaryEmerald, fontSize: 11, fontWeight: FontWeight.w600),
+                          style: TextStyle(color: AppColors.primaryEmerald, fontSize: 12, fontWeight: FontWeight.bold),
                         ),
                     ],
                   ),
@@ -928,69 +949,139 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
   }
   
   Widget _buildStickyFooter() {
+    final totalPrice = _calculateTotalPrice();
+    final description = widget.isPublic ? 'Fixed Expedition Price' : _buildPriceDescription();
+    
     return Positioned(
       bottom: 0,
       left: 0,
       right: 0,
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(24, 20, 24, 34),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 30, offset: const Offset(0, -10))
-          ],
-          border: Border.all(color: AppColors.border.withOpacity(0.5)),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
+      child: ClipRRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 34),
+            decoration: BoxDecoration(
+              color: AppColors.background.withOpacity(0.8),
+              border: Border(top: BorderSide(color: AppColors.border.withOpacity(0.5))),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Row(
                 children: [
-                  const Text(
-                    'ESTIMATED TOTAL',
-                    style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'ESTIMATED TOTAL',
+                          style: GoogleFonts.plusJakartaSans(
+                            color: AppColors.textSecondary,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        TweenAnimationBuilder<double>(
+                          tween: Tween<double>(begin: 0, end: totalPrice.toDouble()),
+                          duration: const Duration(milliseconds: 500),
+                          builder: (context, value, child) {
+                            return Text(
+                              'Rs${value.toInt()}',
+                              style: GoogleFonts.plusJakartaSans(
+                                color: AppColors.textPrimary,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          description,
+                          style: GoogleFonts.plusJakartaSans(
+                            color: widget.isPublic ? AppColors.textSecondary : AppColors.primaryEmerald,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${widget.package.currency} ${_calculateTotalPrice()}',
-                    style: GoogleFonts.plusJakartaSans(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    widget.isPublic ? 'Fixed Expedition Price' : _buildPriceDescription(),
-                    style: TextStyle(color: widget.isPublic ? AppColors.textSecondary : AppColors.primaryEmerald, fontSize: 10, fontWeight: FontWeight.w600),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: CommonButton(
+                      text: 'Review Trip',
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ReviewTripScreen(
+                              package: widget.package,
+                              isPublic: widget.isPublic,
+                              startDate: widget.startDate,
+                              selectedOptionalItems: _selectedOptionalItems,
+                              travelers: widget.travelers,
+                              scheduleId: widget.scheduleId,
+                            ),
+                          ),
+                        );
+                      },
+                      borderRadius: 20,
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: CommonButton(
-                text: 'Review Trip',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ReviewTripScreen(
-                        package: widget.package,
-                        isPublic: widget.isPublic,
-                        startDate: widget.startDate,
-                        selectedOptionalItems: _selectedOptionalItems,
-                        travelers: widget.travelers,
-                        scheduleId: widget.scheduleId,
-                      ),
-                    ),
-                  );
-                },
-                borderRadius: 20,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
+    );
+  }
+}
+
+// Boing Physics Button
+class _BounceButton extends StatefulWidget {
+  final Widget child;
+  final VoidCallback? onTap;
+
+  const _BounceButton({required this.child, this.onTap});
+
+  @override
+  State<_BounceButton> createState() => _BounceButtonState();
+}
+
+class _BounceButtonState extends State<_BounceButton> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 150));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => _controller.forward(),
+      onTapUp: (_) {
+       _controller.reverse();
+       if (widget.onTap != null) widget.onTap!();
+      },
+      onTapCancel: () => _controller.reverse(),
+      child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
     );
   }
 }

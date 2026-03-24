@@ -1,6 +1,7 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:swift_trip_app/models/package_model.dart';
 import '../config/api_config.dart';
 import '../theme/app_colors.dart';
@@ -38,9 +39,16 @@ class _AgencySelectionState extends State<AgencySelection> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(color: AppColors.background.withOpacity(0.7)),
+          ),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
@@ -49,18 +57,18 @@ class _AgencySelectionState extends State<AgencySelection> {
           children: [
             Text(
               '${widget.destination} ${widget.isPublic ? 'Public' : 'Private'} Tours',
-              style: const TextStyle(
+              style: GoogleFonts.plusJakartaSans(
                 color: AppColors.textPrimary,
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
               '${widget.dates} • ${widget.travelers} travelers',
-              style: const TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
+              style: GoogleFonts.plusJakartaSans(
+                color: AppColors.textSecondary.withOpacity(0.7),
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
@@ -68,14 +76,14 @@ class _AgencySelectionState extends State<AgencySelection> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.tune, color: AppColors.textPrimary),
+            icon: const Icon(Icons.tune_rounded, color: AppColors.textPrimary),
             onPressed: () {},
           ),
         ],
       ),
       body: Column(
         children: [
-          const SizedBox(height: 8),
+          SizedBox(height: MediaQuery.of(context).padding.top + kToolbarHeight + 12),
           _buildFilterBar(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -288,403 +296,256 @@ class _AgencySelectionState extends State<AgencySelection> {
     final pricingUnit = packageIsPublic ? '/ person' : '/ group';
     final priceText = _formatPrice(price, currency);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(20),
-                ),
-                child: Image.network(
-                  imageUrl,
-                  height: 200,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.4),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              // Availability Badge
-              Positioned(
-                top: 12,
-                left: 12,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: BackdropFilter(
-                    filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: packageIsPublic
-                            ? AppColors.background.withOpacity(0.6)
-                            : Colors.purple.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: packageIsPublic
-                                  ? Colors.green
-                                  : Colors.purpleAccent,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            packageIsPublic
-                                ? 'PUBLIC AVAILABLE'
-                                : 'PRIVATE AVAILABLE',
-                            style: const TextStyle(
-                              color: AppColors.textPrimary,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              // Duration Badge
-              Positioned(
-                bottom: 12,
-                left: 12,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: BackdropFilter(
-                    filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.schedule,
-                            color: Colors.white,
-                            size: 14,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            duration,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return _BounceButton(
+      onTap: () async {
+                           CustomizeItineraryModel? packageDetails;
+
+                           showDialog(
+                             context: context,
+                             barrierDismissible: false,
+                             builder: (context) => const Center(
+                               child: CircularProgressIndicator(),
+                             ),
+                           );
+
+                           try {
+                             final packageService = PackageService();
+                             final response =
+                                 await packageService.getPackageDetailsWithItinerary(
+                               packageResult.id,
+                             );
+
+                             Navigator.pop(context); // Close loading dialog
+
+                             if (response != null && response.success) {
+                               packageDetails = response.data;
+                             } else {
+                               ScaffoldMessenger.of(context).showSnackBar(
+                                 const SnackBar(
+                                   content: Text('Failed to load package details'),
+                                   backgroundColor: Colors.red,
+                                 ),
+                               );
+                               return;
+                             }
+                           } catch (e) {
+                             Navigator.pop(context); // Close loading dialog
+                             ScaffoldMessenger.of(context).showSnackBar(
+                               SnackBar(
+                                 content: Text('Error: ${e.toString()}'),
+                                 backgroundColor: Colors.red,
+                               ),
+                             );
+                             return;
+                           }
+
+
+                           final details = packageDetails;
+
+                           Navigator.push(
+                             context,
+                             MaterialPageRoute(
+                               builder: (context) => PackageDetailsScreen(
+                                 isPublic: packageIsPublic,
+                                 customizeItinerary: details,
+                                 travelers: widget.travelers,
+                                 publicScheduleId: packageIsPublic
+                                   ? int.tryParse(
+                                     packageResult.nextDeparture?['id']
+                                         ?.toString() ??
+                                       '',
+                                     )
+                                   : null,
+                                 fixedStartDate: packageIsPublic
+                                     ? DateTime.tryParse(
+                                         packageResult
+                                                 .nextDeparture?['departureDate']
+                                                 ?.toString() ??
+                                             '',
+                                       )
+                                     : null,
+                               ),
+                             ),
+                           );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: AppColors.border.withOpacity(0.5)),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 24, offset: const Offset(0, 12))
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            style: const TextStyle(
-                              color: AppColors.textPrimary,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.store,
-                                size: 14,
-                                color: AppColors.textSecondary,
-                              ),
-                              const SizedBox(width: 4),
-                              Expanded(
-                                child: Text(
-                                  agencyName,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: AppColors.textSecondary,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.location_on,
-                                color: AppColors.textSecondary,
-                                size: 14,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                locations,
-                                style: const TextStyle(
-                                  color: AppColors.textSecondary,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.yellow.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.star,
-                                color: Colors.yellow,
-                                size: 14,
-                              ),
-                              const SizedBox(width: 2),
-                              Text(
-                                rating.toString(),
-                                style: const TextStyle(
-                                  color: Colors.yellow,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Text(
-                          '($reviews reviews)',
-                          style: const TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                  child: Image.network(
+                    imageUrl,
+                    height: 220,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 4,
-                  children: tags
-                      .map(
-                        (tag) => Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: packageIsPublic
-                                ? Colors.blue.withOpacity(0.1)
-                                : Colors.deepPurple.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            tag,
-                            style: TextStyle(
-                              color: packageIsPublic
-                                  ? Colors.blue
-                                  : Colors.purpleAccent,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      )
-                      .toList(),
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.transparent, Colors.black.withOpacity(0.6)],
+                      ),
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 16),
-                const Divider(color: AppColors.border),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 4,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'PACKAGE PRICE',
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
+                Positioned(
+                  top: 16,
+                  left: 16,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: BackdropFilter(
+                      filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: (packageIsPublic ? AppColors.textEmerald : AppColors.textOrange).withOpacity(0.2),
+                          border: Border.all(color: Colors.white.withOpacity(0.2)),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(width: 6, height: 6, decoration: BoxDecoration(color: packageIsPublic ? AppColors.textEmerald : AppColors.textOrange, shape: BoxShape.circle)),
+                            const SizedBox(width: 8),
+                            Text(
+                              packageIsPublic ? 'PUBLIC TOUR' : 'PRIVATE REQUEST',
+                              style: GoogleFonts.plusJakartaSans(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                             ),
-                          ),
-                          const SizedBox(height: 2),
-                          FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.centerLeft,
-                            child: Row(
-                              children: [
-                                Text(
-                                  priceText,
-                                  style: const TextStyle(
-                                    color: AppColors.accent,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  ' $pricingUnit',
-                                  style: const TextStyle(
-                                    color: AppColors.textSecondary,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      flex: 5,
-                      child: CommonButton(
-                        text: buttonText,
-                        fontSize: 13,
-                        height: 40,
-                        onPressed: () async {
-                          CustomizeItineraryModel? packageDetails;
-
-                          showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (context) => const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
-
-                          try {
-                            final packageService = PackageService();
-                            final response =
-                                await packageService.getPackageDetailsWithItinerary(
-                              packageResult.id,
-                            );
-
-                            Navigator.pop(context); // Close loading dialog
-
-                            if (response != null && response.success) {
-                              packageDetails = response.data;
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Failed to load package details'),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                              return;
-                            }
-                          } catch (e) {
-                            Navigator.pop(context); // Close loading dialog
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Error: ${e.toString()}'),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                            return;
-                          }
-
-
-                          final details = packageDetails;
-
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PackageDetailsScreen(
-                                isPublic: packageIsPublic,
-                                customizeItinerary: details,
-                                travelers: widget.travelers,
-                                publicScheduleId: packageIsPublic
-                                  ? int.tryParse(
-                                    packageResult.nextDeparture?['id']
-                                        ?.toString() ??
-                                      '',
-                                    )
-                                  : null,
-                                fixedStartDate: packageIsPublic
-                                    ? DateTime.tryParse(
-                                        packageResult
-                                                .nextDeparture?['departureDate']
-                                                ?.toString() ??
-                                            '',
-                                      )
-                                    : null,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              style: GoogleFonts.plusJakartaSans(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              agencyName,
+                              style: GoogleFonts.plusJakartaSans(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(color: Colors.amber.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.star_rounded, color: Colors.amber, size: 16),
+                            const SizedBox(width: 4),
+                            Text(rating.toString(), style: GoogleFonts.plusJakartaSans(color: Colors.amber, fontSize: 12, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('PACKAGE PRICE', style: GoogleFonts.plusJakartaSans(color: AppColors.textSecondary, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+                            const SizedBox(height: 4),
+                            RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(text: priceText, style: GoogleFonts.plusJakartaSans(color: AppColors.accent, fontSize: 20, fontWeight: FontWeight.bold)),
+                                  TextSpan(text: ' $pricingUnit', style: GoogleFonts.plusJakartaSans(color: AppColors.textSecondary, fontSize: 11)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        decoration: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 6))]),
+                        child: Text(buttonText, style: GoogleFonts.plusJakartaSans(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+}
+
+// Boing Physics Button
+class _BounceButton extends StatefulWidget {
+  final Widget child;
+  final VoidCallback? onTap;
+
+  const _BounceButton({required this.child, this.onTap});
+
+  @override
+  State<_BounceButton> createState() => _BounceButtonState();
+}
+
+class _BounceButtonState extends State<_BounceButton> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 150));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => _controller.forward(),
+      onTapUp: (_) {
+       _controller.reverse();
+       if (widget.onTap != null) widget.onTap!();
+      },
+      onTapCancel: () => _controller.reverse(),
+      child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
     );
   }
 }

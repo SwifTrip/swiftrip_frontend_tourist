@@ -23,6 +23,8 @@ class _SignupScreenState extends State<SignupScreen> {
   late final TextEditingController _passwordController;
   late final TextEditingController _confirmPasswordController;
   bool _isLoading = false;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   // Service
   final AuthService _authService = AuthService();
@@ -260,11 +262,12 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                       child: Column(
                         children: [
-                          CustomTextFormField(
+                           CustomTextFormField(
                             controller: _passwordController,
                             hintText: 'Password',
                             icon: Icons.lock_outline,
-                            obscureText: true,
+                            obscureText: _obscurePassword,
+                            onToggleVisibility: () => setState(() => _obscurePassword = !_obscurePassword),
                             validator: (value) {
                               if (value == null || value.isEmpty) return 'Required';
                               return null;
@@ -275,7 +278,8 @@ class _SignupScreenState extends State<SignupScreen> {
                             controller: _confirmPasswordController,
                             hintText: 'Confirm Password',
                             icon: Icons.lock_outline,
-                            obscureText: true,
+                            obscureText: _obscureConfirmPassword,
+                            onToggleVisibility: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
                             validator: (value) {
                               if (value != _passwordController.text) return 'Mismatch';
                               return null;
@@ -313,7 +317,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           },
                           child: const Text('Sign In', 
                             style: TextStyle(
-                              color: AppColors.primaryEmerald, 
+                              color: AppColors.textEmerald, 
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                             )),
@@ -339,6 +343,7 @@ class CustomTextFormField extends StatelessWidget {
   final TextEditingController? controller;
   final String? Function(String?)? validator;
   final TextInputType? inputType;
+  final VoidCallback? onToggleVisibility;
 
   const CustomTextFormField({
     super.key,
@@ -348,6 +353,7 @@ class CustomTextFormField extends StatelessWidget {
     this.controller,
     this.validator,
     this.inputType,
+    this.onToggleVisibility,
   });
 
   @override
@@ -360,6 +366,12 @@ class CustomTextFormField extends StatelessWidget {
       validator: validator,
       decoration: InputDecoration(
         prefixIcon: Icon(icon, color: AppColors.textSecondary, size: 20),
+        suffixIcon: onToggleVisibility != null 
+          ? IconButton(
+              icon: Icon(obscureText ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 20, color: AppColors.textSecondary),
+              onPressed: onToggleVisibility,
+            )
+          : null,
         hintText: hintText,
         hintStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 15),
         filled: true,
