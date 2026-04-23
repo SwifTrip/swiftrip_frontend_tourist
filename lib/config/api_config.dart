@@ -16,7 +16,7 @@ class ApiConfig {
 
   static const String getPackages = '$baseUrl/agency';
 
-// Custom Tour Endpoints
+  // Custom Tour Endpoints
   static const String createCustomTour = '$baseUrl/custom-tour/create';
   static const String touristCustomTours = '$baseUrl/tourist/custom-tours';
 
@@ -25,6 +25,9 @@ class ApiConfig {
 
   // Tourist Package Search Endpoints (Public)
   static const String searchPackages = '$baseUrl/tourist/packages/search';
+  static const String trendingPackages = '$baseUrl/tourist/packages/trending';
+  static const String planningSuggestions =
+      '$baseUrl/tourist/planning/suggestions';
   static const String touristPackages = '$baseUrl/tourist/packages';
 
   // Tourist Bookings Endpoints
@@ -37,7 +40,8 @@ class ApiConfig {
   // Chat Endpoints
   static const String chatSocket = 'http://localhost:3000'; // Socket Server URL
   static const String myChatRooms = '$baseUrl/chat/rooms';
-  static String chatMessages(String roomId) => '$baseUrl/chat/rooms/$roomId/messages';
+  static String chatMessages(String roomId) =>
+      '$baseUrl/chat/rooms/$roomId/messages';
 
   // Request timeout duration
   static const Duration timeout = Duration(seconds: 30);

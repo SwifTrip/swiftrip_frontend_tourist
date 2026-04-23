@@ -5,6 +5,59 @@ import '../models/search_result.dart';
 import '../models/package_model.dart';
 
 class PackageService {
+  Future<Map<String, dynamic>?> getPlanningSuggestions({int limit = 8}) async {
+    try {
+      final uri = Uri.parse(
+        ApiConfig.planningSuggestions,
+      ).replace(queryParameters: {'limit': limit.toString()});
+
+      final response = await http
+          .get(uri, headers: {'Content-Type': 'application/json'})
+          .timeout(ApiConfig.timeout);
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return responseData['data'] as Map<String, dynamic>?;
+      }
+
+      print(
+        'Planning suggestions error: ${response.statusCode} - ${response.body}',
+      );
+      return null;
+    } catch (e) {
+      print('Planning suggestions request error: ${e.toString()}');
+      return null;
+    }
+  }
+
+  Future<agencyResult?> getTrendingPackages({int limit = 8}) async {
+    try {
+      final uri = Uri.parse(
+        ApiConfig.trendingPackages,
+      ).replace(queryParameters: {'limit': limit.toString()});
+
+      final response = await http
+          .get(uri, headers: {'Content-Type': 'application/json'})
+          .timeout(ApiConfig.timeout);
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        return agencyResult.fromJson(responseData);
+      }
+
+      print(
+        'Trending packages error: ${response.statusCode} - ${response.body}',
+      );
+      return null;
+    } on http.ClientException catch (e) {
+      print('Connection error: ${e.message}');
+      return null;
+    } catch (e) {
+      print('Trending request error: ${e.toString()}');
+      return null;
+    }
+  }
+
   Future<agencyResult?> searchPackages({
     String? fromLocation,
     String? toLocation,
@@ -57,7 +110,6 @@ class PackageService {
           .get(uri, headers: {'Content-Type': 'application/json'})
           .timeout(ApiConfig.timeout);
 
-
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         // Success - parse into agencyResult model
@@ -78,7 +130,8 @@ class PackageService {
 
   /// Get package details by ID with full itinerary
   Future<PackageDetailsResponse?> getPackageDetailsWithItinerary(
-      int packageId) async {
+    int packageId,
+  ) async {
     try {
       final response = await http
           .get(
