@@ -8,6 +8,7 @@ class PublicTourService {
     required int scheduleId,
     required int travelerCount,
     required List<Map<String, dynamic>> itineraries,
+    bool allowWaitlistRequest = false,
   }) async {
     try {
       final token = await TokenService.getToken();
@@ -20,6 +21,7 @@ class PublicTourService {
         'scheduleId': scheduleId,
         'travelerCount': travelerCount,
         'itineraries': itineraries,
+        'allowWaitlistRequest': allowWaitlistRequest,
       };
 
       final response = await http
@@ -50,7 +52,8 @@ class PublicTourService {
     } on http.ClientException catch (e) {
       return {
         'success': false,
-        'message': 'Connection error. Please check your internet connection. ${e.toString()}',
+        'message':
+            'Connection error. Please check your internet connection. ${e.toString()}',
       };
     } catch (e) {
       return {

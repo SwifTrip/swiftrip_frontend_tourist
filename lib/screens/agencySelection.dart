@@ -1,3 +1,5 @@
+// ignore_for_file: file_names, deprecated_member_use
+
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
@@ -5,7 +7,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:swift_trip_app/models/package_model.dart';
 import '../config/api_config.dart';
 import '../theme/app_colors.dart';
-import '../widgets/common_button.dart';
 import '../models/search_result.dart';
 import '../services/package_service.dart';
 import 'package_details_screen.dart';
@@ -34,6 +35,17 @@ class AgencySelection extends StatefulWidget {
 
 class _AgencySelectionState extends State<AgencySelection> {
   String _activeFilter = 'Recommended';
+
+  Color _tagColor(int index) {
+    const colors = [
+      AppColors.primaryOrange,
+      AppColors.accentTeal,
+      AppColors.accentBlue,
+      AppColors.accentViolet,
+      AppColors.accentRose,
+    ];
+    return colors[index % colors.length];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,15 +88,24 @@ class _AgencySelectionState extends State<AgencySelection> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.tune_rounded, color: AppColors.textPrimary),
+            icon: const Icon(
+              Icons.tune_rounded,
+              color: AppColors.primaryOrange,
+            ),
             onPressed: () {},
           ),
         ],
       ),
       body: Column(
         children: [
-          SizedBox(height: MediaQuery.of(context).padding.top + kToolbarHeight + 12),
+          SizedBox(
+            height: MediaQuery.of(context).padding.top + kToolbarHeight + 12,
+          ),
           _buildFilterBar(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: _buildBookingModeGuideCard(),
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
@@ -125,8 +146,9 @@ class _AgencySelectionState extends State<AgencySelection> {
                       final rawImage = pkg.coverImage?.isNotEmpty == true
                           ? pkg.coverImage!
                           : 'https://placehold.co/600x400/png?text=Tour+Package';
-                          
-                      final String coverImage = (kIsWeb && rawImage.startsWith('http'))
+
+                      final String coverImage =
+                          (kIsWeb && rawImage.startsWith('http'))
                           ? '${ApiConfig.chatSocket}/proxy-image?url=${Uri.encodeComponent(rawImage)}'
                           : rawImage;
                       final from = pkg.fromLocation;
@@ -138,7 +160,6 @@ class _AgencySelectionState extends State<AgencySelection> {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 20),
                         child: _buildTourCard(
-                          context: context,
                           title: pkg.title,
                           agencyName: agencyName,
                           locations: locations,
@@ -221,9 +242,16 @@ class _AgencySelectionState extends State<AgencySelection> {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
-          _buildFilterChip('Recommended', isActive: _activeFilter == 'Recommended', hasDropdown: true),
+          _buildFilterChip(
+            'Recommended',
+            isActive: _activeFilter == 'Recommended',
+            hasDropdown: true,
+          ),
           const SizedBox(width: 8),
-          _buildFilterChip('Price: Low to High', isActive: _activeFilter == 'Price: Low to High'),
+          _buildFilterChip(
+            'Price: Low to High',
+            isActive: _activeFilter == 'Price: Low to High',
+          ),
           const SizedBox(width: 8),
           _buildFilterChip('Duration', isActive: _activeFilter == 'Duration'),
         ],
@@ -277,7 +305,6 @@ class _AgencySelectionState extends State<AgencySelection> {
   }
 
   Widget _buildTourCard({
-    required BuildContext context,
     required String title,
     required String agencyName,
     required String locations,
@@ -292,81 +319,91 @@ class _AgencySelectionState extends State<AgencySelection> {
     required TourPackageResult packageResult,
     bool isPopular = false,
   }) {
-    final buttonText = packageIsPublic ? 'View Details' : 'Choose Start Date';
+    final buttonText = packageIsPublic
+        ? 'Check Seats & Details'
+        : 'Choose Dates & Details';
     final pricingUnit = packageIsPublic ? '/ person' : '/ group';
     final priceText = _formatPrice(price, currency);
+    final nextDepartureId = packageIsPublic
+        ? int.tryParse(packageResult.nextDeparture?['id']?.toString() ?? '')
+        : null;
+    final nextDepartureDate = packageIsPublic
+        ? DateTime.tryParse(
+            packageResult.nextDeparture?['departureDate']?.toString() ?? '',
+          )
+        : null;
 
     return _BounceButton(
       onTap: () async {
-                           CustomizeItineraryModel? packageDetails;
+        final currentContext = context;
+        if (packageIsPublic &&
+            (nextDepartureId == null || nextDepartureDate == null)) {
+          ScaffoldMessenger.of(currentContext).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'This public package has no active departure schedule yet. Please choose another departure.',
+              ),
+              backgroundColor: Colors.orange,
+            ),
+          );
+          return;
+        }
 
-                           showDialog(
-                             context: context,
-                             barrierDismissible: false,
-                             builder: (context) => const Center(
-                               child: CircularProgressIndicator(),
-                             ),
-                           );
+        CustomizeItineraryModel? packageDetails;
 
-                           try {
-                             final packageService = PackageService();
-                             final response =
-                                 await packageService.getPackageDetailsWithItinerary(
-                               packageResult.id,
-                             );
+        showDialog(
+          context: currentContext,
+          barrierDismissible: false,
+          builder: (_) => const Center(child: CircularProgressIndicator()),
+        );
 
-                             Navigator.pop(context); // Close loading dialog
+        try {
+          final packageService = PackageService();
+          final response = await packageService.getPackageDetailsWithItinerary(
+            packageResult.id,
+          );
 
-                             if (response != null && response.success) {
-                               packageDetails = response.data;
-                             } else {
-                               ScaffoldMessenger.of(context).showSnackBar(
-                                 const SnackBar(
-                                   content: Text('Failed to load package details'),
-                                   backgroundColor: Colors.red,
-                                 ),
-                               );
-                               return;
-                             }
-                           } catch (e) {
-                             Navigator.pop(context); // Close loading dialog
-                             ScaffoldMessenger.of(context).showSnackBar(
-                               SnackBar(
-                                 content: Text('Error: ${e.toString()}'),
-                                 backgroundColor: Colors.red,
-                               ),
-                             );
-                             return;
-                           }
+          if (!currentContext.mounted) return;
+          Navigator.pop(currentContext); // Close loading dialog
 
+          if (response != null && response.success) {
+            packageDetails = response.data;
+          } else {
+            ScaffoldMessenger.of(currentContext).showSnackBar(
+              const SnackBar(
+                content: Text('Failed to load package details'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            return;
+          }
+        } catch (e) {
+          if (!currentContext.mounted) return;
+          Navigator.pop(currentContext); // Close loading dialog
+          ScaffoldMessenger.of(currentContext).showSnackBar(
+            SnackBar(
+              content: Text('Error: ${e.toString()}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
 
-                           final details = packageDetails;
+        final details = packageDetails;
 
-                           Navigator.push(
-                             context,
-                             MaterialPageRoute(
-                               builder: (context) => PackageDetailsScreen(
-                                 isPublic: packageIsPublic,
-                                 customizeItinerary: details,
-                                 travelers: widget.travelers,
-                                 publicScheduleId: packageIsPublic
-                                   ? int.tryParse(
-                                     packageResult.nextDeparture?['id']
-                                         ?.toString() ??
-                                       '',
-                                     )
-                                   : null,
-                                 fixedStartDate: packageIsPublic
-                                     ? DateTime.tryParse(
-                                         packageResult
-                                                 .nextDeparture?['departureDate']
-                                                 ?.toString() ??
-                                             '',
-                                       )
-                                     : null,
-                               ),
-                             ),
-                           );
+        if (!currentContext.mounted) return;
+        Navigator.push(
+          currentContext,
+          MaterialPageRoute(
+            builder: (context) => PackageDetailsScreen(
+              isPublic: packageIsPublic,
+              customizeItinerary: details,
+              travelers: widget.travelers,
+              publicScheduleId: packageIsPublic ? nextDepartureId : null,
+              fixedStartDate: packageIsPublic ? nextDepartureDate : null,
+            ),
+          ),
+        );
       },
       child: Container(
         decoration: BoxDecoration(
@@ -374,7 +411,11 @@ class _AgencySelectionState extends State<AgencySelection> {
           borderRadius: BorderRadius.circular(28),
           border: Border.all(color: AppColors.border.withOpacity(0.5)),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 24, offset: const Offset(0, 12))
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 24,
+              offset: const Offset(0, 12),
+            ),
           ],
         ),
         child: Column(
@@ -383,7 +424,9 @@ class _AgencySelectionState extends State<AgencySelection> {
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(28),
+                  ),
                   child: Image.network(
                     imageUrl,
                     height: 220,
@@ -397,7 +440,10 @@ class _AgencySelectionState extends State<AgencySelection> {
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        colors: [Colors.transparent, Colors.black.withOpacity(0.6)],
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.6),
+                        ],
                       ),
                     ),
                   ),
@@ -410,19 +456,44 @@ class _AgencySelectionState extends State<AgencySelection> {
                     child: BackdropFilter(
                       filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
-                          color: (packageIsPublic ? AppColors.textEmerald : AppColors.textOrange).withOpacity(0.2),
-                          border: Border.all(color: Colors.white.withOpacity(0.2)),
+                          color:
+                              (packageIsPublic
+                                      ? AppColors.textEmerald
+                                      : AppColors.textOrange)
+                                  .withOpacity(0.2),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.2),
+                          ),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
                           children: [
-                            Container(width: 6, height: 6, decoration: BoxDecoration(color: packageIsPublic ? AppColors.textEmerald : AppColors.textOrange, shape: BoxShape.circle)),
+                            Container(
+                              width: 6,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: packageIsPublic
+                                    ? AppColors.textEmerald
+                                    : AppColors.textOrange,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
                             const SizedBox(width: 8),
                             Text(
-                              packageIsPublic ? 'PUBLIC TOUR' : 'PRIVATE REQUEST',
-                              style: GoogleFonts.plusJakartaSans(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                              packageIsPublic
+                                  ? 'PUBLIC TOUR'
+                                  : 'PRIVATE REQUEST',
+                              style: GoogleFonts.plusJakartaSans(
+                                color: Colors.white,
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
                             ),
                           ],
                         ),
@@ -446,43 +517,155 @@ class _AgencySelectionState extends State<AgencySelection> {
                           children: [
                             Text(
                               title,
-                              style: GoogleFonts.plusJakartaSans(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
+                              style: GoogleFonts.plusJakartaSans(
+                                color: AppColors.textPrimary,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               agencyName,
-                              style: GoogleFonts.plusJakartaSans(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w600),
+                              style: GoogleFonts.plusJakartaSans(
+                                color: AppColors.textSecondary,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ],
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        decoration: BoxDecoration(color: Colors.amber.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.amber.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                         child: Row(
                           children: [
-                            const Icon(Icons.star_rounded, color: Colors.amber, size: 16),
+                            const Icon(
+                              Icons.star_rounded,
+                              color: Colors.amber,
+                              size: 16,
+                            ),
                             const SizedBox(width: 4),
-                            Text(rating.toString(), style: GoogleFonts.plusJakartaSans(color: Colors.amber, fontSize: 12, fontWeight: FontWeight.bold)),
+                            Text(
+                              rating.toString(),
+                              style: GoogleFonts.plusJakartaSans(
+                                color: Colors.amber,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
+                  if (tags.isNotEmpty) ...[
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: tags.take(4).toList().asMap().entries.map((
+                        entry,
+                      ) {
+                        final color = _tagColor(
+                          entry.key + (packageIsPublic ? 0 : 2),
+                        );
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: color.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(color: color.withOpacity(0.25)),
+                          ),
+                          child: Text(
+                            entry.value,
+                            style: GoogleFonts.plusJakartaSans(
+                              color: color,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 14),
+                  ],
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color:
+                          (packageIsPublic
+                                  ? AppColors.accentBlue
+                                  : AppColors.primaryEmerald)
+                              .withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color:
+                            (packageIsPublic
+                                    ? AppColors.accentBlue
+                                    : AppColors.primaryEmerald)
+                                .withOpacity(0.2),
+                      ),
+                    ),
+                    child: Text(
+                      packageIsPublic
+                          ? 'Public flow: fixed departure date, seat availability checked live.'
+                          : 'Private flow: choose your own dates and tailor the itinerary.',
+                      style: GoogleFonts.plusJakartaSans(
+                        color: AppColors.textSecondary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
                   Row(
                     children: [
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('PACKAGE PRICE', style: GoogleFonts.plusJakartaSans(color: AppColors.textSecondary, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+                            Text(
+                              'PACKAGE PRICE',
+                              style: GoogleFonts.plusJakartaSans(
+                                color: AppColors.textSecondary,
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
                             const SizedBox(height: 4),
                             RichText(
                               text: TextSpan(
                                 children: [
-                                  TextSpan(text: priceText, style: GoogleFonts.plusJakartaSans(color: AppColors.accent, fontSize: 20, fontWeight: FontWeight.bold)),
-                                  TextSpan(text: ' $pricingUnit', style: GoogleFonts.plusJakartaSans(color: AppColors.textSecondary, fontSize: 11)),
+                                  TextSpan(
+                                    text: priceText,
+                                    style: GoogleFonts.plusJakartaSans(
+                                      color: AppColors.accent,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: ' $pricingUnit',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      color: AppColors.textSecondary,
+                                      fontSize: 11,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -490,9 +673,33 @@ class _AgencySelectionState extends State<AgencySelection> {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        decoration: BoxDecoration(color: AppColors.accent, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: AppColors.accent.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 6))]),
-                        child: Text(buttonText, style: GoogleFonts.plusJakartaSans(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: AppColors.premiumActionGradient,
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primaryOrange.withOpacity(0.25),
+                              blurRadius: 12,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          buttonText,
+                          style: GoogleFonts.plusJakartaSans(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -501,6 +708,69 @@ class _AgencySelectionState extends State<AgencySelection> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildBookingModeGuideCard() {
+    final tone = widget.isPublic
+        ? AppColors.accentBlue
+        : AppColors.primaryEmerald;
+    final icon = widget.isPublic
+        ? Icons.event_seat_outlined
+        : Icons.auto_fix_high_rounded;
+    final title = widget.isPublic
+        ? 'Public Package Results'
+        : 'Private Package Results';
+    final subtitle = widget.isPublic
+        ? 'These tours use fixed departure schedules. Seat availability is checked before booking.'
+        : 'These tours are flexible. You will choose dates and finalize your custom trip before payment.';
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: tone.withOpacity(0.25)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: tone.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: tone, size: 18),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.plusJakartaSans(
+                    color: AppColors.textPrimary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: GoogleFonts.plusJakartaSans(
+                    color: AppColors.textSecondary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -517,17 +787,22 @@ class _BounceButton extends StatefulWidget {
   State<_BounceButton> createState() => _BounceButtonState();
 }
 
-class _BounceButtonState extends State<_BounceButton> with SingleTickerProviderStateMixin {
+class _BounceButtonState extends State<_BounceButton>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 150));
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
     );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
   }
 
   @override
@@ -541,8 +816,8 @@ class _BounceButtonState extends State<_BounceButton> with SingleTickerProviderS
     return GestureDetector(
       onTapDown: (_) => _controller.forward(),
       onTapUp: (_) {
-       _controller.reverse();
-       if (widget.onTap != null) widget.onTap!();
+        _controller.reverse();
+        if (widget.onTap != null) widget.onTap!();
       },
       onTapCancel: () => _controller.reverse(),
       child: ScaleTransition(scale: _scaleAnimation, child: widget.child),

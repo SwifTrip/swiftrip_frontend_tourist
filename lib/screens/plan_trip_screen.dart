@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../services/package_service.dart';
 import '../theme/app_colors.dart';
+import '../widgets/common_button.dart';
 import 'agencySelection.dart';
 
 class PlanTripScreen extends StatefulWidget {
@@ -413,7 +414,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
               const SizedBox(height: 16),
               _inputTile(
                 icon: Icons.my_location_rounded,
-                iconColor: const Color(0xFFFB923C),
+                iconColor: AppColors.accentTeal,
                 title: 'From',
                 value: _fromLocation.isEmpty
                     ? 'Select departure city'
@@ -423,7 +424,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
               const SizedBox(height: 10),
               _inputTile(
                 icon: Icons.location_on_rounded,
-                iconColor: const Color(0xFFEA580C),
+                iconColor: AppColors.accentBlue,
                 title: 'To',
                 value: _toLocation.isEmpty ? 'Select destination' : _toLocation,
                 onTap: () => _showLocationPicker(false),
@@ -432,7 +433,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
               if (_isPublicTrip) ...[
                 _inputTile(
                   icon: Icons.calendar_month_rounded,
-                  iconColor: const Color(0xFFF97316),
+                  iconColor: AppColors.accentViolet,
                   title: 'Start Date',
                   value: _selectedDate == null
                       ? 'Select your preferred departure date'
@@ -622,13 +623,13 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
             width: 34,
             height: 34,
             decoration: BoxDecoration(
-              color: const Color(0xFFF97316).withValues(alpha: 0.14),
+              color: AppColors.accentRose.withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(
               Icons.group_rounded,
               size: 19,
-              color: Color(0xFFF97316),
+              color: AppColors.accentRose,
             ),
           ),
           const SizedBox(width: 10),
@@ -694,37 +695,14 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
   }
 
   Widget _searchCta() {
-    return GestureDetector(
-      onTap: _isLoading ? null : _searchPackages,
-      child: Container(
-        width: double.infinity,
-        height: 52,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          gradient: const LinearGradient(
-            colors: [Color(0xFFEA580C), Color(0xFFF97316)],
-          ),
-        ),
-        child: Center(
-          child: _isLoading
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                )
-              : Text(
-                  _isPublicTrip ? 'Find Public Tours' : 'Find Private Tours',
-                  style: GoogleFonts.plusJakartaSans(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 14,
-                  ),
-                ),
-        ),
-      ),
+    return CommonButton(
+      text: _isPublicTrip ? 'Find Public Tours' : 'Find Private Tours',
+      onPressed: _isLoading ? null : _searchPackages,
+      isEnabled: !_isLoading,
+      isLoading: _isLoading,
+      borderRadius: 14,
+      height: 52,
+      fontSize: 14,
     );
   }
 
@@ -800,7 +778,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
             _buildSuggestionChips(
               label: 'Top destinations',
               items: _suggestedDestinations,
-              chipColor: const Color(0xFFEA580C),
+              chipColor: AppColors.accentBlue,
               onTap: (item) => setState(() => _toLocation = item),
             ),
           ],
@@ -809,7 +787,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
             _buildSuggestionChips(
               label: 'Popular origins',
               items: _suggestedFromLocations,
-              chipColor: const Color(0xFFF97316),
+              chipColor: AppColors.accentTeal,
               onTap: (item) => setState(() => _fromLocation = item),
             ),
           ],
@@ -818,7 +796,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
             _buildSuggestionChips(
               label: 'Hot styles',
               items: _suggestedStyles,
-              chipColor: const Color(0xFFFB923C),
+              chipColor: AppColors.accentViolet,
               onTap: (item) => setState(() => _selectedStyle = item),
             ),
           ],

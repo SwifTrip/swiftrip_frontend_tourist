@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 import '../models/search_result.dart';
@@ -20,17 +21,17 @@ class PackageService {
         return responseData['data'] as Map<String, dynamic>?;
       }
 
-      print(
+      debugPrint(
         'Planning suggestions error: ${response.statusCode} - ${response.body}',
       );
       return null;
     } catch (e) {
-      print('Planning suggestions request error: ${e.toString()}');
+      debugPrint('Planning suggestions request error: ${e.toString()}');
       return null;
     }
   }
 
-  Future<agencyResult?> getTrendingPackages({int limit = 8}) async {
+  Future<AgencyResult?> getTrendingPackages({int limit = 8}) async {
     try {
       final uri = Uri.parse(
         ApiConfig.trendingPackages,
@@ -42,23 +43,23 @@ class PackageService {
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        return agencyResult.fromJson(responseData);
+        return AgencyResult.fromJson(responseData);
       }
 
-      print(
+      debugPrint(
         'Trending packages error: ${response.statusCode} - ${response.body}',
       );
       return null;
     } on http.ClientException catch (e) {
-      print('Connection error: ${e.message}');
+      debugPrint('Connection error: ${e.message}');
       return null;
     } catch (e) {
-      print('Trending request error: ${e.toString()}');
+      debugPrint('Trending request error: ${e.toString()}');
       return null;
     }
   }
 
-  Future<agencyResult?> searchPackages({
+  Future<AgencyResult?> searchPackages({
     String? fromLocation,
     String? toLocation,
     String? category,
@@ -112,18 +113,18 @@ class PackageService {
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        // Success - parse into agencyResult model
-        return agencyResult.fromJson(responseData);
+        // Success - parse into AgencyResult model
+        return AgencyResult.fromJson(responseData);
       } else {
         // Error from server
-        print('Server error: ${response.statusCode} - ${response.body}');
+        debugPrint('Server error: ${response.statusCode} - ${response.body}');
         return null;
       }
     } on http.ClientException catch (e) {
-      print('Connection error: ${e.message}');
+      debugPrint('Connection error: ${e.message}');
       return null;
     } catch (e) {
-      print('Network error: ${e.toString()}');
+      debugPrint('Network error: ${e.toString()}');
       return null;
     }
   }
@@ -146,15 +147,15 @@ class PackageService {
         if (responseData['success'] == true) {
           return PackageDetailsResponse.fromJson(responseData);
         } else {
-          print('API returned success: false');
+          debugPrint('API returned success: false');
           return null;
         }
       } else {
-        print('Server error: ${response.statusCode} - ${response.body}');
+        debugPrint('Server error: ${response.statusCode} - ${response.body}');
         return null;
       }
     } catch (e) {
-      print('Network error: ${e.toString()}');
+      debugPrint('Network error: ${e.toString()}');
       return null;
     }
   }
@@ -185,6 +186,44 @@ class PackageService {
       }
     } catch (e) {
       return {'success': false, 'message': 'Network error: ${e.toString()}'};
+    }
+  }
+
+  /// Get live seat availability and booking policy for a specific schedule.
+  Future<Map<String, dynamic>> getScheduleAvailability(
+    int scheduleId, {
+    int travelers = 1,
+  }) async {
+    try {
+      final uri = Uri.parse(
+        ApiConfig.touristScheduleAvailability(scheduleId.toString()),
+      ).replace(queryParameters: {'travelers': travelers.toString()});
+
+      final response = await http
+          .get(uri, headers: {'Content-Type': 'application/json'})
+          .timeout(ApiConfig.timeout);
+
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'data': responseData['data'] ?? {},
+          'message': 'Availability retrieved successfully',
+        };
+      }
+
+      return {
+        'success': false,
+        'message': responseData['message'] ?? 'Failed to get availability',
+        'data': {},
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Network error: ${e.toString()}',
+        'data': {},
+      };
     }
   }
 

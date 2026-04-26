@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:swift_trip_app/models/package_model.dart';
@@ -37,7 +39,6 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
       _isDayExpanded.add(i == 0);
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +98,8 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                     children: [
                       const SizedBox(height: 24),
                       _buildInfoGrid(),
+                      const SizedBox(height: 16),
+                      _buildFlowSummaryCard(),
                       const SizedBox(height: 32),
                       _buildOverview(),
                       const SizedBox(height: 32),
@@ -127,7 +130,7 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
             color: Colors.black.withOpacity(0.04),
             blurRadius: 20,
             offset: const Offset(0, 10),
-          )
+          ),
         ],
         border: Border.all(color: AppColors.border),
       ),
@@ -136,7 +139,11 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.check_circle, color: AppColors.primaryEmerald, size: 20),
+              const Icon(
+                Icons.check_circle,
+                color: AppColors.primaryEmerald,
+                size: 20,
+              ),
               const SizedBox(width: 10),
               Text(
                 'What\'s Included',
@@ -185,11 +192,18 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
   List<String> _buildIncludedItems() {
     final inc = widget.customizeItinerary.includes;
     final items = <String>[];
-    if ((inc.guide ?? '').isNotEmpty) items.add('Professional local guide: ${inc.guide}');
-    if ((inc.meals ?? '').isNotEmpty) items.add('Meal plan: ${inc.meals}');
-    if ((inc.transport ?? '').isNotEmpty)
+    if ((inc.guide ?? '').isNotEmpty) {
+      items.add('Professional local guide: ${inc.guide}');
+    }
+    if ((inc.meals ?? '').isNotEmpty) {
+      items.add('Meal plan: ${inc.meals}');
+    }
+    if ((inc.transport ?? '').isNotEmpty) {
       items.add('Vehicle: ${inc.transport}');
-    if (inc.permits) items.add('All necessary permits and entrance fees');
+    }
+    if (inc.permits) {
+      items.add('All necessary permits and entrance fees');
+    }
     return items.take(4).toList();
   }
 
@@ -216,7 +230,7 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                   color: AppColors.primaryOrange.withOpacity(0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
-                )
+                ),
               ],
             ),
             child: Icon(
@@ -259,8 +273,6 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
     );
   }
 
-
-
   Widget _buildInfoGrid() {
     return Container(
       padding: const EdgeInsets.all(4),
@@ -272,28 +284,68 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
       child: IntrinsicHeight(
         child: Row(
           children: [
-            _buildInfoItem(Icons.calendar_month, 'Duration', '${widget.customizeItinerary.duration} Day${widget.customizeItinerary.duration == 1 ? '' : 's'}'),
-            const VerticalDivider(width: 1, indent: 12, endIndent: 12, color: AppColors.border),
-            _buildInfoItem(Icons.group, 'Travelers', '${widget.travelers} Guest${widget.travelers == 1 ? '' : 's'}'),
-            const VerticalDivider(width: 1, indent: 12, endIndent: 12, color: AppColors.border),
-            _buildInfoItem(Icons.verified_user, 'Type', widget.isPublic ? 'Public' : 'Private'),
+            _buildInfoItem(
+              Icons.calendar_month,
+              'Duration',
+              '${widget.customizeItinerary.duration} Day${widget.customizeItinerary.duration == 1 ? '' : 's'}',
+              AppColors.primaryOrange,
+            ),
+            const VerticalDivider(
+              width: 1,
+              indent: 12,
+              endIndent: 12,
+              color: AppColors.border,
+            ),
+            _buildInfoItem(
+              Icons.group,
+              'Travelers',
+              '${widget.travelers} Guest${widget.travelers == 1 ? '' : 's'}',
+              AppColors.accentBlue,
+            ),
+            const VerticalDivider(
+              width: 1,
+              indent: 12,
+              endIndent: 12,
+              color: AppColors.border,
+            ),
+            _buildInfoItem(
+              Icons.verified_user,
+              'Type',
+              widget.isPublic ? 'Public' : 'Private',
+              AppColors.accentTeal,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoItem(IconData icon, String label, String value) {
+  Widget _buildInfoItem(IconData icon, String label, String value, Color tone) {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20),
         child: Column(
           children: [
-            Icon(icon, color: AppColors.primaryOrange, size: 20),
+            Icon(icon, color: tone, size: 20),
             const SizedBox(height: 8),
-            Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+            Text(
+              label,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+            ),
             const SizedBox(height: 4),
-            Text(value, style: GoogleFonts.plusJakartaSans(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.bold)),
+            Text(
+              value,
+              style: GoogleFonts.plusJakartaSans(
+                color: AppColors.textPrimary,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
       ),
@@ -328,6 +380,10 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
   }
 
   Widget _buildStickyBottomBar() {
+    final String buttonText = widget.isPublic
+        ? 'Check Seats & Review'
+        : 'Choose Dates & Review';
+
     return Positioned(
       bottom: 0,
       left: 0,
@@ -367,7 +423,8 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                     text: TextSpan(
                       children: [
                         TextSpan(
-                          text: '${widget.customizeItinerary.currency} ${widget.customizeItinerary.basePrice}',
+                          text:
+                              '${widget.customizeItinerary.currency} ${widget.customizeItinerary.basePrice}',
                           style: GoogleFonts.plusJakartaSans(
                             color: AppColors.textPrimary,
                             fontSize: 26,
@@ -375,7 +432,7 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                           ),
                         ),
                         TextSpan(
-                          text: ' / guest',
+                          text: widget.isPublic ? ' / seat' : ' / guest',
                           style: TextStyle(
                             color: AppColors.textSecondary,
                             fontSize: 14,
@@ -390,12 +447,14 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
             const SizedBox(width: 20),
             Expanded(
               child: CommonButton(
-                text: 'Customize Plan',
+                text: buttonText,
                 onPressed: () {
                   if (widget.isPublic && widget.fixedStartDate == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('No fixed departure date found for this tour.'),
+                        content: Text(
+                          'No fixed departure date found for this tour.',
+                        ),
                         backgroundColor: Colors.red,
                       ),
                     );
@@ -469,15 +528,23 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                   _buildBadge(),
                   const SizedBox(width: 10),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: AppColors.accentBlue.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: Colors.white24),
                     ),
                     child: Text(
                       widget.customizeItinerary.category.toUpperCase(),
-                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
                 ],
@@ -495,11 +562,19 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  const Icon(Icons.location_on, color: Colors.amber, size: 18),
+                  const Icon(
+                    Icons.location_on,
+                    color: AppColors.accentBlue,
+                    size: 18,
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     '${widget.customizeItinerary.fromLocation} to ${widget.customizeItinerary.toLocation}',
-                    style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
@@ -511,7 +586,9 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
   }
 
   Widget _buildBadge() {
-    final color = widget.isPublic ? AppColors.primaryEmerald : Colors.amber;
+    final color = widget.isPublic
+        ? AppColors.accentTeal
+        : AppColors.accentViolet;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -522,11 +599,116 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(widget.isPublic ? Icons.public : Icons.workspace_premium, color: color, size: 14),
+          Icon(
+            widget.isPublic ? Icons.public : Icons.workspace_premium,
+            color: color,
+            size: 14,
+          ),
           const SizedBox(width: 8),
           Text(
             widget.isPublic ? 'PUBLIC TOUR' : 'PRIVATE EXPERIENCE',
-            style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.8),
+            style: TextStyle(
+              color: color,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.8,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFlowSummaryCard() {
+    final Color tone = widget.isPublic
+        ? AppColors.accentBlue
+        : AppColors.primaryEmerald;
+    final IconData icon = widget.isPublic
+        ? Icons.event_available_outlined
+        : Icons.auto_fix_high_rounded;
+    final String title = widget.isPublic
+        ? 'Public Schedule Booking'
+        : 'Private Custom Trip';
+    final List<String> points = widget.isPublic
+        ? [
+            'Your departure date is fixed by the selected schedule',
+            'Seat availability is checked live before booking',
+            'Optional add-ons can be adjusted before payment',
+          ]
+        : [
+            'Pick a start date in the next step',
+            'The trip stays flexible for your group',
+            'Review itinerary and price before checkout',
+          ];
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: tone.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: tone.withOpacity(0.18)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: tone.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(icon, color: tone, size: 22),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.plusJakartaSans(
+                    color: AppColors.textPrimary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                ...points.map(
+                  (point) => Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: Container(
+                            width: 6,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              color: tone,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            point,
+                            style: GoogleFonts.plusJakartaSans(
+                              color: AppColors.textSecondary,
+                              fontSize: 12,
+                              height: 1.4,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

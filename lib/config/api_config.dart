@@ -29,6 +29,8 @@ class ApiConfig {
   static const String planningSuggestions =
       '$baseUrl/tourist/planning/suggestions';
   static const String touristPackages = '$baseUrl/tourist/packages';
+  static String touristScheduleAvailability(String scheduleId) =>
+      '$baseUrl/tourist/schedules/$scheduleId/availability';
 
   // Tourist Bookings Endpoints
   static const String myBookings = '$baseUrl/tourist/bookings/my';

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_colors.dart';
+import '../widgets/common_button.dart';
 import '../services/payment_service.dart';
 import 'home_screen.dart';
 
@@ -22,9 +23,9 @@ class StripePaymentScreen extends StatefulWidget {
     required this.currency,
     required this.tripTitle,
   }) : assert(
-          (customTourId != null) != (publicTourId != null),
-          'Provide exactly one of customTourId or publicTourId.',
-        );
+         (customTourId != null) != (publicTourId != null),
+         'Provide exactly one of customTourId or publicTourId.',
+       );
 
   @override
   State<StripePaymentScreen> createState() => _StripePaymentScreenState();
@@ -134,10 +135,8 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
                 tween: Tween(begin: 0, end: 1),
                 duration: const Duration(milliseconds: 600),
                 curve: Curves.elasticOut,
-                builder: (ctx, val, child) => Transform.scale(
-                  scale: val,
-                  child: child,
-                ),
+                builder: (ctx, val, child) =>
+                    Transform.scale(scale: val, child: child),
                 child: Container(
                   width: 80,
                   height: 80,
@@ -159,8 +158,11 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.check_rounded,
-                      color: Colors.white, size: 44),
+                  child: const Icon(
+                    Icons.check_rounded,
+                    color: Colors.white,
+                    size: 44,
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -185,28 +187,17 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
               const SizedBox(height: 28),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: CommonButton(
+                  text: 'Back to Home',
                   onPressed: () {
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(builder: (_) => const HomeScreen()),
                       (route) => false,
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryEmerald,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    'Back to Home',
-                    style: GoogleFonts.plusJakartaSans(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    ),
-                  ),
+                  gradient: const [AppColors.primaryEmerald, Color(0xFF0EA371)],
+                  borderRadius: 16,
+                  height: 52,
                 ),
               ),
             ],
@@ -236,8 +227,8 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
               fontSize: 16,
             ),
           ),
-        )
         ),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         child: Form(
@@ -278,8 +269,7 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(24),
-        border:
-            Border.all(color: AppColors.primaryOrange.withOpacity(0.2)),
+        border: Border.all(color: AppColors.primaryOrange.withOpacity(0.2)),
       ),
       child: Column(
         children: [
@@ -292,8 +282,11 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
                   color: AppColors.primaryOrange.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.map_outlined,
-                    color: AppColors.primaryOrange, size: 22),
+                child: const Icon(
+                  Icons.map_outlined,
+                  color: AppColors.primaryOrange,
+                  size: 22,
+                ),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -517,8 +510,10 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
         ),
         filled: true,
         fillColor: AppColors.background,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: const BorderSide(color: AppColors.border),
@@ -529,8 +524,10 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide:
-              const BorderSide(color: AppColors.primaryOrange, width: 1.5),
+          borderSide: const BorderSide(
+            color: AppColors.primaryOrange,
+            width: 1.5,
+          ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -577,22 +574,25 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF635BFF).withOpacity(0.06),
+        color: AppColors.primaryOrange.withOpacity(0.08),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF635BFF).withOpacity(0.2)),
+        border: Border.all(color: AppColors.primaryOrange.withOpacity(0.25)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.science_outlined,
-                  color: Color(0xFF635BFF), size: 16),
+              const Icon(
+                Icons.science_outlined,
+                color: AppColors.accentTeal,
+                size: 16,
+              ),
               const SizedBox(width: 8),
               Text(
                 'Stripe Sandbox — Test Cards',
                 style: GoogleFonts.plusJakartaSans(
-                  color: const Color(0xFF635BFF),
+                  color: AppColors.textOrange,
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
                 ),
@@ -647,48 +647,13 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
 
   // ── Pay Button ────────────────────────────────────────────────────────────
   Widget _buildPayButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: _isLoading ? null : _handlePayment,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryOrange,
-          disabledBackgroundColor: AppColors.primaryOrange.withOpacity(0.5),
-          padding: const EdgeInsets.symmetric(vertical: 16), // same as review screen
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24), // same as review screen
-          ),
-          elevation: 0, // same as review screen
-        ),
-        child: _isLoading
-            ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.confirmation_number_outlined,
-                    color: Colors.white,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Pay $_formattedAmount',
-                    style: GoogleFonts.plusJakartaSans(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    ),
-                  ),
-                ],
-              ),
-      ),
+    return CommonButton(
+      text: 'Pay $_formattedAmount',
+      onPressed: _isLoading ? null : _handlePayment,
+      isEnabled: !_isLoading,
+      isLoading: _isLoading,
+      borderRadius: 24,
+      height: 54,
     );
   }
 }
@@ -698,7 +663,9 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
 class _CardNumberFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     final digits = newValue.text.replaceAll(RegExp(r'\D'), '');
     final buffer = StringBuffer();
     for (int i = 0; i < digits.length; i++) {
@@ -716,7 +683,9 @@ class _CardNumberFormatter extends TextInputFormatter {
 class _ExpiryFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     final digits = newValue.text.replaceAll(RegExp(r'\D'), '');
     String formatted = digits;
     if (digits.length >= 3) {

@@ -32,7 +32,11 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
     super.initState();
     _currentDate = DateTime.now();
     // Set selected date to tomorrow
-    _selectedDate = DateTime(_currentDate.year, _currentDate.month, _currentDate.day + 1);
+    _selectedDate = DateTime(
+      _currentDate.year,
+      _currentDate.month,
+      _currentDate.day + 1,
+    );
     // Set displayed month to current month
     _displayedMonth = DateTime(_currentDate.year, _currentDate.month, 1);
   }
@@ -158,16 +162,21 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryEmerald.withOpacity(0.08),
+                    color: AppColors.accentBlue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.primaryEmerald.withOpacity(0.15)),
+                    border: Border.all(
+                      color: AppColors.accentBlue.withOpacity(0.2),
+                    ),
                   ),
                   child: Text(
                     '$_durationDays DAY${_durationDays == 1 ? '' : 'S'}',
                     style: const TextStyle(
-                      color: AppColors.primaryEmerald,
+                      color: AppColors.accentBlue,
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                     ),
@@ -249,16 +258,16 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
   Widget _buildCalendarView() {
     final year = _displayedMonth.year;
     final month = _displayedMonth.month;
-    
+
     // Get number of days in the displayed month
     final daysInMonth = DateTime(year, month + 1, 0).day;
-    
+
     // Get the first day of the month and its weekday offset
     final firstDay = DateTime(year, month, 1);
     final firstDayOffset = firstDay.weekday; // 1 = Monday, 7 = Sunday
     // Adjust offset for Sunday start (0 = Sunday)
     final adjustedOffset = firstDayOffset % 7;
-    
+
     final weekdays = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
 
     return Column(
@@ -294,13 +303,18 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
 
             final day = index - adjustedOffset + 1;
             final date = DateTime(year, month, day);
-            
+
             // Only allow dates greater than today
             final today = DateTime.now();
-            final todayWithoutTime = DateTime(today.year, today.month, today.day);
+            final todayWithoutTime = DateTime(
+              today.year,
+              today.month,
+              today.day,
+            );
             final isPast = date.isBefore(todayWithoutTime);
-            
-            final isSelected = date.year == _selectedDate.year &&
+
+            final isSelected =
+                date.year == _selectedDate.year &&
                 date.month == _selectedDate.month &&
                 date.day == _selectedDate.day;
 
@@ -311,7 +325,8 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
               Duration(days: _durationDays - 1),
             );
             isInRange = date.isAfter(_selectedDate) && date.isBefore(rangeEnd);
-            isRangeEnd = date.year == rangeEnd.year &&
+            isRangeEnd =
+                date.year == rangeEnd.year &&
                 date.month == rangeEnd.month &&
                 date.day == rangeEnd.day;
 
@@ -362,7 +377,11 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
                     height: 38,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isSelected ? _accentColor : (isRangeEnd ? _accentColor.withOpacity(0.15) : Colors.transparent),
+                      color: isSelected
+                          ? _accentColor
+                          : (isRangeEnd
+                                ? _accentColor.withOpacity(0.15)
+                                : Colors.transparent),
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
@@ -422,7 +441,11 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: AppColors.border),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 10))
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
         ],
       ),
       child: Row(
@@ -455,15 +478,18 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
-                        color: _accentColor.withOpacity(0.1),
+                        color: AppColors.accentViolet.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         'PRIVATE EXPEDITION',
                         style: TextStyle(
-                          color: _accentColor,
+                          color: AppColors.accentViolet,
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.5,
@@ -490,10 +516,23 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
   }
 
   Widget _buildCalendarHeader() {
-    final months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    final months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
     final monthName = months[_displayedMonth.month - 1];
     final year = _displayedMonth.year;
-    
+
     return Row(
       children: [
         Text(
@@ -514,19 +553,35 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
           child: Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.chevron_left, color: AppColors.textPrimary, size: 20),
+                icon: const Icon(
+                  Icons.chevron_left,
+                  color: AppColors.accentBlue,
+                  size: 20,
+                ),
                 onPressed: () {
                   setState(() {
-                    _displayedMonth = DateTime(_displayedMonth.year, _displayedMonth.month - 1, 1);
+                    _displayedMonth = DateTime(
+                      _displayedMonth.year,
+                      _displayedMonth.month - 1,
+                      1,
+                    );
                   });
                 },
               ),
               Container(width: 1, height: 20, color: AppColors.border),
               IconButton(
-                icon: const Icon(Icons.chevron_right, color: AppColors.textPrimary, size: 20),
+                icon: const Icon(
+                  Icons.chevron_right,
+                  color: AppColors.accentBlue,
+                  size: 20,
+                ),
                 onPressed: () {
                   setState(() {
-                    _displayedMonth = DateTime(_displayedMonth.year, _displayedMonth.month + 1, 1);
+                    _displayedMonth = DateTime(
+                      _displayedMonth.year,
+                      _displayedMonth.month + 1,
+                      1,
+                    );
                   });
                 },
               ),
@@ -539,7 +594,20 @@ class _SelectStartDateScreenState extends State<SelectStartDateScreen> {
 
   String _formatDate(DateTime? date) {
     if (date == null) return '--';
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${months[date.month - 1]} ${date.day}';
   }
 }

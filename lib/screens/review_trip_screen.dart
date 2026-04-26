@@ -1,8 +1,12 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
+import '../widgets/common_button.dart';
 import '../services/custom_tour_service.dart';
+import '../services/package_service.dart';
 import '../services/public_tour_service.dart';
 import 'home_screen.dart';
 import 'payment_screen.dart';
@@ -33,15 +37,86 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
   bool _allExpanded = true;
   bool _isSubmitting = false;
   bool _isBooking = false;
+  bool _isLoadingAvailability = false;
+  String? _availabilityError;
+  Map<String, dynamic>? _availability;
   final CustomTourService _customTourService = CustomTourService();
   final PublicTourService _publicTourService = PublicTourService();
+  final PackageService _packageService = PackageService();
 
   Color get _accentColor => AppColors.primaryOrange;
 
   @override
   void initState() {
     super.initState();
+    if (widget.isPublic && widget.scheduleId != null) {
+      _loadScheduleAvailability();
+    }
   }
+
+  Future<void> _loadScheduleAvailability() async {
+    if (widget.scheduleId == null) return;
+
+    setState(() {
+      _isLoadingAvailability = true;
+      _availabilityError = null;
+    });
+
+    try {
+      final result = await _packageService.getScheduleAvailability(
+        widget.scheduleId!,
+        travelers: widget.travelers,
+      );
+
+      if (!mounted) return;
+
+      if (result['success'] == true && result['data'] is Map<String, dynamic>) {
+        setState(() {
+          _availability = Map<String, dynamic>.from(result['data']);
+        });
+      } else {
+        setState(() {
+          _availabilityError =
+              result['message']?.toString() ??
+              'Could not load seat availability';
+        });
+      }
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _availabilityError = 'Could not load seat availability';
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingAvailability = false;
+        });
+      }
+    }
+  }
+
+  num get _totalAddOns {
+    num total = 0;
+    for (final day in widget.package.itineraries) {
+      for (final item in day.items) {
+        if (item.optional && (widget.selectedOptionalItems[item.id] ?? false)) {
+          total += item.price;
+        }
+      }
+    }
+    return total;
+  }
+
+  num get _totalAmount =>
+      (widget.package.basePrice + _totalAddOns) * widget.travelers;
+
+  bool get _publicCanBookExact => _availability?['canBookExact'] == true;
+
+  bool get _publicCanRequestExtraSeats =>
+      _availability?['canRequestExtraSeats'] == true;
+
+  bool get _isPublicExtraSeatRequestFlow =>
+      widget.isPublic && !_publicCanBookExact && _publicCanRequestExtraSeats;
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +147,10 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildTripSummaryCard(),
+                if (widget.isPublic) ...[
+                  const SizedBox(height: 16),
+                  _buildPublicSeatStatusCard(),
+                ],
                 const SizedBox(height: 32),
                 _buildItineraryHeader(),
                 const SizedBox(height: 16),
@@ -119,6 +198,27 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
 
   Widget _buildStickyFooter() {
     final bool busy = _isSubmitting || _isBooking;
+    final bool publicBlocked =
+        widget.isPublic &&
+        !_isLoadingAvailability &&
+        _availability != null &&
+        !_publicCanBookExact &&
+        !_publicCanRequestExtraSeats;
+    final bool publicWaitingAvailability =
+        widget.isPublic && (_isLoadingAvailability || _availability == null);
+
+    String primaryText = widget.isPublic ? 'Proceed to Payment' : 'Book Now';
+    if (widget.isPublic && _isLoadingAvailability) {
+      primaryText = 'Checking Availability...';
+    } else if (_isPublicExtraSeatRequestFlow) {
+      primaryText = 'Request Extra Seats';
+    } else if (publicBlocked) {
+      primaryText = 'No Seats Available';
+    }
+
+    final bool primaryEnabled =
+        !busy && !publicWaitingAvailability && !publicBlocked;
+
     return Positioned(
       bottom: 0,
       left: 0,
@@ -181,46 +281,12 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
             // ── Book Now (primary) ──
             Expanded(
               flex: widget.isPublic ? 1 : 2,
-              child: ElevatedButton(
-                onPressed: busy ? null : _saveAndBook,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryOrange,
-                  disabledBackgroundColor:
-                      AppColors.primaryOrange.withOpacity(0.5),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  elevation: 0,
-                ),
-                child: _isBooking
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.confirmation_number_outlined,
-                            color: Colors.white,
-                            size: 18,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            widget.isPublic ? 'Proceed to Payment' : 'Book Now',
-                            style: GoogleFonts.plusJakartaSans(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ],
-                      ),
+              child: CommonButton(
+                text: primaryText,
+                onPressed: primaryEnabled ? _saveAndBook : null,
+                isEnabled: primaryEnabled,
+                isLoading: _isBooking,
+                borderRadius: 24,
               ),
             ),
           ],
@@ -251,8 +317,8 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
       }
     }
 
-    num totalAddOns = accommodationTotal + transportTotal + mealTotal + activityTotal;
-    num finalTotal = (widget.package.basePrice + totalAddOns) * widget.travelers;
+    final num totalAddOns =
+        accommodationTotal + transportTotal + mealTotal + activityTotal;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -277,7 +343,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                 color: Colors.black.withOpacity(0.04),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
-              )
+              ),
             ],
           ),
           child: Column(
@@ -302,14 +368,18 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
               ),
               _buildPriceRow(
                 'Total Investment',
-                '${widget.package.currency} $finalTotal',
+                '${widget.package.currency} $_totalAmount',
                 isTotal: true,
               ),
               const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const Icon(Icons.verified, color: AppColors.primaryEmerald, size: 14),
+                  const Icon(
+                    Icons.verified,
+                    color: AppColors.primaryEmerald,
+                    size: 14,
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     'Inclusive of all service taxes',
@@ -328,7 +398,12 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
     );
   }
 
-  Widget _buildPriceRow(String label, String value, {bool isTotal = false, bool accent = false}) {
+  Widget _buildPriceRow(
+    String label,
+    String value, {
+    bool isTotal = false,
+    bool accent = false,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -473,7 +548,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                 color: Colors.black.withOpacity(0.04),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
-              )
+              ),
             ],
           ),
           child: Theme(
@@ -704,7 +779,24 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
     return widgets;
   }
 
-  Widget _buildReviewItem(IconData icon, String text, bool isOptional, {num price = 0, String currency = 'Rs'}) {
+  Widget _buildReviewItem(
+    IconData icon,
+    String text,
+    bool isOptional, {
+    num price = 0,
+    String currency = 'Rs',
+  }) {
+    Color tone;
+    if (icon == Icons.hotel_outlined) {
+      tone = AppColors.primaryOrange;
+    } else if (icon == Icons.directions_bus_outlined) {
+      tone = AppColors.accentBlue;
+    } else if (icon == Icons.restaurant_menu_outlined) {
+      tone = AppColors.accentTeal;
+    } else {
+      tone = AppColors.accentViolet;
+    }
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -712,10 +804,10 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: AppColors.background,
+              color: tone.withOpacity(0.12),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: AppColors.textSecondary, size: 14),
+            child: Icon(icon, color: tone, size: 14),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -748,13 +840,13 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primaryEmerald.withOpacity(0.1),
+                      color: tone.withOpacity(0.14),
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Text(
+                    child: Text(
                       'ADDED',
                       style: TextStyle(
-                        color: AppColors.primaryEmerald,
+                        color: tone,
                         fontSize: 8,
                         fontWeight: FontWeight.bold,
                       ),
@@ -842,7 +934,9 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              widget.isPublic ? 'PUBLIC TOUR' : 'PRIVATE EXPERIENCE',
+                              widget.isPublic
+                                  ? 'PUBLIC TOUR'
+                                  : 'PRIVATE EXPERIENCE',
                               style: GoogleFonts.plusJakartaSans(
                                 color: _accentColor,
                                 fontSize: 9,
@@ -872,7 +966,11 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: AppColors.border),
                         boxShadow: [
-                           BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
                         ],
                         image: DecorationImage(
                           image: NetworkImage(
@@ -905,7 +1003,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                         Icons.group_outlined,
                         'TRAVELERS',
                         '${widget.travelers} Guests',
-                        AppColors.primaryEmerald,
+                        AppColors.accentBlue,
                       ),
                     ),
                   ],
@@ -1058,8 +1156,94 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
     }
   }
 
+  Widget _buildPublicSeatStatusCard() {
+    if (_isLoadingAvailability) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border.withOpacity(0.6)),
+        ),
+        child: Row(
+          children: const [
+            SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            SizedBox(width: 10),
+            Expanded(child: Text('Checking live seat availability...')),
+          ],
+        ),
+      );
+    }
+
+    if (_availabilityError != null) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.accentRose.withOpacity(0.35)),
+        ),
+        child: Text(
+          _availabilityError!,
+          style: GoogleFonts.plusJakartaSans(
+            color: AppColors.textSecondary,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
+    }
+
+    final seatsAvailable =
+        (_availability?['seatsAvailable'] as num?)?.toInt() ?? 0;
+    final canBook = _publicCanBookExact;
+    final canRequest = _publicCanRequestExtraSeats;
+    final String status = canBook
+        ? 'Seats available for direct booking'
+        : canRequest
+        ? 'Limited seats - extra-seat request required'
+        : 'This departure is currently sold out';
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border.withOpacity(0.6)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            status,
+            style: GoogleFonts.plusJakartaSans(
+              color: AppColors.textPrimary,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '${widget.travelers} traveler(s) requested • $seatsAvailable seat(s) currently available',
+            style: GoogleFonts.plusJakartaSans(
+              color: AppColors.textSecondary,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   // ── Creates a PublicTour on backend and returns its ID ──────────────────
-  Future<int?> _createPublicTourAndGetId() async {
+  Future<int?> _createPublicTourAndGetId({
+    bool allowWaitlistRequest = false,
+  }) async {
     if (widget.scheduleId == null) {
       throw Exception('No schedule selected for this public tour');
     }
@@ -1068,6 +1252,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
       scheduleId: widget.scheduleId!,
       travelerCount: widget.travelers,
       itineraries: _buildItineraries(),
+      allowWaitlistRequest: allowWaitlistRequest,
     );
 
     if (result == null || result['success'] != true) {
@@ -1087,11 +1272,25 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
 
   // ── Book Now (save first, then navigate to payment) ─────────────────────
   Future<void> _saveAndBook() async {
+    if (widget.isPublic && _isLoadingAvailability) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Checking live seats, please wait...'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isBooking = true);
     try {
       if (widget.isPublic) {
+        final bool isExtraSeatRequest = _isPublicExtraSeatRequestFlow;
+
         // Step 1: Create PublicTour to get its ID
-        final publicTourId = await _createPublicTourAndGetId();
+        final publicTourId = await _createPublicTourAndGetId(
+          allowWaitlistRequest: isExtraSeatRequest,
+        );
 
         if (!mounted) return;
 
@@ -1106,18 +1305,23 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
           return;
         }
 
-        // Compute total for display only (backend uses server-side amount)
-        num totalAddOns = 0;
-        for (final day in widget.package.itineraries) {
-          for (final item in day.items) {
-            final selected = widget.selectedOptionalItems[item.id] ?? false;
-            if (item.optional && selected) {
-              totalAddOns += item.price;
-            }
-          }
+        if (isExtraSeatRequest) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Extra-seat request sent to the company. You will be notified after approval.',
+              ),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 3),
+            ),
+          );
+          if (!mounted) return;
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const HomeScreen()),
+            (route) => false,
+          );
+          return;
         }
-        final num totalAmount =
-            (widget.package.basePrice + totalAddOns) * widget.travelers;
 
         // Step 2: Navigate to payment with publicTourId
         Navigator.of(context).push(
@@ -1125,7 +1329,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
             builder: (_) => StripePaymentScreen(
               publicTourId: publicTourId,
               travelers: widget.travelers,
-              totalAmount: totalAmount,
+              totalAmount: _totalAmount,
               currency: 'usd',
               tripTitle: widget.package.title,
             ),
@@ -1143,26 +1347,14 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-                'Trip saved but could not retrieve tour ID. Please book from your trips.'),
+              'Trip saved but could not retrieve tour ID. Please book from your trips.',
+            ),
             backgroundColor: Colors.orange,
             duration: Duration(seconds: 4),
           ),
         );
         return;
       }
-
-      // Step 2: Compute total price for Stripe
-      num totalAddOns = 0;
-      for (final day in widget.package.itineraries) {
-        for (final item in day.items) {
-          if (item.optional &&
-              (widget.selectedOptionalItems[item.id] ?? false)) {
-            totalAddOns += item.price;
-          }
-        }
-      }
-      final num totalAmount =
-          (widget.package.basePrice + totalAddOns) * widget.travelers;
 
       // Step 3: Navigate to Stripe payment screen
       if (!mounted) return;
@@ -1171,7 +1363,7 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
           builder: (_) => StripePaymentScreen(
             customTourId: tourId,
             travelers: widget.travelers,
-            totalAmount: totalAmount,
+            totalAmount: _totalAmount,
             currency: 'usd', // Stripe sandbox uses USD for test cards
             tripTitle: widget.package.title,
           ),

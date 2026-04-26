@@ -307,7 +307,7 @@ class SigninState extends State<Signin> {
                               children: [
                                 const Icon(
                                   Icons.travel_explore,
-                                  color: Colors.white,
+                                  color: AppColors.primaryOrange,
                                   size: 16,
                                 ),
                                 const SizedBox(width: 8),
@@ -508,7 +508,7 @@ class SigninState extends State<Signin> {
                               child: const Text(
                                 'Create Account',
                                 style: TextStyle(
-                                  color: AppColors.textOrange,
+                                  color: AppColors.primaryOrange,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 14,
                                 ),

@@ -18,6 +18,13 @@ class AppColors {
 
   static const Color accent = primaryOrange;
 
+  // Contrast accents that pair well with orange + white UI
+  static const Color accentTeal = Color(0xFF0F766E);
+  static const Color accentBlue = Color(0xFF1D4ED8);
+  static const Color accentViolet = Color(0xFF7C3AED);
+  static const Color accentRose = Color(0xFFBE185D);
+  static const Color accentAmber = Color(0xFFB45309);
+
   // Tourism mood colors
   static const Color oceanDeep = Color(0xFF0E3559);
   static const Color skyBlue = Color(0xFF38BDF8);

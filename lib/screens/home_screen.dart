@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:ui';
 import '../theme/app_colors.dart';
 import '../config/api_config.dart';
+import '../widgets/common_button.dart';
 import '../widgets/custom_bottom_nav.dart';
 import 'fixed_packages_screen.dart';
 import 'guide_list_screen.dart';
@@ -46,18 +47,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Color _accentForIndex(int index, bool isDark) {
     const lightPalette = [
-      Color(0xFFEA580C),
-      Color(0xFFF97316),
-      Color(0xFFFB923C),
-      Color(0xFFC2410C),
-      Color(0xFFB45309),
+      AppColors.primaryOrange,
+      AppColors.accentBlue,
+      AppColors.accentTeal,
+      AppColors.accentViolet,
+      AppColors.accentRose,
     ];
     const darkPalette = [
       Color(0xFFFFA94D),
-      Color(0xFFFF922B),
-      Color(0xFFFFB566),
-      Color(0xFFFF7B22),
-      Color(0xFFFFC078),
+      Color(0xFF60A5FA),
+      Color(0xFF2DD4BF),
+      Color(0xFFA78BFA),
+      Color(0xFFF472B6),
     ];
 
     final palette = isDark ? darkPalette : lightPalette;
@@ -766,13 +767,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.all(2),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: isDark
-                            ? [const Color(0xFFFFA94D), const Color(0xFFFF922B)]
-                            : [
-                                const Color(0xFFEA580C),
-                                const Color(0xFFF97316),
-                              ],
+                      gradient: const LinearGradient(
+                        colors: AppColors.premiumActionGradient,
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -868,7 +864,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [Color(0xFFEA580C), Color(0xFFF97316)],
+                              colors: AppColors.premiumActionGradient,
                             ),
                             borderRadius: BorderRadius.circular(999),
                           ),
@@ -955,7 +951,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 56,
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFFF97316), Color(0xFFFB923C)],
+                        colors: AppColors.premiumActionGradient,
                       ),
                       borderRadius: BorderRadius.circular(14),
                     ),
@@ -988,7 +984,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textOrange,
+                    color: AppColors.primaryOrange,
                   ),
                 ),
               ],
@@ -1161,7 +1157,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textOrange,
+                      color: AppColors.primaryOrange,
                     ),
                   ),
                 ),
@@ -1506,8 +1502,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 .toList(),
                       ),
                       const SizedBox(height: 14),
-                      _BounceButton(
-                        onTap: () {
+                      CommonButton(
+                        text: 'Generate My Itinerary',
+                        onPressed: () {
                           final prompt = controller.text.trim();
                           if (prompt.isEmpty) {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -1524,26 +1521,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 'AI Suggestion:\n- Day 1: Local cultural walk + cafe hopping\n- Day 2: Nature excursion + sunset viewpoint\n- Day 3: Adventure activity + social nightlife\n\nTip: Open Custom Tour to personalize this plan fully.';
                           });
                         },
-                        child: Container(
-                          width: double.infinity,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14),
-                            gradient: const LinearGradient(
-                              colors: AppColors.premiumActionGradient,
-                            ),
-                          ),
-                          child: Center(
-                            child: Text(
-                              'Generate My Itinerary',
-                              style: GoogleFonts.plusJakartaSans(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                        ),
+                        borderRadius: 14,
+                        height: 48,
+                        fontSize: 14,
                       ),
                       if (generatedPlan != null) ...[
                         const SizedBox(height: 14),
@@ -1572,8 +1552,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        _BounceButton(
-                          onTap: () {
+                        CommonButton(
+                          text: 'Continue in Custom Tour',
+                          onPressed: () {
                             Navigator.pop(context);
                             Navigator.push(
                               this.context,
@@ -1584,26 +1565,13 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             );
                           },
-                          child: Container(
-                            width: double.infinity,
-                            height: 44,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              color: isDark
-                                  ? Colors.white.withValues(alpha: 0.12)
-                                  : const Color(0xFFFFEDD5),
-                            ),
-                            child: Center(
-                              child: Text(
-                                'Continue in Custom Tour',
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.textOrange,
-                                ),
-                              ),
-                            ),
-                          ),
+                          backgroundColor: isDark
+                              ? Colors.white.withValues(alpha: 0.12)
+                              : const Color(0xFFFFEDD5),
+                          textColor: AppColors.primaryOrange,
+                          borderRadius: 12,
+                          height: 44,
+                          fontSize: 13,
                         ),
                       ],
                     ],

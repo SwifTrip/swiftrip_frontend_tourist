@@ -1,21 +1,24 @@
 // Search result model for tour packages
-class agencyResult {
+class AgencyResult {
   final bool success;
   final List<TourPackageResult> data;
   final PaginationInfo pagination;
 
-  agencyResult({
+  AgencyResult({
     required this.success,
     required this.data,
     required this.pagination,
   });
 
-  factory agencyResult.fromJson(Map<String, dynamic> json) {
-    return agencyResult(
+  factory AgencyResult.fromJson(Map<String, dynamic> json) {
+    return AgencyResult(
       success: json['success'] as bool? ?? false,
-      data: (json['data'] as List?)
-              ?.map((item) =>
-                  TourPackageResult.fromJson(item as Map<String, dynamic>))
+      data:
+          (json['data'] as List?)
+              ?.map(
+                (item) =>
+                    TourPackageResult.fromJson(item as Map<String, dynamic>),
+              )
               .toList() ??
           [],
       pagination: PaginationInfo.fromJson(
@@ -89,7 +92,7 @@ class TourPackageResult {
       company: Company.fromJson(
         (json['company'] as Map<String, dynamic>?) ?? {},
       ),
-        nextDeparture: json['nextDeparture'] is Map<String, dynamic>
+      nextDeparture: json['nextDeparture'] is Map<String, dynamic>
           ? json['nextDeparture'] as Map<String, dynamic>
           : null,
     );
@@ -121,10 +124,7 @@ class Company {
   final int id;
   final String name;
 
-  Company({
-    required this.id,
-    required this.name,
-  });
+  Company({required this.id, required this.name});
 
   factory Company.fromJson(Map<String, dynamic> json) {
     return Company(
@@ -134,10 +134,7 @@ class Company {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-    };
+    return {'id': id, 'name': name};
   }
 }
 

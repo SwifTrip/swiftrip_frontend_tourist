@@ -542,7 +542,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               child: const Text(
                                 'Sign In',
                                 style: TextStyle(
-                                  color: AppColors.textOrange,
+                                  color: AppColors.primaryOrange,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 14,
                                 ),
