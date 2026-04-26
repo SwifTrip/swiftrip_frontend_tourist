@@ -488,16 +488,49 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
     );
   }
 
+  String _getPackageImageUrl() {
+    const fallbackUrl =
+        'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200';
+
+    // Check if media list has items
+    if (widget.customizeItinerary.media.isEmpty) {
+      return fallbackUrl;
+    }
+
+    // Get first media item with type 'image', or just the first one
+    final Media? imageMedia = widget.customizeItinerary.media.firstWhere(
+      (media) => media.type.toLowerCase() == 'image',
+      orElse: () => widget.customizeItinerary.media.first,
+    );
+
+    // Return media URL if available, otherwise fallback
+    return (imageMedia?.url?.isNotEmpty ?? false)
+        ? imageMedia!.url
+        : fallbackUrl;
+  }
+
   Widget _buildHeroSection() {
+    final imageUrl = _getPackageImageUrl();
     return Stack(
       children: [
         Hero(
           tag: 'package_${widget.customizeItinerary.id}',
           child: Image.network(
-            "https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200",
+            imageUrl,
             height: 420,
             width: double.infinity,
             fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => Container(
+              height: 420,
+              color: AppColors.surface,
+              child: const Center(
+                child: Icon(
+                  Icons.broken_image,
+                  size: 50,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
           ),
         ),
         Container(
