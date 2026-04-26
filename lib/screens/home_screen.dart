@@ -1,5 +1,4 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:ui';
 import '../theme/app_colors.dart';
@@ -81,8 +80,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   String _resolvePackageImageUrl(String? rawUrl) {
-    const fallback = 'https://placehold.co/600x400?text=No+Image';
-    if (rawUrl == null || rawUrl.trim().isEmpty) return fallback;
+    const fallback = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=300&fit=crop';
+    if (rawUrl == null || rawUrl.trim().isEmpty) {
+      return fallback;
+    }
 
     String url = rawUrl.trim();
 
@@ -94,7 +95,8 @@ class _HomeScreenState extends State<HomeScreen> {
       url = '${ApiConfig.chatSocket}/${url.replaceFirst(RegExp(r'^/+'), '')}';
     }
 
-    if (kIsWeb && url.startsWith('http')) {
+    // Always proxy S3/AWS URLs to avoid CORS
+    if (url.contains('amazonaws.com') || url.contains('.s3')) {
       return '${ApiConfig.chatSocket}/proxy-image?url=${Uri.encodeComponent(url)}';
     }
 
@@ -1965,7 +1967,7 @@ class _HomeScreenState extends State<HomeScreen> {
       date = booking.departureDate != null
           ? "${booking.departureDate!.day}/${booking.departureDate!.month}/${booking.departureDate!.year}"
           : "TBD";
-      imageUrl = booking.package?.coverImage ?? "";
+      imageUrl = _resolvePackageImageUrl(booking.package?.coverImage);
       type = "PUBLIC";
 
       if (booking.departureDate != null && booking.arrivalDate != null) {
@@ -1978,7 +1980,7 @@ class _HomeScreenState extends State<HomeScreen> {
       date = booking.departureDate != null
           ? "${booking.departureDate!.day}/${booking.departureDate!.month}/${booking.departureDate!.year}"
           : "TBD";
-      imageUrl = booking.package?.coverImage ?? "";
+      imageUrl = _resolvePackageImageUrl(booking.package?.coverImage);
       type = "PRIVATE";
 
       if (booking.departureDate != null && booking.arrivalDate != null) {
@@ -2018,16 +2020,38 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: 64,
                       height: 64,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        width: 64,
-                        height: 64,
-                        color: AppColors.background,
-                        child: const Icon(
-                          Icons.broken_image_rounded,
-                          color: AppColors.textSecondary,
-                          size: 20,
-                        ),
-                      ),
+                      cacheWidth: 128,
+                      cacheHeight: 128,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          width: 64,
+                          height: 64,
+                          color: AppColors.background,
+                          child: const Center(
+                            child: SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.accent,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: 64,
+                          height: 64,
+                          color: AppColors.background,
+                          child: const Icon(
+                            Icons.image_not_supported_outlined,
+                            color: AppColors.textSecondary,
+                            size: 28,
+                          ),
+                        );
+                      },
                     )
                   : Container(
                       width: 64,
@@ -2036,6 +2060,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: const Icon(
                         Icons.landscape,
                         color: AppColors.textSecondary,
+                        size: 28,
                       ),
                     ),
             ),

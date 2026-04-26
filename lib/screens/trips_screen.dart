@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_colors.dart';
+import '../config/api_config.dart';
 import '../models/booking_model.dart';
 import '../services/booking_service.dart';
 import 'package:shimmer/shimmer.dart';
@@ -75,6 +76,28 @@ class _TripsScreenState extends State<TripsScreen> {
         });
       }
     }
+  }
+
+  String _resolveImageUrl(String? rawUrl) {
+    const fallback = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=300&fit=crop';
+    if (rawUrl == null || rawUrl.trim().isEmpty) return fallback;
+
+    String url = rawUrl.trim();
+
+    if (url.startsWith('/uploads')) {
+      url = '${ApiConfig.chatSocket}$url';
+    } else if (url.startsWith('uploads/')) {
+      url = '${ApiConfig.chatSocket}/$url';
+    } else if (!url.startsWith('http')) {
+      url = '${ApiConfig.chatSocket}/${url.replaceFirst(RegExp(r'^/+'), '')}';
+    }
+
+    // Always proxy S3/AWS URLs to avoid CORS
+    if (url.contains('amazonaws.com') || url.contains('.s3')) {
+      return '${ApiConfig.chatSocket}/proxy-image?url=${Uri.encodeComponent(url)}';
+    }
+
+    return url;
   }
 
   @override
@@ -571,7 +594,7 @@ class _TripsScreenState extends State<TripsScreen> {
           : 'Date TBD',
       countdown: countdown,
       statusColor: statusColor,
-      imageUrl: booking.package?.coverImage ?? '',
+      imageUrl: _resolveImageUrl(booking.package?.coverImage),
       onTap: () => Navigator.pushNamed(this.context, '/tripDetails', arguments: {
         'bookingId': booking.id,
         'type': booking.type,
@@ -623,7 +646,7 @@ class _TripsScreenState extends State<TripsScreen> {
           : 'Date TBD',
       countdown: countdown,
       statusColor: statusColor,
-      imageUrl: booking.package?.coverImage ?? '',
+      imageUrl: _resolveImageUrl(booking.package?.coverImage),
       onTap: () => Navigator.pushNamed(this.context, '/tripDetails', arguments: {
         'bookingId': booking.id,
         'type': booking.type,
