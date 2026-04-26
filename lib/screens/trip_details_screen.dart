@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:ui';
 import '../theme/app_colors.dart';
+import '../config/api_config.dart';
 import '../models/booking_model.dart';
 import '../services/booking_service.dart';
 import 'package:shimmer/shimmer.dart';
@@ -62,6 +64,29 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
     }
   }
 
+  String _resolveImageUrl(String? rawUrl) {
+    const fallback = 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200';
+    if (rawUrl == null || rawUrl.trim().isEmpty) return fallback;
+
+    String url = rawUrl.trim();
+
+    // Convert relative paths to absolute URLs
+    if (url.startsWith('/uploads')) {
+      url = '${ApiConfig.chatSocket}$url';
+    } else if (url.startsWith('uploads/')) {
+      url = '${ApiConfig.chatSocket}/$url';
+    } else if (!url.startsWith('http')) {
+      url = '${ApiConfig.chatSocket}/${url.replaceFirst(RegExp(r'^/+'), '')}';
+    }
+
+    // For web, use proxy to handle CORS
+    if (kIsWeb && url.startsWith('http')) {
+      return '${ApiConfig.chatSocket}/proxy-image?url=${Uri.encodeComponent(url)}';
+    }
+
+    return url;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,9 +137,11 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
         ? _booking.package?.title ?? "Public Tour"
         : _booking.package?.title ?? "Private Tour";
 
-    final imageUrl = _booking is PublicTourBooking
+    final rawImageUrl = _booking is PublicTourBooking
         ? _booking.package?.coverImage ?? ""
         : _booking.package?.coverImage ?? "";
+
+    final imageUrl = _resolveImageUrl(rawImageUrl.isNotEmpty ? rawImageUrl : null);
 
     final date = _booking.departureDate != null
         ? "${_booking.departureDate!.day}/${_booking.departureDate!.month}/${_booking.departureDate!.year}"
