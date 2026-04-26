@@ -1,9 +1,11 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
+import '../config/api_config.dart';
 import '../widgets/common_button.dart';
 import 'customize_itinerary_screen.dart';
 import 'select_start_date_screen.dart';
@@ -488,6 +490,29 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
     );
   }
 
+  String _resolveImageUrl(String? rawUrl) {
+    const fallback = 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200';
+    if (rawUrl == null || rawUrl.trim().isEmpty) return fallback;
+
+    String url = rawUrl.trim();
+
+    // Convert relative paths to absolute URLs
+    if (url.startsWith('/uploads')) {
+      url = '${ApiConfig.chatSocket}$url';
+    } else if (url.startsWith('uploads/')) {
+      url = '${ApiConfig.chatSocket}/$url';
+    } else if (!url.startsWith('http')) {
+      url = '${ApiConfig.chatSocket}/${url.replaceFirst(RegExp(r'^/+'), '')}';
+    }
+
+    // For web, use proxy to handle CORS
+    if (kIsWeb && url.startsWith('http')) {
+      return '${ApiConfig.chatSocket}/proxy-image?url=${Uri.encodeComponent(url)}';
+    }
+
+    return url;
+  }
+
   String _getPackageImageUrl() {
     const fallbackUrl =
         'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200';
@@ -503,10 +528,9 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
       orElse: () => widget.customizeItinerary.media.first,
     );
 
-    // Return media URL if available, otherwise fallback
-    return (imageMedia?.url?.isNotEmpty ?? false)
-        ? imageMedia!.url
-        : fallbackUrl;
+    // Return resolved media URL if available, otherwise fallback
+    final String rawUrl = imageMedia?.url ?? '';
+    return rawUrl.isNotEmpty ? _resolveImageUrl(rawUrl) : fallbackUrl;
   }
 
   Widget _buildHeroSection() {
