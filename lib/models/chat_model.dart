@@ -84,6 +84,7 @@ class Message {
   final String chatRoomId;
   final String senderId;
   final bool isRead;
+  final bool isAiGenerated;
   final DateTime createdAt;
 
   Message({
@@ -94,6 +95,7 @@ class Message {
     required this.chatRoomId,
     required this.senderId,
     required this.isRead,
+    required this.isAiGenerated,
     required this.createdAt,
   });
 
@@ -129,6 +131,7 @@ class Message {
       chatRoomId: json['chatRoomId'] ?? json['roomId'] ?? '',
       senderId: extractSenderId,
       isRead: json['isRead'] ?? false,
+      isAiGenerated: json['isAiGenerated'] ?? false,
       createdAt: parsedDate,
     );
   }

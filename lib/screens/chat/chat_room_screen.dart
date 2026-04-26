@@ -24,6 +24,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
   List<Message> _messages = [];
   bool _isLoading = true;
+  bool _aiTyping = false;
   String? _currentUserId;
 
   @override
@@ -35,7 +36,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   Future<void> _initChat() async {
     // 1. Get current user ID to distinguish sender/receiver bubbles
     final user = await TokenService.getUser();
-    _currentUserId = user?.id?.toString();
+    _currentUserId = user?.id.toString();
 
     // 2. Fetch history via REST
     try {
@@ -62,9 +63,19 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           if (mounted) {
             setState(() {
               _messages.add(message);
+              _aiTyping = false;
             });
             _scrollToBottom();
           }
+        }
+      };
+
+      _chatService.onAiTyping = (roomId, isTyping) {
+        if (roomId == widget.room.id && mounted) {
+          setState(() {
+            _aiTyping = isTyping;
+          });
+          if (isTyping) _scrollToBottom();
         }
       };
     } catch (e) {
@@ -103,6 +114,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         chatRoomId: widget.room.id,
         senderId: _currentUserId ?? '',
         isRead: false,
+        isAiGenerated: false,
         createdAt: DateTime.now(),
       ));
     });
@@ -146,13 +158,38 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   }
 
   Widget _buildMessageList() {
+    final int extra = _aiTyping ? 1 : 0;
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.all(16),
-      itemCount: _messages.length,
+      itemCount: _messages.length + extra,
       itemBuilder: (context, index) {
+        if (_aiTyping && index == _messages.length) {
+          return Padding(
+            padding: const EdgeInsets.only(left: 40, bottom: 16),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    border: Border.all(color: AppColors.border),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const SizedBox(
+                    height: 14,
+                    width: 42,
+                    child: _TypingDots(),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
         final message = _messages[index];
-        final isMe = message.senderId == _currentUserId;
+        final isMe =
+            message.id.startsWith('temp_') || message.senderId == _currentUserId;
         
         bool showDate = false;
         if (index == 0) {
@@ -175,6 +212,76 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           ],
         );
       },
+    );
+  }
+}
+
+class _TypingDots extends StatefulWidget {
+  const _TypingDots();
+
+  @override
+  State<_TypingDots> createState() => _TypingDotsState();
+}
+
+class _TypingDotsState extends State<_TypingDots>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        final t = _controller.value;
+        double o1 = (t < 0.33) ? 1 : 0.3;
+        double o2 = (t >= 0.33 && t < 0.66) ? 1 : 0.3;
+        double o3 = (t >= 0.66) ? 1 : 0.3;
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Opacity(
+              opacity: o1,
+              child: _dot(),
+            ),
+            const SizedBox(width: 6),
+            Opacity(
+              opacity: o2,
+              child: _dot(),
+            ),
+            const SizedBox(width: 6),
+            Opacity(
+              opacity: o3,
+              child: _dot(),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _dot() {
+    return Container(
+      width: 6,
+      height: 6,
+      decoration: BoxDecoration(
+        color: AppColors.textSecondary.withOpacity(0.6),
+        shape: BoxShape.circle,
+      ),
     );
   }
 }

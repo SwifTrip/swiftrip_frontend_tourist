@@ -9,6 +9,7 @@ import 'token_service.dart';
 class ChatService {
   IO.Socket? socket;
   Function(Message)? onMessageReceived;
+  Function(String roomId, bool isTyping)? onAiTyping;
 
   // Initialize Socket Connection and wait for it to be ready
   Future<void> connect() async {
@@ -53,6 +54,19 @@ class ChatService {
           onMessageReceived!(message);
         } catch (e) {
           print('Error parsing incoming socket message: $e');
+        }
+      }
+    });
+
+    // Listen for AI typing indicator
+    socket!.on('ai_typing', (data) {
+      if (onAiTyping != null && data != null) {
+        try {
+          final roomId = (data['roomId'] ?? '').toString();
+          final isTyping = data['isTyping'] == true;
+          if (roomId.isNotEmpty) onAiTyping!(roomId, isTyping);
+        } catch (e) {
+          print('Error parsing ai_typing packet: $e');
         }
       }
     });

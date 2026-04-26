@@ -39,6 +39,25 @@ class ChatBubble extends StatelessWidget {
             child: Column(
               crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
+                if (!isMe && message.isAiGenerated) ...[
+                  Container(
+                    margin: const EdgeInsets.only(left: 4, bottom: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: Colors.deepPurple.withOpacity(0.18)),
+                    ),
+                    child: Text(
+                      'AI',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.deepPurple,
+                      ),
+                    ),
+                  ),
+                ],
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
