@@ -50,6 +50,7 @@ class PublicTourBooking {
   final DateTime? arrivalDate;
   final PackageInfo? package;
   final CompanyInfo? company;
+  final List<BookingItinerary>? itineraries;
   final DateTime createdAt;
 
   PublicTourBooking({
@@ -63,6 +64,7 @@ class PublicTourBooking {
     this.arrivalDate,
     this.package,
     this.company,
+    this.itineraries,
     required this.createdAt,
   });
 
@@ -86,6 +88,9 @@ class PublicTourBooking {
       company: json['company'] != null
           ? CompanyInfo.fromJson(json['company'])
           : null,
+      itineraries: (json['itineraries'] as List<dynamic>?)
+          ?.map((i) => BookingItinerary.fromJson(i))
+          .toList(),
       createdAt: DateTime.parse(json['createdAt']),
     );
   }
@@ -108,7 +113,7 @@ class PrivateTourBooking {
   final int duration;
   final CompanyInfo? company;
   final PackageInfo? package;
-  final List<dynamic>? itineraries;
+  final List<BookingItinerary>? itineraries;
   final DateTime createdAt;
 
   PrivateTourBooking({
@@ -142,11 +147,11 @@ class PrivateTourBooking {
           ? DateTime.tryParse(json['endDate'].toString())
           : null,
       departureDate: json['departureDate'] != null
-        ? DateTime.tryParse(json['departureDate'].toString())
-        : null,
+          ? DateTime.tryParse(json['departureDate'].toString())
+          : null,
       arrivalDate: json['arrivalDate'] != null
-        ? DateTime.tryParse(json['arrivalDate'].toString())
-        : null,
+          ? DateTime.tryParse(json['arrivalDate'].toString())
+          : null,
       travelerCount: json['travelerCount'] ?? 1,
       seats: json['seats'] ?? (json['travelerCount'] as int?),
       totalPrice: json['totalPrice']?.toString(),
@@ -155,8 +160,12 @@ class PrivateTourBooking {
       company: json['company'] != null
           ? CompanyInfo.fromJson(json['company'])
           : null,
-      package: json['package'] != null ? PackageInfo.fromJson(json['package']) : null,
-      itineraries: (json['itineraries'] as List<dynamic>?)?.map((i) => i).toList(),
+      package: json['package'] != null
+          ? PackageInfo.fromJson(json['package'])
+          : null,
+      itineraries: (json['itineraries'] as List<dynamic>?)
+          ?.map((i) => BookingItinerary.fromJson(i))
+          .toList(),
       createdAt: DateTime.parse(json['createdAt']),
     );
   }
@@ -196,5 +205,79 @@ class CompanyInfo {
 
   factory CompanyInfo.fromJson(Map<String, dynamic> json) {
     return CompanyInfo(id: json['id'] ?? 0, name: json['name'] ?? '');
+  }
+}
+
+class BookingItinerary {
+  final int id;
+  final int dayNumber;
+  final String title;
+  final String? description;
+  final String? dayType;
+  final List<BookingItineraryItem>? items;
+  final DateTime? actualDate;
+
+  BookingItinerary({
+    required this.id,
+    required this.dayNumber,
+    required this.title,
+    this.description,
+    this.dayType,
+    this.items,
+    this.actualDate,
+  });
+
+  factory BookingItinerary.fromJson(Map<String, dynamic> json) {
+    return BookingItinerary(
+      id: json['id'] ?? 0,
+      dayNumber: json['dayNumber'] ?? 0,
+      title: json['title'] ?? 'Day ${json['dayNumber'] ?? 1}',
+      description: json['description'],
+      dayType: json['dayType'],
+      items: (json['items'] as List<dynamic>?)
+          ?.map((i) => BookingItineraryItem.fromJson(i))
+          .toList(),
+      actualDate: json['actualDate'] != null
+          ? DateTime.tryParse(json['actualDate'].toString())
+          : null,
+    );
+  }
+}
+
+class BookingItineraryItem {
+  final int id;
+  final String name;
+  final String? type;
+  final String? description;
+  final String? startTime;
+  final String? endTime;
+  final int? duration;
+  final String? location;
+  final num? price;
+
+  BookingItineraryItem({
+    required this.id,
+    required this.name,
+    this.type,
+    this.description,
+    this.startTime,
+    this.endTime,
+    this.duration,
+    this.location,
+    this.price,
+  });
+
+  factory BookingItineraryItem.fromJson(Map<String, dynamic> json) {
+    return BookingItineraryItem(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      type: json['type'],
+      description: json['description'],
+      startTime: json['startTime'],
+      endTime: json['endTime'],
+      duration: json['duration'],
+      location: json['location'],
+      price: json['price'],
+    );
   }
 }

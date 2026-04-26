@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:swift_trip_app/models/package_model.dart';
 import '../theme/app_colors.dart';
 import '../widgets/common_button.dart';
-import '../widgets/common_button.dart';
 import '../services/package_service.dart';
 import 'customize_itinerary_screen.dart';
 import 'package:intl/intl.dart';

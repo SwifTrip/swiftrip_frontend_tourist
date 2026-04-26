@@ -791,12 +791,4 @@ class _BounceButtonState extends State<_BounceButton> with SingleTickerProviderS
       child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
     );
   }
-
-  String _formatDate(DateTime date) {
-    const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-    return '${months[date.month - 1]} ${date.day}';
-  }
 }
