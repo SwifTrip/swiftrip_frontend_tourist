@@ -150,6 +150,7 @@ class _PlanTripScreenState extends State<PlanTripScreen> {
               dates: _isPublicTrip && _selectedDate != null
                   ? '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'
                   : '',
+              publicSearchDate: _isPublicTrip ? _selectedDate : null,
               travelers: _travelers,
               isPublic: _isPublicTrip,
               packages: result.data,

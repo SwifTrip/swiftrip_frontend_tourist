@@ -470,7 +470,11 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
                           ? CustomizeItineraryScreen(
                               package: widget.customizeItinerary,
                               isPublic: true,
-                              startDate: widget.fixedStartDate!,
+                              startDate: DateTime(
+                                widget.fixedStartDate!.year,
+                                widget.fixedStartDate!.month,
+                                widget.fixedStartDate!.day,
+                              ),
                               travelers: widget.travelers,
                               scheduleId: widget.publicScheduleId,
                             )

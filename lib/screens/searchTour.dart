@@ -125,6 +125,7 @@ class _SearchTourState extends State<SearchTour> {
                         ? "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
                         : '')
                     : '',
+              publicSearchDate: isPublicTrip ? selectedDate : null,
               travelers: travelers,
               isPublic: isPublicTrip,
               packages: result.data,

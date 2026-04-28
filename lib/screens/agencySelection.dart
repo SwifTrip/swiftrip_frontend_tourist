@@ -14,6 +14,7 @@ import 'package_details_screen.dart';
 class AgencySelection extends StatefulWidget {
   final String destination;
   final String dates;
+  final DateTime? publicSearchDate;
   final int travelers;
   final bool isPublic;
   final List<TourPackageResult> packages;
@@ -24,6 +25,7 @@ class AgencySelection extends StatefulWidget {
     required this.isPublic,
     required this.destination,
     required this.dates,
+    this.publicSearchDate,
     this.travelers = 0,
     this.packages = const [],
     this.pagination,
@@ -35,6 +37,122 @@ class AgencySelection extends StatefulWidget {
 
 class _AgencySelectionState extends State<AgencySelection> {
   String _activeFilter = 'Recommended';
+
+  DateTime? get _effectivePublicSearchDate {
+    if (!widget.isPublic) return null;
+    if (widget.publicSearchDate != null) {
+      return DateTime(
+        widget.publicSearchDate!.year,
+        widget.publicSearchDate!.month,
+        widget.publicSearchDate!.day,
+      );
+    }
+    final raw = widget.dates.trim();
+    if (raw.isEmpty) return null;
+    final parts = raw.split('/');
+    if (parts.length != 3) return null;
+    final d = int.tryParse(parts[0]);
+    final m = int.tryParse(parts[1]);
+    final y = int.tryParse(parts[2]);
+    if (d == null || m == null || y == null) return null;
+    return DateTime(y, m, d);
+  }
+
+  String _dateKeyFromDateTime(DateTime date) {
+    final local = date.toLocal();
+    final y = local.year.toString().padLeft(4, '0');
+    final m = local.month.toString().padLeft(2, '0');
+    final d = local.day.toString().padLeft(2, '0');
+    return '$y-$m-$d';
+  }
+
+  String? _dateKeyFromRaw(String? raw) {
+    if (raw == null || raw.isEmpty) return null;
+    // Prefer literal YYYY-MM-DD from API string to avoid timezone day-shift.
+    final normalized = raw.trim();
+    if (normalized.length >= 10 &&
+        normalized[4] == '-' &&
+        normalized[7] == '-') {
+      return normalized.substring(0, 10);
+    }
+    final parsed = DateTime.tryParse(normalized);
+    if (parsed == null) return null;
+    return _dateKeyFromDateTime(parsed);
+  }
+
+  DateTime? _parseScheduleDateSafely(String? raw) {
+    final key = _dateKeyFromRaw(raw);
+    if (key == null) return null;
+    final parts = key.split('-');
+    if (parts.length != 3) return null;
+    final y = int.tryParse(parts[0]);
+    final m = int.tryParse(parts[1]);
+    final d = int.tryParse(parts[2]);
+    if (y == null || m == null || d == null) return null;
+    return DateTime(y, m, d);
+  }
+
+  Future<Map<String, dynamic>?> _resolvePublicScheduleForPackage(
+    TourPackageResult packageResult,
+  ) async {
+    final selectedDate = _effectivePublicSearchDate;
+    final selectedDateKey = selectedDate != null
+        ? _dateKeyFromDateTime(selectedDate)
+        : null;
+
+    try {
+      final response = await PackageService().getPackageSchedules(
+        packageResult.id.toString(),
+        fromDate: selectedDate != null
+            ? '${selectedDate.year.toString().padLeft(4, '0')}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}'
+            : null,
+        travelers: widget.travelers,
+      );
+
+      if (response['success'] != true || response['data'] is! List) {
+        return null;
+      }
+
+      final schedules = List<Map<String, dynamic>>.from(response['data']);
+      if (schedules.isEmpty) return null;
+
+      // If user selected a date, force exact matching schedule.
+      if (selectedDate != null) {
+        for (final schedule in schedules) {
+          final departureKey = _dateKeyFromRaw(
+            schedule['departureDate']?.toString(),
+          );
+          if (departureKey == null) continue;
+          if (departureKey == selectedDateKey) {
+            return schedule;
+          }
+        }
+        return null;
+      }
+
+      // No date selected: always take earliest upcoming departure.
+      schedules.sort((a, b) {
+        final ad = DateTime.tryParse(a['departureDate']?.toString() ?? '');
+        final bd = DateTime.tryParse(b['departureDate']?.toString() ?? '');
+        if (ad == null && bd == null) return 0;
+        if (ad == null) return 1;
+        if (bd == null) return -1;
+        return ad.compareTo(bd);
+      });
+
+      final firstValid = schedules.firstWhere(
+        (s) => DateTime.tryParse(s['departureDate']?.toString() ?? '') != null,
+        orElse: () => schedules.first,
+      );
+      return firstValid;
+    } catch (_) {
+      // Fallback only when no explicit date is selected.
+      if (selectedDate == null) {
+        return packageResult.nextDeparture;
+      }
+      return null;
+    }
+  }
 
   Color _tagColor(int index) {
     const colors = [
@@ -324,29 +442,35 @@ class _AgencySelectionState extends State<AgencySelection> {
         : 'Choose Dates & Details';
     final pricingUnit = packageIsPublic ? '/ person' : '/ group';
     final priceText = _formatPrice(price, currency);
-    final nextDepartureId = packageIsPublic
-        ? int.tryParse(packageResult.nextDeparture?['id']?.toString() ?? '')
-        : null;
-    final nextDepartureDate = packageIsPublic
-        ? DateTime.tryParse(
-            packageResult.nextDeparture?['departureDate']?.toString() ?? '',
-          )
-        : null;
-
     return _BounceButton(
       onTap: () async {
         final currentContext = context;
-        if (packageIsPublic &&
-            (nextDepartureId == null || nextDepartureDate == null)) {
-          ScaffoldMessenger.of(currentContext).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'This public package has no active departure schedule yet. Please choose another departure.',
-              ),
-              backgroundColor: Colors.orange,
-            ),
+        int? nextDepartureId;
+        DateTime? nextDepartureDate;
+
+        if (packageIsPublic) {
+          final resolvedSchedule = await _resolvePublicScheduleForPackage(
+            packageResult,
           );
-          return;
+          nextDepartureId = int.tryParse(
+            resolvedSchedule?['id']?.toString() ?? '',
+          );
+          nextDepartureDate = _parseScheduleDateSafely(
+            resolvedSchedule?['departureDate']?.toString() ?? '',
+          );
+
+          if (nextDepartureId == null || nextDepartureDate == null) {
+            final message = _effectivePublicSearchDate != null
+                ? 'No departure found on your selected date for this package.'
+                : 'This public package has no active departure schedule yet. Please choose another departure.';
+            ScaffoldMessenger.of(currentContext).showSnackBar(
+              SnackBar(
+                content: Text(message),
+                backgroundColor: Colors.orange,
+              ),
+            );
+            return;
+          }
         }
 
         CustomizeItineraryModel? packageDetails;
