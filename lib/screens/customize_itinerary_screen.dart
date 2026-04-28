@@ -442,6 +442,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
           item: item,
           isFixed: !item.optional,
           isSelected: _selectedOptionalItems[item.id] ?? false,
+          date: widget.startDate.add(Duration(days: _selectedDayIndex)),
         ),
       );
       if (i < items.length - 1) {
@@ -454,16 +455,11 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
 
   num _calculateTotalPrice() {
     num total = widget.package.basePrice;
-    final items = [
-      ..._getActivityItemsForDay(),
-      ..._getAccommodationItemsForDay(),
-      ..._getTransportItemsForDay(),
-      ..._getMealItemsForDay(),
-    ];
-
-    for (final item in items) {
-      if (item.optional && (_selectedOptionalItems[item.id] ?? false)) {
-        total += item.price;
+    for (final day in widget.package.itineraries) {
+      for (final item in day.items) {
+        if (item.optional && (_selectedOptionalItems[item.id] ?? false)) {
+          total += item.price;
+        }
       }
     }
 
@@ -471,25 +467,98 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
   }
 
   String _buildPriceDescription() {
-    final items = [
-      ..._getActivityItemsForDay(),
-      ..._getAccommodationItemsForDay(),
-      ..._getTransportItemsForDay(),
-      ..._getMealItemsForDay(),
-    ];
     num addOnTotal = 0;
 
-    for (final item in items) {
-      if (item.optional && (_selectedOptionalItems[item.id] ?? false)) {
-        addOnTotal += item.price;
+    for (final day in widget.package.itineraries) {
+      for (final item in day.items) {
+        if (item.optional && (_selectedOptionalItems[item.id] ?? false)) {
+          addOnTotal += item.price;
+        }
       }
     }
 
     if (addOnTotal > 0) {
-      return 'Base + Rs$addOnTotal add-ons';
+      return 'Base + ${widget.package.currency} $addOnTotal add-ons';
     } else {
       return 'Base price';
     }
+  }
+
+  List<String> _buildMetaBadges(ItineraryItem item, DateTime date) {
+    final badges = <String>[];
+    if (item.startTime != null && item.startTime!.isNotEmpty) {
+      final end = (item.endTime != null && item.endTime!.isNotEmpty)
+          ? ' - ${item.endTime}'
+          : '';
+      badges.add('${item.startTime}$end');
+    }
+    if (item.duration > 0) {
+      badges.add('${item.duration} min');
+    }
+    if (item.location.isNotEmpty) {
+      badges.add(item.location);
+    }
+    badges.add('${date.day}/${date.month}/${date.year}');
+    return badges;
+  }
+
+  Widget _buildBadgeRow(List<String> badges) {
+    if (badges.isEmpty) return const SizedBox.shrink();
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      children: badges
+          .map(
+            (badge) => Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.border.withOpacity(0.45)),
+              ),
+              child: Text(
+                badge,
+                style: GoogleFonts.plusJakartaSans(
+                  color: AppColors.textSecondary.withOpacity(0.9),
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  Widget _buildDetailLine(
+    String label,
+    String value, {
+    Color? tone,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: RichText(
+        text: TextSpan(
+          style: GoogleFonts.plusJakartaSans(
+            color: AppColors.textSecondary,
+            fontSize: 10,
+            height: 1.3,
+            fontWeight: FontWeight.w500,
+          ),
+          children: [
+            TextSpan(text: '$label: '),
+            TextSpan(
+              text: value,
+              style: GoogleFonts.plusJakartaSans(
+                color: tone ?? AppColors.textPrimary,
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildAccommodationSection(DateTime date) {
@@ -664,42 +733,16 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 12),
+                  _buildBadgeRow(_buildMetaBadges(item, date)),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.background,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today_rounded,
-                              size: 10,
-                              color: AppColors.textSecondary.withOpacity(0.6),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              '${date.day}/${date.month}',
-                              style: TextStyle(
-                                color: AppColors.textSecondary.withOpacity(0.8),
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                       const Spacer(),
                       if (item.price > 0)
                         Text(
                           item.optional
-                              ? '+Rs${item.price}'
-                              : 'Rs${item.price}',
+                              ? '+${widget.package.currency} ${item.price}'
+                              : '${widget.package.currency} ${item.price}',
                           style: GoogleFonts.plusJakartaSans(
                             color: isFixed
                                 ? AppColors.textSecondary
@@ -886,27 +929,31 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 10),
+                  if (item.transportDetails.isNotEmpty) ...[
+                    for (final detail in item.transportDetails) ...[
+                      if (detail.vehicleType.isNotEmpty)
+                        _buildDetailLine(
+                          'Vehicle',
+                          detail.vehicleType,
+                          tone: _transportTone,
+                        ),
+                      if (detail.pickupLocation.isNotEmpty)
+                        _buildDetailLine('Pickup', detail.pickupLocation),
+                      if (detail.dropoffLocation.isNotEmpty)
+                        _buildDetailLine('Drop-off', detail.dropoffLocation),
+                    ],
+                    const SizedBox(height: 10),
+                  ],
+                  _buildBadgeRow(_buildMetaBadges(item, date)),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
-                      Icon(
-                        Icons.calendar_today_outlined,
-                        size: 12,
-                        color: AppColors.textSecondary.withOpacity(0.5),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        '${date.day}/${date.month}/${date.year}',
-                        style: TextStyle(
-                          color: AppColors.textSecondary.withOpacity(0.6),
-                          fontSize: 11,
-                        ),
-                      ),
                       const Spacer(),
                       if (item.price > 0)
                         Text(
                           item.optional
-                              ? '+Rs${item.price}'
-                              : 'Rs${item.price}',
+                              ? '+${widget.package.currency} ${item.price}'
+                              : '${widget.package.currency} ${item.price}',
                           style: GoogleFonts.plusJakartaSans(
                             color: isFixed
                                 ? AppColors.textSecondary
@@ -1172,27 +1219,26 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 10),
+                  if (item.mealDetails.isNotEmpty) ...[
+                    for (final detail in item.mealDetails)
+                      if (detail.cuisine.isNotEmpty)
+                        _buildDetailLine(
+                          '${detail.mealType} Cuisine',
+                          detail.cuisine,
+                          tone: _mealTone,
+                        ),
+                    const SizedBox(height: 10),
+                  ],
+                  _buildBadgeRow(_buildMetaBadges(item, date)),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
-                      Icon(
-                        Icons.calendar_today_outlined,
-                        size: 12,
-                        color: AppColors.textSecondary.withOpacity(0.5),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        '${date.day}/${date.month}/${date.year}',
-                        style: TextStyle(
-                          color: AppColors.textSecondary.withOpacity(0.6),
-                          fontSize: 11,
-                        ),
-                      ),
                       const Spacer(),
                       if (item.price > 0)
                         Text(
                           item.optional
-                              ? '+Rs${item.price}'
-                              : 'Rs${item.price}',
+                              ? '+${widget.package.currency} ${item.price}'
+                              : '${widget.package.currency} ${item.price}',
                           style: GoogleFonts.plusJakartaSans(
                             color: isFixed
                                 ? AppColors.textSecondary
@@ -1225,6 +1271,7 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
     required ItineraryItem item,
     required bool isFixed,
     required bool isSelected,
+    required DateTime date,
   }) {
     final isIncluded = isFixed && item.optional == false;
 
@@ -1333,7 +1380,9 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                     if (!isFixed) ...[
                       const SizedBox(height: 6),
                       Text(
-                        item.price > 0 ? '+Rs${item.price}' : 'Free Activity',
+                        item.price > 0
+                            ? '+${widget.package.currency} ${item.price}'
+                            : 'Free Activity',
                         style: GoogleFonts.plusJakartaSans(
                           color: isSelected
                               ? _activityTone
@@ -1343,6 +1392,8 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
                         ),
                       ),
                     ],
+                    const SizedBox(height: 8),
+                    _buildBadgeRow(_buildMetaBadges(item, date)),
                   ],
                 ),
               ),
