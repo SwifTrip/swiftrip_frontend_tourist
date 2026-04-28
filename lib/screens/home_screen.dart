@@ -5,8 +5,6 @@ import '../theme/app_colors.dart';
 import '../config/api_config.dart';
 import '../widgets/common_button.dart';
 import '../widgets/custom_bottom_nav.dart';
-import 'fixed_packages_screen.dart';
-import 'guide_list_screen.dart';
 import 'plan_trip_screen.dart';
 import 'signin.dart';
 import 'profile_screen.dart';
@@ -175,108 +173,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _showSearchModal(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          height: MediaQuery.of(context).size.height * 0.85,
-          decoration: BoxDecoration(
-            color: AppColors.background.withValues(alpha: 0.9),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-          ),
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.border,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-              Text(
-                'Where to?',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: AppColors.accent.withValues(alpha: 0.3),
-                  ),
-                ),
-                child: const TextField(
-                  autofocus: true,
-                  decoration: InputDecoration(
-                    hintText: 'Search destinations...',
-                    border: InputBorder.none,
-                    icon: Icon(Icons.search, color: AppColors.accent),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-              Text(
-                'Popular Categories',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: [
-                  _buildSearchChip('Mountains'),
-                  _buildSearchChip('Historical'),
-                  _buildSearchChip('Family'),
-                  _buildSearchChip('Adventure'),
-                  _buildSearchChip('Cultural'),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSearchChip(String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          color: AppColors.textPrimary,
-          fontSize: 13,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-
   Future<void> _fetchTrendingPackages() async {
     setState(() => _isLoadingPackages = true);
     try {
@@ -361,9 +257,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     if (index == 1) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Social events are coming soon.')),
-      );
+      _openAiPlannerSheet();
       return;
     }
 
@@ -785,8 +679,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       child: const CircleAvatar(
                         radius: 18,
-                        backgroundImage: NetworkImage(
-                          'https://lh3.googleusercontent.com/aida-public/AB6AXuCzKIJritHt8R1Ry9INksc5nKG9a6qEWeLEHUV8L022NPnTwNpdhB6pxn8q3F_EWRswUVFyGeODfMqoty990Vs0sKlmbyPUgD4FjoETAl4KFRhH57jwlu8VIcQEmg3DV9ZpUFLAv3oKs03QhINDVBHCm63GS1XjHtfUy_sP8rXQlNaONgvqTBqszhO3Zbg9ytU9DmcPQuF5mkeitYRiWAkdJ7abAkozEnYXxF3sMmbmi1W_7kcTPmgfMTvkyxgFFBe1kM0MCMiygCwq',
+                        backgroundColor: AppColors.surface,
+                        child: Icon(
+                          Icons.face_rounded,
+                          color: AppColors.textPrimary,
+                          size: 20,
                         ),
                       ),
                     ),
@@ -857,113 +754,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         isDark: isDark,
                       ),
                       const Spacer(),
-                      _BounceButton(
-                        onTap: _openAiPlannerSheet,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: AppColors.premiumActionGradient,
-                            ),
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.auto_awesome_rounded,
-                                size: 14,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                'AI Plan',
-                                style: GoogleFonts.plusJakartaSans(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ],
               ),
-            ),
-          ),
-
-          // Search + quick AI
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => _showSearchModal(context),
-                    child: Container(
-                      height: 56,
-                      decoration: BoxDecoration(
-                        color: surfaceColor,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: borderColor),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(
-                              alpha: isDark ? 0.16 : 0.05,
-                            ),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          const SizedBox(width: 16),
-                          Icon(Icons.search, color: mutedColor),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'Search destinations, people, stories...',
-                              style: GoogleFonts.plusJakartaSans(
-                                color: mutedColor,
-                                fontSize: 14,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                _BounceButton(
-                  onTap: () => _openAiPlannerSheet(
-                    initialPrompt:
-                        '3-day budget-friendly itinerary near mountains',
-                  ),
-                  child: Container(
-                    height: 56,
-                    width: 56,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: AppColors.premiumActionGradient,
-                      ),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: const Icon(
-                      Icons.auto_awesome_rounded,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
             ),
           ),
 
@@ -979,14 +773,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
                     color: headlineColor,
-                  ),
-                ),
-                Text(
-                  'Share yours',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primaryOrange,
                   ),
                 ),
               ],
@@ -1080,61 +866,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-            ),
-          ),
-
-          // Categories
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 18, 16, 6),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildCategoryItem(
-                  icon: Icons.edit_note,
-                  label: 'Custom Tour',
-                  accentColor: _accentForIndex(0, isDark),
-                  isActive: false,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            const PlanTripScreen(initialIsPublic: false),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(width: 12),
-                _buildCategoryItem(
-                  icon: Icons.explore_outlined,
-                  label: 'Fixed Packages',
-                  accentColor: _accentForIndex(3, isDark),
-                  isActive: false,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const FixedPackagesScreen(),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(width: 12),
-                _buildCategoryItem(
-                  icon: Icons.person_pin_circle_outlined,
-                  label: 'Hire a Guide',
-                  accentColor: _accentForIndex(4, isDark),
-                  isActive: false,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const GuideListScreen(),
-                      ),
-                    );
-                  },
-                ),
-              ],
             ),
           ),
 
@@ -1586,68 +1317,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
-
-  Widget _buildCategoryItem({
-    required IconData icon,
-    required String label,
-    required Color accentColor,
-    required bool isActive,
-    VoidCallback? onTap,
-  }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Expanded(
-      child: AspectRatio(
-        aspectRatio: 1,
-        child: _BounceButton(
-          onTap: onTap,
-          child: Container(
-            decoration: BoxDecoration(
-              color: isActive
-                  ? accentColor
-                  : accentColor.withValues(alpha: isDark ? 0.16 : 0.1),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isActive
-                    ? accentColor
-                    : accentColor.withValues(alpha: isDark ? 0.4 : 0.24),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 2,
-                  offset: const Offset(0, 1),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  icon,
-                  size: 32,
-                  color: isActive ? Colors.white : accentColor,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  label,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: isActive
-                        ? Colors.white
-                        : (isDark ? Colors.white : AppColors.textPrimary),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
+  
   Widget _buildTrendingIndicators(bool isDark) {
     if (_isLoadingPackages || _trendingPackages.length <= 1) {
       return const SizedBox.shrink();

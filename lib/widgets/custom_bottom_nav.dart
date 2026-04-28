@@ -37,7 +37,7 @@ class CustomBottomNav extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildNavItem(Icons.explore_outlined, 'Explore', 0),
-          _buildNavItem(Icons.event_outlined, 'Events', 1),
+          _buildNavItem(Icons.event_outlined, 'Smart Plan', 1),
           _buildCenterButton(),
           _buildNavItem(Icons.chat_bubble_outline, 'Chats', 3),
           _buildNavItem(Icons.card_travel, 'Trips', 4),
@@ -74,7 +74,7 @@ class CustomBottomNav extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'AI Planner',
+            'Make Tour',
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
