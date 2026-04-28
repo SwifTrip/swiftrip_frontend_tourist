@@ -2,13 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../theme/app_colors.dart';
 import '../../../models/chat_model.dart';
+import '../../../config/api_config.dart';
 import '../chat_room_screen.dart';
 
 class ChatListCard extends StatelessWidget {
   final ChatRoom room;
+  final String? fallbackTourImageUrl;
   final VoidCallback onReturn;
 
-  const ChatListCard({super.key, required this.room, required this.onReturn});
+  const ChatListCard({
+    super.key,
+    required this.room,
+    this.fallbackTourImageUrl,
+    required this.onReturn,
+  });
+
+  String _resolvePackageImageUrl(String? rawUrl) {
+    if (rawUrl == null || rawUrl.trim().isEmpty) {
+      return '';
+    }
+
+    String url = rawUrl.trim();
+    if (url.startsWith('/uploads')) {
+      url = '${ApiConfig.chatSocket}$url';
+    } else if (url.startsWith('uploads/')) {
+      url = '${ApiConfig.chatSocket}/$url';
+    } else if (!url.startsWith('http')) {
+      url = '${ApiConfig.chatSocket}/${url.replaceFirst(RegExp(r'^/+'), '')}';
+    }
+
+    if (url.contains('amazonaws.com') || url.contains('.s3')) {
+      return '${ApiConfig.chatSocket}/proxy-image?url=${Uri.encodeComponent(url)}';
+    }
+
+    return url;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,17 +73,9 @@ class ChatListCard extends StatelessWidget {
         child: Row(
           children: [
             // Tour Image Thumbnail
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: AppColors.border,
-                borderRadius: BorderRadius.circular(12),
-                image: const DecorationImage(
-                  image: NetworkImage('https://lh3.googleusercontent.com/aida-public/AB6AXuDLs7lfb9VOU5yniZsEzrmydmGdfJvAgsKbVVu0EFpJySdRgVltuTSv4Osn5qClGELA5Sqawqe0yobsYgDwQFf9T56TmGaX57zI10vz3xWdy93ExDpTv6T5PvKK0tv4ieSqCNrTaWgY0pU_y3RCRyrgdoW21LVFL56CKyCfLgYJk6SgzSdVJtedhjbe_zMDAwx0VZkENocAoyLgrQTpG2Xp3tsPN22QTk67wEhMFFCOc4TmLPEqWgf-SlQzIZYFu589baYMOlXeeknj'), // Sample Image
-                  fit: BoxFit.cover,
-                ),
-              ),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: _buildTourImage(),
             ),
             const SizedBox(width: 16),
             // Text Details
@@ -120,6 +140,40 @@ class ChatListCard extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTourImage() {
+    final imageUrl =
+        _resolvePackageImageUrl(room.tourImageUrl ?? fallbackTourImageUrl);
+    if (imageUrl.isEmpty) {
+      return Container(
+        width: 80,
+        height: 80,
+        color: AppColors.border,
+        child: const Icon(
+          Icons.landscape_outlined,
+          color: AppColors.textSecondary,
+          size: 28,
+        ),
+      );
+    }
+
+    return Image.network(
+      imageUrl,
+      width: 80,
+      height: 80,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) => Container(
+        width: 80,
+        height: 80,
+        color: AppColors.border,
+        child: const Icon(
+          Icons.broken_image_outlined,
+          color: AppColors.textSecondary,
+          size: 28,
         ),
       ),
     );

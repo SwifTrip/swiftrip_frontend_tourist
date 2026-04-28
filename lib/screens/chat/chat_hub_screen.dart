@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../theme/app_colors.dart';
 import '../../services/chat_service.dart';
+import '../../services/booking_service.dart';
 import '../../models/chat_model.dart';
+import '../../models/booking_model.dart';
 import 'widgets/chat_empty_state.dart';
 import 'widgets/chat_list_card.dart';
 
@@ -16,9 +18,11 @@ class ChatHubScreen extends StatefulWidget {
 
 class _ChatHubScreenState extends State<ChatHubScreen> {
   final ChatService _chatService = ChatService();
+  final BookingService _bookingService = BookingService();
   bool _isLoading = true;
   String? _error;
   List<ChatRoom> _allRooms = [];
+  Map<String, String> _bookingImageById = {};
   String _activeTab = 'ACTIVE';
 
   @override
@@ -33,10 +37,40 @@ class _ChatHubScreenState extends State<ChatHubScreen> {
       _error = null;
     });
     try {
-      final rooms = await _chatService.getRooms();
+      final roomsFuture = _chatService.getRooms();
+      final ongoingFuture = _bookingService.getUserBookings(when: 'ONGOING');
+      final upcomingFuture = _bookingService.getUserBookings(when: 'UPCOMING');
+
+      final rooms = await roomsFuture;
+      final ongoing = await ongoingFuture;
+      final upcoming = await upcomingFuture;
+
+      final bookingImageById = <String, String>{};
+
+      void addFromResponse(BookingsResponse? response) {
+        if (response == null || !response.success) return;
+
+        for (final booking in response.data.publicTours) {
+          final image = booking.package?.coverImage?.trim();
+          if (image != null && image.isNotEmpty) {
+            bookingImageById[booking.id.toString()] = image;
+          }
+        }
+        for (final booking in response.data.privateTours) {
+          final image = booking.package?.coverImage?.trim();
+          if (image != null && image.isNotEmpty) {
+            bookingImageById[booking.id.toString()] = image;
+          }
+        }
+      }
+
+      addFromResponse(ongoing);
+      addFromResponse(upcoming);
+
       if (mounted) {
         setState(() {
           _allRooms = rooms;
+          _bookingImageById = bookingImageById;
           _isLoading = false;
         });
       }
@@ -190,8 +224,12 @@ class _ChatHubScreenState extends State<ChatHubScreen> {
         padding: const EdgeInsets.only(bottom: 100, top: 8),
         itemCount: filteredRooms.length,
         itemBuilder: (context, index) {
+          final room = filteredRooms[index];
           return ChatListCard(
-            room: filteredRooms[index],
+            room: room,
+            fallbackTourImageUrl: room.bookingId != null
+                ? _bookingImageById[room.bookingId!]
+                : null,
             onReturn: _fetchRooms,
           );
         },
