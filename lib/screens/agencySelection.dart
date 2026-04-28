@@ -116,7 +116,7 @@ class _AgencySelectionState extends State<AgencySelection> {
       final schedules = List<Map<String, dynamic>>.from(response['data']);
       if (schedules.isEmpty) return null;
 
-      // If user selected a date, force exact matching schedule.
+      // If user selected a date, prefer exact matching schedule.
       if (selectedDate != null) {
         for (final schedule in schedules) {
           final departureKey = _dateKeyFromRaw(
@@ -127,7 +127,7 @@ class _AgencySelectionState extends State<AgencySelection> {
             return schedule;
           }
         }
-        return null;
+        // No exact match — fall back to the nearest upcoming departure.
       }
 
       // No date selected: always take earliest upcoming departure.

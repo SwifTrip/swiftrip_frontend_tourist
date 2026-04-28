@@ -495,7 +495,8 @@ class _PackageDetailsScreenState extends State<PackageDetailsScreen> {
   }
 
   String _resolveImageUrl(String? rawUrl) {
-    const fallback = 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200';
+    const fallback =
+        'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200';
     if (rawUrl == null || rawUrl.trim().isEmpty) return fallback;
 
     String url = rawUrl.trim();
