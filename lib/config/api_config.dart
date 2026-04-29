@@ -2,7 +2,7 @@ class ApiConfig {
   // Base URL for the API
   // For Chrome/Web use localhost
   // For Android Emulator use 10.0.2.2
-  static const String baseUrl = 'http://localhost:3000/api';
+  static const String baseUrl = 'http://13.51.47.248/api';
 
   // Auth Endpoints
   static const String register = '$baseUrl/register';
@@ -40,7 +40,7 @@ class ApiConfig {
   static const String processPayment = '$baseUrl/tourist/payment/process';
 
   // Chat Endpoints
-  static const String chatSocket = 'http://localhost:3000'; // Socket Server URL
+  static const String chatSocket = 'http://13.51.47.248'; // Socket Server URL
   static const String myChatRooms = '$baseUrl/chat/rooms';
   static String chatMessages(String roomId) =>
       '$baseUrl/chat/rooms/$roomId/messages';
