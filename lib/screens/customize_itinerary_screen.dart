@@ -486,12 +486,6 @@ class _CustomizeItineraryScreenState extends State<CustomizeItineraryScreen> {
 
   List<String> _buildMetaBadges(ItineraryItem item, DateTime date) {
     final badges = <String>[];
-    if (item.startTime != null && item.startTime!.isNotEmpty) {
-      final end = (item.endTime != null && item.endTime!.isNotEmpty)
-          ? ' - ${item.endTime}'
-          : '';
-      badges.add('${item.startTime}$end');
-    }
     if (item.duration > 0) {
       badges.add('${item.duration} min');
     }

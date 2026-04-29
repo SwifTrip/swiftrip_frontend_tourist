@@ -143,8 +143,8 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        AppColors.primaryEmerald,
-                        AppColors.primaryEmerald.withOpacity(0.7),
+                        AppColors.primaryOrange,
+                        AppColors.primaryOrange.withOpacity(0.7),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -152,7 +152,7 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primaryEmerald.withOpacity(0.35),
+                        color: AppColors.primaryOrange.withOpacity(0.35),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
@@ -195,7 +195,7 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
                       (route) => false,
                     );
                   },
-                  gradient: const [AppColors.primaryEmerald, Color(0xFF0EA371)],
+                  gradient: const [AppColors.primaryOrange, Color(0xFFF5691B)],
                   borderRadius: 16,
                   height: 52,
                 ),
@@ -370,7 +370,7 @@ class _StripePaymentScreenState extends State<StripePaymentScreen>
           _buildField(
             controller: _nameCtrl,
             label: 'Cardholder Name',
-            hint: 'John Smith',
+            hint: 'Ali',
             icon: Icons.person_outline_rounded,
             keyboardType: TextInputType.name,
             validator: (v) =>
