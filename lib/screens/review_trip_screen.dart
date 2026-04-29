@@ -148,8 +148,8 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
               children: [
                 _buildTripSummaryCard(),
                 if (widget.isPublic) ...[
-                  const SizedBox(height: 16),
-                  _buildPublicSeatStatusCard(),
+                  // const SizedBox(height: 16),
+                  // _buildPublicSeatStatusCard(),
                 ],
                 const SizedBox(height: 32),
                 _buildItineraryHeader(),
@@ -158,34 +158,6 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                 const SizedBox(height: 32),
                 _buildPriceBreakdown(),
                 const SizedBox(height: 24),
-                const Center(
-                  child: Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(text: 'By proceeding, you agree to our '),
-                        TextSpan(
-                          text: 'Terms of Service',
-                          style: TextStyle(
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                        TextSpan(text: ' and '),
-                        TextSpan(
-                          text: 'Cancellation Policy',
-                          style: TextStyle(
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                        TextSpan(text: '.'),
-                      ],
-                    ),
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 10,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
                 const SizedBox(height: 150), // Spacing for footer
               ],
             ),
@@ -370,26 +342,6 @@ class _ReviewTripScreenState extends State<ReviewTripScreen> {
                 'Total Investment',
                 '${widget.package.currency} $_totalAmount',
                 isTotal: true,
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  const Icon(
-                    Icons.verified,
-                    color: AppColors.primaryEmerald,
-                    size: 14,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Inclusive of all service taxes',
-                    style: GoogleFonts.plusJakartaSans(
-                      color: AppColors.primaryEmerald,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
               ),
             ],
           ),
